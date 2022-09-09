@@ -7,33 +7,115 @@
     Style="{StaticResource PageStyle}"
     mc:Ignorable="d">
 
-    <Pivot HorizontalAlignment="Center" Height="400" Width="500" FontSize="25" FontFamily="Cascadia Code SemiBold" >
-        <PivotItem Header="Авторизация" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0, 20, 0, 0">
-            <GroupItem>
-                <StackPanel Height="200" Width="250">
-                    <TextBox Header="Логин" x:Name="LoginLog" PlaceholderText="Логин" Margin="0,0,0,10" FontFamily="Cascadia Code SemiBold" Text="{x:Bind ViewModel.LoginLog, Mode=TwoWay}"/>
-                    <PasswordBox Header="Пароль" x:Name="PasswordLog" PlaceholderText="Пароль" Margin="0,0,0,10" FontFamily="Cascadia Code SemiBold" Password="{x:Bind ViewModel.PasswordLog, Mode=TwoWay}"/>
-                    <Button x:Name="LoginButton" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Войти" Margin="15,0,0,0" FontFamily="Cascadia Code SemiBold" Height="35" Width="100" Command="{x:Bind ViewModel.LogButton, Mode=OneWay}"/>
-                    <CheckBox Margin="15,0,0,0" Content="Запомнить не логин и пароль"/>
+    <StackPanel
+        Width="400"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        BorderBrush="{ThemeResource SystemAccentColorLight1}"
+        BorderThickness="1"
+        CornerRadius="15">
+
+        <Pivot Height="400" Style="{StaticResource CustomPivotStyle}">
+
+            <PivotItem Header="Авторизация">
+
+                <StackPanel
+                    Width="300"
+                    Padding="20"
+                    Spacing="20">
+
+                    <TextBox
+                        FontFamily="Cascadia Code SemiBold"
+                        Header="Логин"
+                        PlaceholderText="Логин"
+                        Text="{x:Bind ViewModel.LoginLog, Mode=TwoWay}" />
+
+                    <PasswordBox
+                        FontFamily="Cascadia Code SemiBold"
+                        Header="Пароль"
+                        Password="{x:Bind ViewModel.PasswordLog, Mode=TwoWay}"
+                        PlaceholderText="Пароль" />
+
+                    <Button
+                        Width="200"
+                        Height="50"
+                        HorizontalAlignment="Center"
+                        Command="{x:Bind ViewModel.LogButton, Mode=OneWay}"
+                        Content="Войти"
+                        FontFamily="Cascadia Code SemiBold" />
+
+                    <CheckBox HorizontalAlignment="Center" Content="Запомнить не логин и пароль" />
+
                 </StackPanel>
-            </GroupItem>
-        </PivotItem>
-        <PivotItem Header="Регистрация" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Grid Width="560" Margin="0,-150,0,-150">
-                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,0,0,0" Width="200">
-                    <TextBox Header="Логин" x:Name="LoginReg" Margin="0,0,0,10" FontFamily="Cascadia Code SemiBold" Text="{x:Bind ViewModel.LoginReg, Mode=TwoWay}"/>
-                    <PasswordBox Header="Пароль" x:Name="PasswordReg"  Margin="0,0,0,10" FontFamily="Cascadia Code SemiBold" Password="{x:Bind ViewModel.PasswordReg, Mode=TwoWay}"/>
-                    <TextBox Header="Номер телефона" x:Name="PhoneNumberReg" Margin="0,0,0,10" FontFamily="Cascadia Code SemiBold" Text="{x:Bind ViewModel.PhoneNumberReg, Mode=TwoWay}"/>
+
+            </PivotItem>
+
+            <PivotItem Header="Регистрация">
+
+                <StackPanel>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel
+                            Width="300"
+                            Padding="20"
+                            Spacing="20">
+
+                            <TextBox
+                                FontFamily="Cascadia Code SemiBold"
+                                Header="Логин"
+                                PlaceholderText="Логин"
+                                Text="{x:Bind ViewModel.LoginLog, Mode=TwoWay}" />
+
+                            <TextBox
+                                FontFamily="Cascadia Code SemiBold"
+                                Header="Фамилия"
+                                Text="{x:Bind ViewModel.SurnameReg, Mode=TwoWay}" />
+
+                            <TextBox
+                                FontFamily="Cascadia Code SemiBold"
+                                Header="Номер телефона"
+                                Text="{x:Bind ViewModel.PhoneNumberReg, Mode=TwoWay}" />
+
+                        </StackPanel>
+
+                        <StackPanel
+                            Grid.Column="1"
+                            Padding="20"
+                            Spacing="20">
+
+                            <PasswordBox
+                                FontFamily="Cascadia Code SemiBold"
+                                Header="Пароль"
+                                Password="{x:Bind ViewModel.PasswordLog, Mode=TwoWay}"
+                                PlaceholderText="Пароль" />
+
+                            <TextBox
+                                FontFamily="Cascadia Code SemiBold"
+                                Header="Имя"
+                                Text="{x:Bind ViewModel.NameReg, Mode=TwoWay}" />
+
+                            <TextBox
+                                FontFamily="Cascadia Code SemiBold"
+                                Header="Email"
+                                Text="{x:Bind ViewModel.EmailReg, Mode=TwoWay}" />
+
+                        </StackPanel>
+                    </Grid>
+
+                    <Button
+                        Width="200"
+                        Height="50"
+                        HorizontalAlignment="Center"
+                        Command="{x:Bind ViewModel.RegButton, Mode=OneWay}"
+                        Content="Войти"
+                        FontFamily="Cascadia Code SemiBold" />
                 </StackPanel>
-                <Grid VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,85,55">
-                    <Button x:Name="RegButton" Content="Зарегистрироваться"  FontSize="25" Margin="0,0,0,0" FontFamily="Cascadia Code SemiBold" Command="{x:Bind ViewModel.RegButton, Mode=OneWay}"/>
-                </Grid>
-                <StackPanel  HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,90,0" Width="200">
-                    <TextBox Header="Имя" x:Name="NameReg" Margin="0,0,0,10" FontFamily="Cascadia Code SemiBold" Text="{x:Bind ViewModel.NameReg, Mode=TwoWay}"/>
-                    <TextBox Header="Фамилия" x:Name="SurnameReg"  Margin="0,0,0,10" FontFamily="Cascadia Code SemiBold" Text="{x:Bind ViewModel.SurnameReg, Mode=TwoWay}"/>
-                    <TextBox Header="Email" x:Name="EmailReg" Margin="0,0,0,10" FontFamily="Cascadia Code SemiBold" Text="{x:Bind ViewModel.EmailReg, Mode=TwoWay}"/>
-                </StackPanel>
-            </Grid>
-        </PivotItem>
-    </Pivot>
+            </PivotItem>
+        </Pivot>
+    </StackPanel>
 </Page>
