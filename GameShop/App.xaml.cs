@@ -1,8 +1,9 @@
-﻿using System;
-
-using GameShop.Services;
-
+﻿using GameShop.Services;
+using System;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.Core;
+using Windows.UI;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 
 namespace GameShop
@@ -27,10 +28,20 @@ namespace GameShop
 
         protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
+            CustomizeTitleBar();
+
             if (!args.PrelaunchActivated)
             {
                 await ActivationService.ActivateAsync(args);
             }
+        }
+
+        private void CustomizeTitleBar()
+        {
+            ApplicationViewTitleBar formattableTitleBar = ApplicationView.GetForCurrentView().TitleBar;
+            formattableTitleBar.ButtonBackgroundColor = Colors.Transparent;
+            CoreApplicationViewTitleBar coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
+            coreTitleBar.ExtendViewIntoTitleBar = true;
         }
 
         protected override async void OnActivated(IActivatedEventArgs args)
