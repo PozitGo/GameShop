@@ -8,12 +8,20 @@ using Windows.UI.Xaml;
 
 namespace GameShop.Activation
 {
+    /// <summary>
+    /// Проверяет авторизирован ли пользователь
+    /// </summary>
     internal class LoginActivationHandler : ActivationHandler
     {
-        public override bool CanHandle(object args)
+       /// <summary>
+       /// Вернёт bool, true если не авторизирован, false если авторизирован 
+       /// </summary>
+       /// <param name="args"></param>
+       /// <returns></returns>
+       public override bool CanHandle(object args)
         {
-            //Если авторизован
-            return true;
+            //Тут проверяем авторизацию пользователя
+            return false;
         }
 
         public override Task HandleAsync(object args)
