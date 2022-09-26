@@ -1,4 +1,5 @@
-﻿using GameShop.Views;
+﻿using GameShop.Services;
+using GameShop.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,8 +21,7 @@ namespace GameShop.Activation
        /// <returns></returns>
        public override bool CanHandle(object args)
         {
-            //Тут проверяем авторизацию пользователя
-            return false;
+            return UserSessionService.IsUserAuth();
         }
 
         public override Task HandleAsync(object args)

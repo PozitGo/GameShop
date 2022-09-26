@@ -3,8 +3,8 @@ using System.Diagnostics;
 using System.Windows.Input;
 using GameShop.Activation;
 using GameShop.DataBase;
-using GameShop.File;
 using GameShop.Helpers;
+using GameShop.Services;
 using GameShop.Views;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
@@ -25,17 +25,20 @@ namespace GameShop.ViewModels
             set => SetProperty(ref _AuthBar, value);
         }
 
+        private bool _AccountIsSave;
+
+        public bool AccountIsSave
+        {
+            get => _AccountIsSave; 
+            set => SetProperty(ref _AccountIsSave, value);
+        }
+
+
         public LoginPViewModel()
         {
             RegButton = new RelayCommand(RegButtonClick);
             LogButton = new RelayCommand(LogButtonClick);
-            SaveCheckBox = new RelayCommand(SaveCheckBoxClick);
             AuthBar = new AuthInfoBar();
-        }
-
-        private async void SaveCheckBoxClick()
-        {
-            LoginActivationHandler loginhandler = new LoginActivationHandler();
         }
 
         private void RegButtonClick()
@@ -47,37 +50,42 @@ namespace GameShop.ViewModels
             }
         }
         
-        private async void LogButtonClick()
+        private void LogButtonClick()
         {
-            //if(DataBaseAuthorization.CheckSpace(LoginLog) != true)
-            //{
-            //    if (DataBaseAuthorization.CheckSpace(PasswordLog) != true)
-            //    {
-            //        if (DataBaseAuthorization.LogUser(LoginLog, PasswordLog, AuthBar))
-            //        {
-            //           // FileInputandOutput.LoginCheck(true);
-            //            Window.Current.Content = new ShellPage();
+            if (DataBaseAuthorization.CheckSpace(LoginLog) != true)
+            {
+                if (DataBaseAuthorization.CheckSpace(PasswordLog) != true)
+                {
+                    if (DataBaseAuthorization.LogUser(LoginLog, PasswordLog, AuthBar))
+                    {
+                        if(AccountIsSave)
+                        {
+                            UserSessionService.SaveUserSession(LoginLog, PasswordLog);
+                        }
+                        
+                        Window.Current.Content = new ShellPage();
+                    }
+                }
+                else
+                {
+                    if(AuthBar != null)
+                    AuthBar.Wrong();
+                }
 
-            //        }
-            //    }
-            //    else
-            //    {
-            //        AuthBar.Wrong();
-            //    }
-
-            //}
-            //else
-            //{
-            //    AuthBar.Wrong();
-            //}
+            }
+            else
+            {
+                if (AuthBar != null)
+                    AuthBar.Wrong();
+            }
             //await ApplicationData.Current.LocalSettings.SaveAsync("Login", LoginLog);
             //string data = await ApplicationData.Current.LocalSettings.ReadAsync<string>("Login");
-            MyData data = new MyData() { Data1 = 2, Data2 = LoginLog, Data3 = PasswordLog};
-            await ApplicationData.Current.LocalSettings.SaveAsync("Data1", data);
-            var datadata = await ApplicationData.Current.LocalSettings.ReadAsync<MyData>("Data1");
-            Debug.WriteLine(datadata.Data1);
-            Debug.WriteLine(datadata.Data2);
-            Debug.WriteLine(datadata.Data3);
+            //MyData data = new MyData() { Data1 = 2, Data2 = LoginLog, Data3 = PasswordLog};
+            //await ApplicationData.Current.LocalSettings.SaveAsync("Data1", data);
+            //var datadata = await ApplicationData.Current.LocalSettings.ReadAsync<MyData>("Data1");
+            //Debug.WriteLine(datadata.Data1);
+            //Debug.WriteLine(datadata.Data2);
+            //Debug.WriteLine(datadata.Data3);
         }
 
         class MyData
@@ -87,7 +95,6 @@ namespace GameShop.ViewModels
             public string Data3 { get; set; }
         }
         
-        public ICommand SaveCheckBox { get; }
         public ICommand RegButton { get; }
         public ICommand LogButton { get; }
 

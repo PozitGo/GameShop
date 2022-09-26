@@ -28,7 +28,7 @@ namespace GameShop.DataBase
             db.CloseConnection();
         }
 
-        public static bool LogUser(string LoginLog, string PasswordLog, AuthInfoBar AuthBar)
+        public static bool LogUser(string LoginLog, string PasswordLog, AuthInfoBar AuthBar = null)
         {
             if ((LoginLog != null || LoginLog != "") && (PasswordLog != null || PasswordLog != ""))
             {
@@ -43,19 +43,22 @@ namespace GameShop.DataBase
                 adapter.Fill(table);
                 if (table.Rows.Count > 0)
                 {
+                    if(AuthBar != null)
                     AuthBar.Successfully();
                     db.CloseConnection();
                     return true;
                 } 
                 else
                 {
+                    if(AuthBar != null)
                     AuthBar.Wrong();
                     db.CloseConnection();
                 }
             }
             else
             {
-                AuthBar.IsNull();
+                if (AuthBar != null)
+                    AuthBar.IsNull();
             }
             return false;
         }

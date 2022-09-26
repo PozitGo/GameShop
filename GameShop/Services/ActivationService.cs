@@ -93,7 +93,6 @@ namespace GameShop.Services
         private IEnumerable<ActivationHandler> GetActivationHandlers()
         {
             yield return new LoginActivationHandler();
-            yield return new UserSessionHandler();
             yield break;
         }
 

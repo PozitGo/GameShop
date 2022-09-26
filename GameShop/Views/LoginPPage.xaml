@@ -43,7 +43,7 @@
                         Content="Войти"
                         FontFamily="Cascadia Code SemiBold" />
 
-                        <CheckBox HorizontalAlignment="Center" Content="Запомнить данные для входа" Command="{x:Bind ViewModel.SaveCheckBox, Mode=OneWay}"/>
+                        <CheckBox HorizontalAlignment="Center" Content="Запомнить данные для входа" IsChecked="{x:Bind ViewModel.AccountIsSave, Mode=TwoWay}"/>
 
                     </StackPanel>
 
