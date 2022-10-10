@@ -17,7 +17,7 @@
             <ic:InvokeCommandAction Command="{x:Bind ViewModel.LoadedCommand}" />
         </ic:EventTriggerBehavior>
     </i:Interaction.Behaviors>
-
+    
     <winui:NavigationView
         x:Name="navigationView"
         IsBackButtonVisible="Visible"
@@ -44,6 +44,27 @@
                                 Text="{Binding}"
                                 Style="{ThemeResource TitleTextBlockStyle}"
                                 Margin="{StaticResource SmallLeftRightMargin}" />
+
+                            <StackPanel VerticalAlignment="Center" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Padding="20">
+                                <StackPanel>
+                                    <PersonPicture Width="50" Height="50"/>
+                                </StackPanel>
+                                <StackPanel>
+                                    <winui:Expander Width="200" >
+                                        <winui:Expander.Header>
+                                            <TextBlock
+                                                Text="PozitGo"
+                                                FontFamily="Cascadia Code SemiBold"/>
+                                        </winui:Expander.Header>
+                                        <winui:Expander.Content>
+                                            <Button
+                                                Content="Просмотр профиля"
+                                                FontFamily="Cascadia Code SemiBold"
+                                                Command="{Binding ViewModel.OpenProfile, Mode=OneWay}"/>
+                                        </winui:Expander.Content>
+                                    </winui:Expander>
+                                </StackPanel>
+                            </StackPanel>
                         </Grid>
                     </DataTemplate>
                 </behaviors:NavigationViewHeaderBehavior.DefaultHeaderTemplate>

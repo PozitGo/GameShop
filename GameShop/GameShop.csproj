@@ -151,11 +151,14 @@
     <Compile Include="Behaviors\NavigationViewHeaderMode.cs" />
     <Compile Include="DataBase\DataBaseAuthorization.cs" />
     <Compile Include="DataBase\DataBaseConnect.cs" />
+    <Compile Include="Enum\Status.cs" />
     <Compile Include="Helpers\Json.cs" />
     <Compile Include="Helpers\NavHelper.cs" />
+    <Compile Include="Model\UserAccount.cs" />
     <Compile Include="Model\UserSessionModel.cs" />
     <Compile Include="Services\JsonObjectSerializer.cs" />
     <Compile Include="Services\UserSessionService.cs" />
+    <Compile Include="ViewModels\AccountsViewModel.cs" />
     <Compile Include="ViewModels\AuthInfoBar.cs" />
     <Compile Include="Services\ActivationService.cs" />
     <Compile Include="Activation\DefaultActivationHandler.cs" />
@@ -163,6 +166,9 @@
     <Compile Include="ViewModels\LoginPViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
+    <Compile Include="Views\AccountsPage.xaml.cs">
+      <DependentUpon>AccountsPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\LoginPPage.xaml.cs">
       <DependentUpon>LoginPPage.xaml</DependentUpon>
     </Compile>
@@ -207,6 +213,10 @@
     <Page Include="Styles\TextBlock.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AccountsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\LoginPPage.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -12,7 +12,7 @@ namespace GameShop.DataBase
         public static void RegUser(string LoginReg, string PasswordReg, string PhoneNumberReg, string NameReg, string SurnameReg, string EmailReg, AuthInfoBar AuthBar)
         {
             DataBaseConnect db = new DataBaseConnect();
-            MySqlCommand command = new MySqlCommand("INSERT INTO gameshop (Login, Password, Name, Surname, Email, PhoneNumber) VALUES (@login, UPPER(SHA1(CONCAT(UPPER(@login),':',UPPER(@password)))), @name, @surname, @email, @phonenumber)", db.IsConnection());
+            MySqlCommand command = new MySqlCommand("INSERT INTO `user` (Login, Password, Name, Surname, Email, PhoneNumber) VALUES (@login, UPPER(SHA1(CONCAT(UPPER(@login),':',UPPER(@password)))), @name, @surname, @email, @phonenumber)", db.IsConnection());
             command.Parameters.Add("@login", MySqlDbType.VarChar).Value = LoginReg;
             command.Parameters.Add("@password", MySqlDbType.VarChar).Value = PasswordReg;
             command.Parameters.Add("@name", MySqlDbType.VarChar).Value = NameReg;
@@ -36,7 +36,7 @@ namespace GameShop.DataBase
                 DataTable table = new DataTable();
                 MySqlDataAdapter adapter = new MySqlDataAdapter();
 
-                MySqlCommand command = new MySqlCommand("SELECT Login, Password FROM gameshop WHERE @log = Login AND  UPPER(SHA1(CONCAT(UPPER(@log),':',UPPER(@pass)))) = Password", db.IsConnection());
+                MySqlCommand command = new MySqlCommand("SELECT Login, Password FROM `user` WHERE @log = Login AND UPPER(SHA1(CONCAT(UPPER(@log),':',UPPER(@pass)))) = Password", db.IsConnection());
                 command.Parameters.Add("@log", MySqlDbType.VarChar).Value = LoginLog;
                 command.Parameters.Add("@pass", MySqlDbType.VarChar).Value = PasswordLog;
                 adapter.SelectCommand = command;
@@ -138,7 +138,7 @@ namespace GameShop.DataBase
             DataTable table = new DataTable();
             MySqlDataAdapter adapter = new MySqlDataAdapter();
 
-            MySqlCommand command = new MySqlCommand("SELECT Login FROM gameshop WHERE @log = Login", db.IsConnection());
+            MySqlCommand command = new MySqlCommand("SELECT Login FROM `user` WHERE @log = Login", db.IsConnection());
             command.Parameters.Add("@log", MySqlDbType.VarChar).Value = LoginReg;
             adapter.SelectCommand = command;
             adapter.Fill(table);
@@ -161,7 +161,7 @@ namespace GameShop.DataBase
             DataTable table = new DataTable();
             MySqlDataAdapter adapter = new MySqlDataAdapter();
 
-            MySqlCommand command = new MySqlCommand("SELECT PhoneNumber FROM gameshop WHERE @PhoneNumber = PhoneNumber", db.IsConnection());
+            MySqlCommand command = new MySqlCommand("SELECT PhoneNumber FROM `user` WHERE @PhoneNumber = PhoneNumber", db.IsConnection());
             command.Parameters.Add("@PhoneNumber", MySqlDbType.VarChar).Value = PhoneNumberReg;
             adapter.SelectCommand = command;
             adapter.Fill(table);
@@ -184,7 +184,7 @@ namespace GameShop.DataBase
             DataTable table = new DataTable();
             MySqlDataAdapter adapter = new MySqlDataAdapter();
 
-            MySqlCommand command = new MySqlCommand("SELECT Email FROM gameshop WHERE @Email = Email", db.IsConnection());
+            MySqlCommand command = new MySqlCommand("SELECT Email FROM `user` WHERE @Email = Email", db.IsConnection());
             command.Parameters.Add("@Email", MySqlDbType.VarChar).Value = EmailReg;
             adapter.SelectCommand = command;
             adapter.Fill(table);

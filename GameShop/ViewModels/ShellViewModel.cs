@@ -6,11 +6,12 @@ using System.Windows.Input;
 
 using GameShop.Helpers;
 using GameShop.Services;
-
+using GameShop.Views;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 
 using Windows.System;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Navigation;
@@ -30,6 +31,12 @@ namespace GameShop.ViewModels
         private WinUI.NavigationViewItem _selected;
         private ICommand _loadedCommand;
         private ICommand _itemInvokedCommand;
+        public ICommand OpenProfile { get; }
+
+        private void OpenProfileClick()
+        {
+            Window.Current.Content = new AccountsPage();
+        }
 
         public bool IsBackEnabled
         {
@@ -49,6 +56,7 @@ namespace GameShop.ViewModels
 
         public ShellViewModel()
         {
+            OpenProfile = new RelayCommand(OpenProfileClick);
         }
 
         public void Initialize(Frame frame, WinUI.NavigationView navigationView, IList<KeyboardAccelerator> keyboardAccelerators)

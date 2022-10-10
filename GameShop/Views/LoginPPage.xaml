@@ -27,11 +27,13 @@
                         FontFamily="Cascadia Code SemiBold"
                         Header="Логин"
                         PlaceholderText="Логин"
+                        MaxLength="20"
                         Text="{x:Bind ViewModel.LoginLog, Mode=TwoWay}" />
 
                     <PasswordBox
                         FontFamily="Cascadia Code SemiBold"
                         Header="Пароль"
+                        MaxLength="50"
                         Password="{x:Bind ViewModel.PasswordLog, Mode=TwoWay}"
                         PlaceholderText="Пароль" />
 
@@ -43,9 +45,10 @@
                         Content="Войти"
                         FontFamily="Cascadia Code SemiBold" />
 
-                        <CheckBox HorizontalAlignment="Center" Content="Запомнить данные для входа" IsChecked="{x:Bind ViewModel.AccountIsSave, Mode=TwoWay}"/>
+                    <CheckBox HorizontalAlignment="Center" Content="Запомнить данные для входа"
+                        IsChecked="{x:Bind ViewModel.AccountIsSave, Mode=TwoWay}"/>
 
-                    </StackPanel>
+                </StackPanel>
 
             </PivotItem>
 
@@ -66,16 +69,19 @@
                                 FontFamily="Cascadia Code SemiBold"
                                 Header="Логин"
                                 PlaceholderText="Логин"
+                                MaxLength="20"
                                 Text="{x:Bind ViewModel.LoginReg, Mode=TwoWay}" />
 
                             <TextBox
                                 FontFamily="Cascadia Code SemiBold"
                                 Header="Фамилия"
+                                MaxLength="20"
                                 Text="{x:Bind ViewModel.SurnameReg, Mode=TwoWay}" />
 
                             <TextBox
                                 FontFamily="Cascadia Code SemiBold"
                                 Header="Номер телефона"
+                                MaxLength="20"
                                 Text="{x:Bind ViewModel.PhoneNumberReg, Mode=TwoWay}" />
 
                         </StackPanel>
@@ -88,17 +94,20 @@
                             <PasswordBox
                                 FontFamily="Cascadia Code SemiBold"
                                 Header="Пароль"
+                                MaxLength="50"
                                 Password="{x:Bind ViewModel.PasswordReg, Mode=TwoWay}"
                                 PlaceholderText="Пароль" />
 
                             <TextBox
                                 FontFamily="Cascadia Code SemiBold"
                                 Header="Имя"
+                                MaxLength="20"
                                 Text="{x:Bind ViewModel.NameReg, Mode=TwoWay}" />
 
                             <TextBox
                                 FontFamily="Cascadia Code SemiBold"
                                 Header="Email"
+                                MaxLength="20"
                                 Text="{x:Bind ViewModel.EmailReg, Mode=TwoWay}" />
                         </StackPanel>
                     </Grid>

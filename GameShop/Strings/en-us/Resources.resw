@@ -133,4 +133,8 @@
     <value>LoginP</value>
     <comment>Navigation view item name for LoginP</comment>
   </data>
+  <data name="Shell_Accounts.Content" xml:space="preserve">
+    <value>Accounts</value>
+    <comment>Navigation view item name for Accounts</comment>
+  </data>
 </root>
