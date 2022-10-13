@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-
+using GameShop.Behaviors;
 using GameShop.Helpers;
 using GameShop.Services;
 using GameShop.Views;
