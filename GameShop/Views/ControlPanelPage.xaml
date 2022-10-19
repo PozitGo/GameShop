@@ -1,0 +1,39 @@
+﻿<Page
+    x:Class="GameShop.Views.ControlPanelPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:muxc="using:Microsoft.UI.Xaml.Controls" xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    Style="{StaticResource PageStyle}"
+    mc:Ignorable="d">
+    <Grid x:Name="ContentArea">
+        <Grid Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}" >
+            <muxc:TabView>
+                <muxc:TabViewItem Header="Управление товарами">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="3*"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <controls:DataGrid>
+                            
+                        </controls:DataGrid>
+                    </Grid>
+                    <muxc:TabViewItem.IconSource>
+                        <muxc:SymbolIconSource Symbol="Manage" />
+                    </muxc:TabViewItem.IconSource>
+                </muxc:TabViewItem>
+                <muxc:TabViewItem Header="Просмотр активных заказов">
+                    <muxc:SymbolIconSource Symbol="Shop" />
+                </muxc:TabViewItem>
+                <muxc:TabViewItem Header="Персонал">
+                    <muxc:SymbolIconSource Symbol="OtherUser" />
+                </muxc:TabViewItem>
+            </muxc:TabView>
+        </Grid>
+    </Grid>
+</Page>

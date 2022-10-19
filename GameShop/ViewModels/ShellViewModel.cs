@@ -9,7 +9,7 @@ using GameShop.Services;
 using GameShop.Views;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
-
+using Windows.Networking.NetworkOperators;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -35,7 +35,7 @@ namespace GameShop.ViewModels
 
         private void OpenProfileClick()
         {
-            Window.Current.Content = new AccountsPage();
+            NavigationService.Navigate(typeof(AccountsPage));
         }
 
         public bool IsBackEnabled

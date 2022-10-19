@@ -10,6 +10,5 @@ namespace GameShop.Enum
     {
         User,
         Personal,
-        Admin
     }
 }

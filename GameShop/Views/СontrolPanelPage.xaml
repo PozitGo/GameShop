@@ -1,13 +1,12 @@
 ﻿<Page
+    x:Class="GameShop.Views.СontrolPanelPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:Custom="using:Microsoft.UI.Xaml.Controls"
-    x:Class="GameShop.Views.AccountsPage"
     Style="{StaticResource PageStyle}"
     mc:Ignorable="d">
-    <Grid x:Name="ContentArea">
+    <Grid x:Name="ContentArea" Margin="{StaticResource MediumLeftRightMargin}">
         <Grid
             Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}">
             <!--
@@ -15,6 +14,5 @@
                 Place your content here.
             -->
         </Grid>
-        <Custom:TeachingTip Content="TeachingTip" Height="0" Width="0"/>
     </Grid>
 </Page>
