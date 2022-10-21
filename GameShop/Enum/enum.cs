@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace GameShop.Enum
 {
-    public enum Status
+    public enum ReturnIsType
     {
-        User,
-        Personal,
+        Collection,
+        ObjectClass
     }
 }

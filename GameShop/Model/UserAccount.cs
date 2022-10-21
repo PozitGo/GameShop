@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 
 namespace GameShop.Model
 {
-    internal class UserAccount : ObservableObject
+    public class UserAccount : ObservableObject
     {
+        public int idUser { get; set; }
+
         private string _Login;
 
         public string Login
@@ -52,6 +54,8 @@ namespace GameShop.Model
 
         public string PathAvatar { get; set; }
 
-        public Status status { get; set; }
+        public Status Status { get; set; }
+
     }
+
 }

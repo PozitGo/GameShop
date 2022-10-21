@@ -7,12 +7,10 @@ using System.Threading.Tasks;
 
 namespace GameShop.Model
 {
-    public class Category : ObservableObject
+    public class PhotoProduct : ObservableObject
     {
-        public int idCategory { get; set; }
-
-        public string NameCategory { get; set; }
-
-        public string Description { get; set; }
+        public int idPhoto { get; set; }
+        public int idProduct { get; set; }
+        public string PhotoPath { get; set; }
     }
 }

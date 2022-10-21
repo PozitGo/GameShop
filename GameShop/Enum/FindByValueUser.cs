@@ -6,9 +6,15 @@ using System.Threading.Tasks;
 
 namespace GameShop.Enum
 {
-    public enum Status
+    public enum FindByValueUser
     {
-        User,
-        Personal,
+        idUser,
+        Login,
+        PhoneNumber,
+        Email,
+        Name,
+        Surname,
+        Status,
+        None
     }
 }

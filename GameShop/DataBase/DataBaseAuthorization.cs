@@ -1,14 +1,30 @@
-﻿using GameShop.ViewModels;
+﻿using GameShop.Enum;
+using GameShop.Model;
+using GameShop.ViewModels;
 using MySql.Data.MySqlClient;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Diagnostics;
 using System.Reflection.Metadata.Ecma335;
 using Windows.UI.Xaml.Controls;
+using Windows.Web.AtomPub;
+using static GameShop.DataBase.DataBaseRequestOrder;
+using static GameShop.DataBase.DataBaseRequstUser;
 
 namespace GameShop.DataBase
 {
     public class DataBaseAuthorization : DataBaseConnect
     {
+        public static UserAccount CurrentUser;
+
+        public static ReadingDataUserInCollection ReadingDataUserInCollectionHandeler { get; set; }
+
+        public delegate UserAccount ReturnCurrentUserDelegate();
+
+        public static UserAccount ReturnCurrentUser()
+        {
+            return CurrentUser;
+        }
         public static void RegUser(string LoginReg, string PasswordReg, string PhoneNumberReg, string NameReg, string SurnameReg, string EmailReg, AuthInfoBar AuthBar)
         {
             DataBaseConnect db = new DataBaseConnect();
@@ -20,10 +36,29 @@ namespace GameShop.DataBase
             command.Parameters.Add("@email", MySqlDbType.VarChar).Value = EmailReg;
             command.Parameters.Add("@phonenumber", MySqlDbType.VarChar).Value = PhoneNumberReg;
 
+            CurrentUser.Login = LoginReg;
+            CurrentUser.Surname = SurnameReg;
+            CurrentUser.Email = EmailReg;
+            CurrentUser.PhoneNumber = PhoneNumberReg;
+            CurrentUser.Name = NameReg;
+            CurrentUser.Status = Status.User;
+            
             if (command.ExecuteNonQuery() > 0)
+            {
                 AuthBar.Successfully();
+                CurrentUser.Login = LoginReg;
+                CurrentUser.Surname = SurnameReg;
+                CurrentUser.Email = EmailReg;
+                CurrentUser.PhoneNumber = PhoneNumberReg;
+                CurrentUser.Name = NameReg;
+                CurrentUser.Status = Status.User;
+                command.Parameters.Clear();
+            }
             else
+            {
                 AuthBar.Wrong();
+                command.Parameters.Clear();
+            }
             
             db.CloseConnection();
         }
@@ -43,9 +78,14 @@ namespace GameShop.DataBase
                 adapter.Fill(table);
                 if (table.Rows.Count > 0)
                 {
-                    if(AuthBar != null)
+                    ReadingDataUserInCollectionHandeler = new ReadingDataUserInCollection(ReadingDataCheck);
+                    ObservableCollection<UserAccount> tempCollection = ReadingDataUserInCollectionHandeler(FindByValueUser.Login, LoginLog);
+                    CurrentUser = tempCollection[0];
+                    
+                    if (AuthBar != null)
                     AuthBar.Successfully();
                     db.CloseConnection();
+                    command.Parameters.Clear();
                     return true;
                 } 
                 else
@@ -53,6 +93,7 @@ namespace GameShop.DataBase
                     if(AuthBar != null)
                     AuthBar.Wrong();
                     db.CloseConnection();
+                    command.Parameters.Clear();
                 }
             }
             else
