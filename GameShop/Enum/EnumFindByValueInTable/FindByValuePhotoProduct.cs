@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace GameShop.Enum
 {
-    public enum Status
+    public enum FindByValuePhotoProduct
     {
-        User,
-        Personal,
-        Admin
+        idPhoto,
+        idProduct
     }
 }

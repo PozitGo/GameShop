@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace GameShop.Enum
 {
-    public enum Status
+    public enum FindByValueCategory
     {
-        User,
-        Personal,
-        Admin
+        idCategory,
+        Name,
+        None
     }
 }

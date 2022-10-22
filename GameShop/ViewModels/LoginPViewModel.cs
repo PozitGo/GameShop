@@ -32,8 +32,6 @@ namespace GameShop.ViewModels
             get => _AccountIsSave; 
             set => SetProperty(ref _AccountIsSave, value);
         }
-
-
         public LoginPViewModel()
         {
             RegButton = new RelayCommand(RegButtonClick);
@@ -58,7 +56,7 @@ namespace GameShop.ViewModels
                 {
                     if (DataBaseAuthorization.LogUser(LoginLog, PasswordLog, AuthBar))
                     {
-                        if(AccountIsSave)
+                        if (AccountIsSave)
                         {
                             UserSessionService.SaveUserSession(LoginLog, PasswordLog);
                         }

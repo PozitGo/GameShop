@@ -9,7 +9,7 @@ namespace GameShop.DataBase
 {
     public class DataBaseRequstCheck
     {
-        public delegate ObservableCollection<Order> ReadingDataCheckInCollection(FindByValueCheck readBy = FindByValueCheck.None, object parametr = null);
+        public delegate ObservableCollection<Check> ReadingDataCheckInCollection(FindByValueCheck readBy = FindByValueCheck.None, object parametr = null);
 
         public delegate Task<bool> SaveNewItemCheckByDBDelegate(Check check);
         public static ObservableCollection<Check> ReadingDataCheck(FindByValueCheck readBy = FindByValueCheck.None, object parametr = null)
@@ -29,7 +29,7 @@ namespace GameShop.DataBase
                     {
                         NameFieldByTable = "@" + nameof(FindByValueCheck.idCheck);
                         command = new MySqlCommand("SELECT * FROM `check` WHERE " + NameFieldByTable + " = idCheck", db.IsConnection());
-                        Collection = ReadOrdersByParametr(db, command, adapter, table, parametr, NameFieldByTable);
+                        Collection = ReadCheckByParametr(db, command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
                 case FindByValueCheck.Sum:
@@ -37,7 +37,7 @@ namespace GameShop.DataBase
                     {
                         NameFieldByTable = "@" + nameof(FindByValueCheck.Sum);
                         command = new MySqlCommand("SELECT * FROM `check` WHERE " + NameFieldByTable + " = Sum", db.IsConnection());
-                        Collection = ReadOrdersByParametr(db, command, adapter, table, parametr, NameFieldByTable);
+                        Collection = ReadCheckByParametr(db, command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
                 case FindByValueCheck.Data:
@@ -45,14 +45,14 @@ namespace GameShop.DataBase
                     {
                         NameFieldByTable = "@" + nameof(FindByValueCheck.Data);
                         command = new MySqlCommand("SELECT * FROM `check` WHERE " + NameFieldByTable + " = Data", db.IsConnection());
-                        Collection = ReadOrdersByParametr(db, command, adapter, table, parametr, NameFieldByTable);
+                        Collection = ReadCheckByParametr(db, command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
                 case FindByValueCheck.None:
                     if (parametr == null)
                     {
                         command = new MySqlCommand("SELECT * FROM `check`", db.IsConnection());
-                        Collection = ReadOrdersByParametr(db, command, adapter, table);
+                        Collection = ReadCheckByParametr(db, command, adapter, table);
                     }
                     break;
             }
@@ -62,7 +62,7 @@ namespace GameShop.DataBase
 
         }
 
-        public static ObservableCollection<Check> ReadOrdersByParametr(DataBaseConnect db, MySqlCommand command, MySqlDataAdapter adapter, DataTable table, object parametr = null, string NameFieldByTable = null)
+        public static ObservableCollection<Check> ReadCheckByParametr(DataBaseConnect db, MySqlCommand command, MySqlDataAdapter adapter, DataTable table, object parametr = null, string NameFieldByTable = null)
         {
             if (parametr != null)
             {

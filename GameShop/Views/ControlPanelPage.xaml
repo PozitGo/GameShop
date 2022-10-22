@@ -9,22 +9,29 @@
 
     <Grid x:Name="ContentArea" Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}">
         <muxc:TabView IsAddTabButtonVisible="False" CloseButtonOverlayMode="OnPointerOver">
-            <muxc:TabViewItem Header="Управление товарами" FontFamily="Cascadia Code SemiBold">
+            <muxc:TabViewItem Header="Панель управления" FontFamily="Cascadia Code SemiBold">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="690"></RowDefinition>
-                        <RowDefinition Height="50"></RowDefinition>
-                        <RowDefinition Height="220"></RowDefinition>
+                        <RowDefinition Height="20*"></RowDefinition>
+                        <RowDefinition Height="2*"></RowDefinition>
+                        <RowDefinition Height="7*"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <TextBlock VerticalAlignment="Top" HorizontalAlignment="Left" Padding="10" Text="Управление заказами" Grid.Row="1" Grid.Column="0" FontSize="25" FontFamily="Cascadia Code SemiBold"/>
+                    <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
+                        <TextBlock VerticalAlignment="Top" HorizontalAlignment="Left" Padding="10" Text="Панель управления" FontSize="25" FontFamily="Cascadia Code SemiBold"/>
+                    </StackPanel>
                     <Grid Grid.Row="2" Grid.Column="0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="50"></RowDefinition>
-                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="8"></RowDefinition>
+                            <RowDefinition Height="40"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition  Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="2*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
 
-                        <CommandBar Background="Transparent" IsOpen="False" HorizontalAlignment="Left" DefaultLabelPosition="Right" Grid.Row="0">
-                            <AppBarButton Icon="Add" Label="Добавить заказ" FontFamily="Cascadia Code SemiBold"/>
+                        <CommandBar Background="Transparent" IsOpen="False" HorizontalAlignment="Left" DefaultLabelPosition="Right" Grid.Row="0" Grid.RowSpan="2">
+                            <AppBarButton Icon="Add" Label="Добавить заказ" FontFamily="Cascadia Code SemiBold" Command="{x:Bind ViewModel.AppBarButtonAddOrder, Mode=OneWay}"/>
                             <AppBarSeparator/>
                             <AppBarButton Icon="Edit" Label="Изменить заказ" FontFamily="Cascadia Code SemiBold"/>
                             <AppBarSeparator/>
@@ -36,63 +43,59 @@
                             <AppBarSeparator/>
                             <AppBarButton Icon="Refresh" Label="Обновить заказы" FontFamily="Cascadia Code SemiBold"/>
                             <AppBarSeparator/>
-                            <CommandBar.SecondaryCommands>
-                                <AppBarButton Icon="Filter" Label="Отобразить активные"/>
-                                <AppBarButton Icon="Filter" Label="Отобразить все"/>
-                                <AppBarButton Icon="Filter" Label="Поиск по имени"/>
-                                <AppBarButton Icon="Filter" Label="Поиск номеру товара"/>
-                                <AppBarButton Icon="Filter" Label="Поиск по номеру чека"/>
-                            </CommandBar.SecondaryCommands>
-
+                            <AppBarButton Icon="Clear" Label="Очистить таблицу" FontFamily="Cascadia Code SemiBold"/>
                         </CommandBar>
 
-                        <DropDownButton muxc:AnimatedIcon.State="Filter" Content="Фильтровать с изменением коллекции" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,6,340,0">
-                            <DropDownButton.Flyout>
-                                <MenuFlyout Placement="Bottom">
-                                    <MenuFlyoutItem Text="Отобразить активные">
-                                        <MenuFlyoutItem.Icon>
-                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE725;"/>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Отобразить все">
-                                        <MenuFlyoutItem.Icon>
-                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8CA;"/>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Поиск по имени">
-                                        <MenuFlyoutItem.Icon>
-                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8C2;"/>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Поиск по номеру товара">
-                                        <MenuFlyoutItem.Icon>
-                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8C2;"/>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Поиск по номеру чека">
-                                        <MenuFlyoutItem.Icon>
-                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8C2;"/>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
+                        <Button Content="Настройки фильтрации" Grid.Row="1" Grid.Column="1"  VerticalAlignment="Top" HorizontalAlignment="Left">
+                            <Button.Flyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="Сбросить все фильтры"/>
+                                    <MenuFlyoutSeparator/>
+                                    <MenuFlyoutSubItem Text="Фильтрация без изменения коллекции">
+                                        <MenuFlyoutItem Text="Отобразить активные заказы"/>
+                                        <MenuFlyoutItem Text="По номеру чека"/>
+                                        <MenuFlyoutItem Text="По сумме"/>
+                                        <MenuFlyoutItem Text="Отобразить заказы по дате оформления чека"/>
+                                        <MenuFlyoutItem Text="Отобразить заказы по имени покупателя"/>
+                                        <MenuFlyoutItem Text="Найти чек по номеру заказа"/>
+                                        <MenuFlyoutItem Text="Получить заказы по номеру чека"/>
+                                    </MenuFlyoutSubItem>
                                 </MenuFlyout>
-                            </DropDownButton.Flyout>
+                            </Button.Flyout>
+                        </Button>
 
-                        </DropDownButton>
+                        <StackPanel Padding="10" VerticalAlignment="Top" Orientation="Vertical" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="2" >
+                            <StackPanel HorizontalAlignment="Left">
+                                <muxc:RadioButtons FontFamily="Cascadia Code SemiBold" Header="Отображение таблиц">
+                                    <RadioButton Content="Список заказов" IsChecked="{x:Bind ViewModel.IsCheckedOrderMainTable, Mode=TwoWay}"/>
+                                    <RadioButton Content="Список чеков" IsChecked="{x:Bind ViewModel.IsCheckedCheckMainTable, Mode=TwoWay}"/>
+                                </muxc:RadioButtons>
+                            </StackPanel>
+                            <StackPanel Padding="10" Spacing="10" VerticalAlignment="Center">
+                                <Button Content="Отобразить" FontFamily="Cascadia Code SemiBold" Command="{x:Bind ViewModel.ButtonMainTable, Mode=OneWay}"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Right" Spacing="5" Padding="3">
+                            <CheckBox Content="Объеденить в один чек" FontFamily="Cascadia Code SemiBold" Visibility="Visible"/>
+                            <Button Content="Сохранить" Visibility="{x:Bind ViewModel.VisibilitySaveButtonCommandBar, Mode=TwoWay}" Command="{x:Bind ViewModel.AppBarButtonSaveButton, Mode=TwoWay}" HorizontalAlignment="Right"/>
+                        </StackPanel>
+
 
                         <controls:DataGrid
-                            Grid.Row="1"
+                            Grid.Row="2"
                             x:Uid="DataTable"
                             AutoGenerateColumns="False"
+                            HorizontalAlignment="Left"
                             GridLinesVisibility="All"
                             VerticalScrollBarVisibility="Visible"
                             ItemsSource="{x:Bind ViewModel.OrderCollectionSettings, Mode=OneWay}"
                             IsReadOnly="False">
 
                             <controls:DataGrid.Columns>
-                                <controls:DataGridTextColumn Header="Номер заказа" IsReadOnly="False" Binding="{Binding idOrder}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                                 <controls:DataGridTextColumn Header="Номер товара" IsReadOnly="False" Binding="{Binding idProduct}"  Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                                 <controls:DataGridTextColumn Header="Номер пользователя" IsReadOnly="False" Binding="{Binding idUser}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
-                                <controls:DataGridTextColumn Header="В наличии" IsReadOnly="False" Binding="{Binding Quantity}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
+                                <controls:DataGridTextColumn Header="Количество" IsReadOnly="False" Binding="{Binding Quantity}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                                 <controls:DataGridTextColumn Header="Цена" IsReadOnly="False" Binding="{Binding Price}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                                 <controls:DataGridTextColumn Header="Процент скидки" IsReadOnly="False" Binding="{Binding Discount}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                                 <controls:DataGridTextColumn Header="Статус" IsReadOnly="False" Binding="{Binding Status}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
@@ -102,23 +105,61 @@
                     </Grid>
 
                     <controls:DataGrid Grid.Row="0" Grid.Column="0"
+                            Height="690"
                             AutoGenerateColumns="False"
                             GridLinesVisibility="All"
+                            HorizontalAlignment="{x:Bind ViewModel.HorizontalAligamentCheckCollectionDataGrid, Mode=TwoWay}"
                             VerticalScrollBarVisibility="Visible"
-                            ItemsSource="{x:Bind ViewModel.OrderCollection, Mode=OneWay}"
-                            IsReadOnly="False">
+                            ItemsSource="{x:Bind ViewModel.CheckCollection, Mode=OneWay}"
+                            IsReadOnly="True"
+                            Visibility="{x:Bind ViewModel.CheckCollectionIsVisibleDataGrid, Mode=TwoWay}">
 
                         <controls:DataGrid.RowDetailsTemplate>
                             <DataTemplate>
-                               
+                            
                             </DataTemplate>
                         </controls:DataGrid.RowDetailsTemplate>
 
                         <controls:DataGrid.Columns>
-                            <controls:DataGridTextColumn Header="Номер заказа" IsReadOnly="False" Binding="{Binding idOrder}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
-                            <controls:DataGridTextColumn Header="Номер товара" IsReadOnly="False" Binding="{Binding idProduct}"  Width="Auto" FontFamily="Cascadia Code SemiBold"/>
-                            <controls:DataGridTextColumn Header="Номер пользователя" IsReadOnly="False" Binding="{Binding idUser}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
-                            <controls:DataGridTextColumn Header="В наличии" IsReadOnly="False" Binding="{Binding Quantity}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
+                            <controls:DataGridTextColumn Header="Номер чека" IsReadOnly="False" Binding="{Binding idCheck}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
+                            <controls:DataGridTextColumn Header="Дата" IsReadOnly="False" Binding="{Binding Data}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
+                            <controls:DataGridTextColumn Header="Сумма покупки" IsReadOnly="False" Binding="{Binding Sum}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
+                        </controls:DataGrid.Columns>
+                    </controls:DataGrid>
+
+                    <controls:DataGrid Grid.Row="0" Grid.Column="0"
+                            Height="690"
+                            AutoGenerateColumns="False"
+                            HorizontalAlignment="{x:Bind ViewModel.HorizontalAligamentOrderCollectionDataGrid, Mode=TwoWay}"
+                            GridLinesVisibility="All"
+                            VerticalScrollBarVisibility="Visible"
+                            ItemsSource="{x:Bind ViewModel.OrderUPGRADECollection, Mode=OneWay}"
+                            IsReadOnly="True"
+                            Visibility="{x:Bind ViewModel.OrderCollectionIsVisibleDataGrid, Mode=TwoWay}">
+
+                        <controls:DataGrid.RowDetailsTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Padding="10" Spacing="10">
+                                    <StackPanel Padding="10" Spacing="5">
+                                        <TextBlock Text="Номер товара:" FontFamily="Cascadia Code SemiBold"/>
+                                        <TextBlock Text="Номер пользователя:" FontFamily="Cascadia Code SemiBold"/>
+                                        <TextBlock Text="Заказов под данным номером чека найденно:" FontFamily="Cascadia Code SemiBold"/>
+                                        <Button Content="Отобразить заказы" FontFamily="Cascadia Code SemiBold" Padding="10"/>
+                                    </StackPanel>
+                                    <StackPanel Padding="10" Spacing="5">
+                                        <TextBlock Text="{Binding idProduct}" FontFamily="Cascadia Code SemiBold"/>
+                                        <TextBlock Text="{Binding idUser}" FontFamily="Cascadia Code SemiBold"/>
+                                        <TextBlock Text="" FontFamily="Cascadia Code SemiBold"/> 
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </controls:DataGrid.RowDetailsTemplate>
+
+                        <controls:DataGrid.Columns>
+                            <controls:DataGridComboBoxColumn Header="Номер заказа" IsReadOnly="False" Binding="{Binding idOrder}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
+                            <controls:DataGridTextColumn Header="Название товара" IsReadOnly="False" Binding="{Binding NameProduct}"  Width="Auto" FontFamily="Cascadia Code SemiBold"/>
+                            <controls:DataGridTextColumn Header="Логин пользователя" IsReadOnly="False" Binding="{Binding LoginUser}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
+                            <controls:DataGridTextColumn Header="Количество" IsReadOnly="False" Binding="{Binding Quantity}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                             <controls:DataGridTextColumn Header="Цена" IsReadOnly="False" Binding="{Binding Price}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                             <controls:DataGridTextColumn Header="Процент скидки" IsReadOnly="False" Binding="{Binding Discount}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                             <controls:DataGridTextColumn Header="Статус" IsReadOnly="False" Binding="{Binding Status}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
@@ -131,8 +172,8 @@
                 </muxc:TabViewItem.IconSource>
             </muxc:TabViewItem>
             <muxc:TabViewItem Header="Персонал" FontFamily="Cascadia Code SemiBold">
-            <muxc:SymbolIconSource Symbol="OtherUser" />
-        </muxc:TabViewItem>
-    </muxc:TabView>
+                <muxc:SymbolIconSource Symbol="OtherUser" />
+            </muxc:TabViewItem>
+        </muxc:TabView>
     </Grid>
 </Page>

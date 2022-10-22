@@ -1,9 +1,15 @@
-﻿using GameShop.Enum;
+﻿using GameShop.DataBase.DataBaseRequstInTable;
+using GameShop.Enum;
 using GameShop.Model;
 using MySql.Data.MySqlClient;
+using System;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Threading.Tasks;
+using Windows.System;
+using Windows.UI.Xaml.Controls;
+using static GameShop.DataBase.DataBaseRequstInTable.DataBaseRequstProduct;
+using static GameShop.DataBase.DataBaseRequstUser;
 
 namespace GameShop.DataBase
 {
@@ -11,8 +17,9 @@ namespace GameShop.DataBase
     {
 
         public delegate ObservableCollection<Order> ReadingDataOrderInCollection(FindByValueOrder readBy = FindByValueOrder.None, object parametr = null);
-
+        
         public delegate Task<bool> SaveNewItemOrderByDBDelegate(Order order);
+
         public static ObservableCollection<Order> ReadingDataOrder(FindByValueOrder readBy = FindByValueOrder.None, object parametr = null)
         {
             DataBaseConnect db = new DataBaseConnect();
@@ -129,12 +136,10 @@ namespace GameShop.DataBase
             if (table.Rows.Count > 0)
             {
                 MySqlDataReader readerBy = command.ExecuteReader();
-
                 for (int i = 0; readerBy.Read(); i++)
                 {
                     Order order = new Order();
                     Collection.Add(order);
-
                     Collection[i].idOrder = int.Parse(readerBy["idOrder"].ToString());
                     Collection[i].idProduct = int.Parse(readerBy["idProduct"].ToString());
                     Collection[i].idUser = int.Parse(readerBy["idUser"].ToString());
@@ -153,14 +158,12 @@ namespace GameShop.DataBase
 
         public static Task<bool> SaveNewItemOrderByDB(Order value)
         {
-            //потом добавить делегат в принемаемые параметры и инициализировать коллекцию вместе с записью
             return Task.Factory.StartNew(() =>
             {
                 if (value != null)
                 {
                     DataBaseConnect db = new DataBaseConnect();
-                    MySqlCommand command = new MySqlCommand("INSERT INTO `Order` (idOrder, idProduct, idUser, Quantity, Price, Discount, Status, idCheck) VALUES (@idOrder, @idProduct, @idUser, @Quantity, @Price, @Discount, @Status, @idCheck)", db.IsConnection());
-                    command.Parameters.Add("@idOrder", MySqlDbType.Int32).Value = value.idOrder;
+                    MySqlCommand command = new MySqlCommand("INSERT INTO `Order` (idProduct, idUser, Quantity, Price, Discount, Status, idCheck) VALUES (@idProduct, @idUser, @Quantity, @Price, @Discount, @Status, @idCheck)", db.IsConnection());
                     command.Parameters.Add("@idProduct", MySqlDbType.Int32).Value = value.idProduct;
                     command.Parameters.Add("@idUser", MySqlDbType.Int32).Value = value.idUser;
                     command.Parameters.Add("@Quantity", MySqlDbType.Int32).Value = value.Quantity;
@@ -178,9 +181,33 @@ namespace GameShop.DataBase
 
         }
 
-        public DataBaseRequestOrder()
-        {
+        //public static string FindNameUserByidOrder(int idOrder)
+        //{
+        //    DataBaseConnect db = new DataBaseConnect();
+        //    MySqlCommand command = new MySqlCommand();
+        //    DataTable table = new DataTable();
+        //    MySqlDataAdapter adapter = new MySqlDataAdapter();
 
-        }
+        //    string Name = "";
+        //    command = new MySqlCommand("SELECT Name FROM `order` WHERE @idOrder = idOrder", db.IsConnection());
+
+        //    command.Parameters.Add(new MySqlParameter("@idOrder", MySqlDbType.Int32));
+        //    command.Parameters["@idOrder"].Value = idOrder;
+
+        //    adapter.SelectCommand = command;
+        //    adapter.Fill(table);
+
+        //    if (table.Rows.Count > 0)
+        //    {
+        //        MySqlDataReader readerBy = command.ExecuteReader();
+        //        for (int i = 0; readerBy.Read(); i++)
+        //        {
+        //            Name = readerBy["Name"].ToString();
+        //        }
+        //    }
+
+        //    return Name;
+        //}
+
     }
 }
