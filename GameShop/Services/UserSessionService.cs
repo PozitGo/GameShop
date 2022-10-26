@@ -1,15 +1,6 @@
 ﻿using GameShop.DataBase;
-using GameShop.Helpers;
 using GameShop.Model;
 using Microsoft.Toolkit.Uwp.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Storage;
-using Windows.UI.Xaml.Controls;
 
 namespace GameShop.Services
 {
@@ -24,7 +15,7 @@ namespace GameShop.Services
 
             if (userSessionData == null)
                 return true;
-            
+
             if (userSessionData.CountOfSession < 10 && DataBaseAuthorization.LogUser(userSessionData.Login, userSessionData.Password))
             {
                 userSessionData.CountOfSession++;

@@ -1,10 +1,5 @@
 ﻿using GameShop.Enum;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameShop.Model
 {
@@ -24,16 +19,16 @@ namespace GameShop.Model
 
         public string PhoneNumber
         {
-            get => _PhoneNumber; 
-            set => SetProperty(ref _PhoneNumber, value); 
+            get => _PhoneNumber;
+            set => SetProperty(ref _PhoneNumber, value);
         }
 
         private string _Name;
 
         public string Name
         {
-            get => _Name; 
-            set => SetProperty(ref _Name, value); 
+            get => _Name;
+            set => SetProperty(ref _Name, value);
         }
 
         private string _Surname;
@@ -45,7 +40,7 @@ namespace GameShop.Model
         }
 
         private string _Email;
-        
+
         public string Email
         {
             get => _Email;

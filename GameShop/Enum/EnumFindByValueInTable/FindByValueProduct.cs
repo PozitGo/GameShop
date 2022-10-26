@@ -14,7 +14,6 @@ namespace GameShop.Enum
         Quantity,
         Name,
         Manufacturer,
-        BasicDescription,
-        None
+        BasicDescription
     }
 }

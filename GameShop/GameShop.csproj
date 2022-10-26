@@ -134,8 +134,14 @@
     <PackageReference Include="Microsoft.Xaml.Behaviors.Uwp.Managed">
       <Version>2.0.1</Version>
     </PackageReference>
+    <PackageReference Include="MvvmLightLibs">
+      <Version>5.4.1.1</Version>
+    </PackageReference>
     <PackageReference Include="MySql.Data">
       <Version>8.0.30</Version>
+    </PackageReference>
+    <PackageReference Include="NPOI">
+      <Version>2.5.6</Version>
     </PackageReference>
     <PackageReference Include="System.IO.FileSystem">
       <Version>4.3.0</Version>
@@ -158,9 +164,11 @@
     <Compile Include="DataBase\DataBaseRequstInTable\DataBaseRequstCheck.cs" />
     <Compile Include="DataBase\DataBaseRequstInTable\DataBaseRequstProduct.cs" />
     <Compile Include="DataBase\DataBaseRequstInTable\DataBaseRequstUser.cs" />
+    <Compile Include="DataBase\UniversalRequst.cs" />
     <Compile Include="Enum\EnumFindByValueInTable\FindByValueCategory.cs" />
     <Compile Include="Enum\EnumFindByValueInTable\FindByValuePhotoProduct.cs" />
     <Compile Include="Enum\EnumFindByValueInTable\FindByValueProduct.cs" />
+    <Compile Include="Enum\ListOfTablesInDataBase.cs" />
     <Compile Include="Enum\ReturnIsType.cs" />
     <Compile Include="Enum\EnumFindByValueInTable\FindByValueCheck.cs" />
     <Compile Include="Enum\EnumFindByValueInTable\FindByValueOrder.cs" />
@@ -171,7 +179,7 @@
     <Compile Include="Model\ModelTableInDataBase\Category.cs" />
     <Compile Include="Model\ModelTableInDataBase\Check.cs" />
     <Compile Include="Model\ModelTableInDataBase\Order.cs" />
-    <Compile Include="Model\ModelTableInDataBase\OrderUPGRADE.cs" />
+    <Compile Include="Model\ModelUPGRADEOrder.cs" />
     <Compile Include="Model\ModelTableInDataBase\PhotoProduct.cs" />
     <Compile Include="Model\ModelTableInDataBase\Product.cs" />
     <Compile Include="Model\ModelTableInDataBase\UserAccount.cs" />
@@ -184,6 +192,7 @@
     <Compile Include="Activation\DefaultActivationHandler.cs" />
     <Compile Include="Services\NavigationService.cs" />
     <Compile Include="ViewModels\ControlPanelViewModel.cs" />
+    <Compile Include="Convert\ConverOrderAndOrderUPGRADE.cs" />
     <Compile Include="ViewModels\LoginPViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />

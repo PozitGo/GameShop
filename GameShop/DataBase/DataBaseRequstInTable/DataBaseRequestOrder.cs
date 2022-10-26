@@ -1,32 +1,23 @@
-﻿using GameShop.DataBase.DataBaseRequstInTable;
-using GameShop.Enum;
+﻿using GameShop.Enum;
 using GameShop.Model;
 using MySql.Data.MySqlClient;
-using System;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Threading.Tasks;
-using Windows.System;
-using Windows.UI.Xaml.Controls;
-using static GameShop.DataBase.DataBaseRequstInTable.DataBaseRequstProduct;
-using static GameShop.DataBase.DataBaseRequstUser;
 
 namespace GameShop.DataBase
 {
-    public class DataBaseRequestOrder : DataBaseConnect
+    public struct DataBaseRequestOrder
     {
-
-        public delegate ObservableCollection<Order> ReadingDataOrderInCollection(FindByValueOrder readBy = FindByValueOrder.None, object parametr = null);
-        
-        public delegate Task<bool> SaveNewItemOrderByDBDelegate(Order order);
-
-        public static ObservableCollection<Order> ReadingDataOrder(FindByValueOrder readBy = FindByValueOrder.None, object parametr = null)
+        public static ObservableCollection<Order> ReadingDataOrder<T>(FindByValueOrder readBy, T parametr)
         {
             DataBaseConnect db = new DataBaseConnect();
             MySqlCommand command = new MySqlCommand();
             DataTable table = new DataTable();
             MySqlDataAdapter adapter = new MySqlDataAdapter();
 
+
+            command.Parameters.Clear();
             string NameFieldByTable;
             ObservableCollection<Order> Collection = new ObservableCollection<Order>();
 
@@ -37,7 +28,7 @@ namespace GameShop.DataBase
                     {
                         NameFieldByTable = "@" + nameof(FindByValueOrder.idOrder);
                         command = new MySqlCommand("SELECT * FROM `order` WHERE " + NameFieldByTable + " = idOrder", db.IsConnection());
-                        Collection = ReadOrdersByParametr(db, command, adapter, table, parametr, NameFieldByTable);
+                        Collection = ReadOrdersByParametr(command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
                 case FindByValueOrder.idProduct:
@@ -45,7 +36,7 @@ namespace GameShop.DataBase
                     {
                         NameFieldByTable = "@" + nameof(FindByValueOrder.idProduct);
                         command = new MySqlCommand("SELECT * FROM `order` WHERE " + NameFieldByTable + " = idProduct", db.IsConnection());
-                        Collection = ReadOrdersByParametr(db, command, adapter, table, parametr, NameFieldByTable);
+                        Collection = ReadOrdersByParametr(command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
                 case FindByValueOrder.idUser:
@@ -53,7 +44,7 @@ namespace GameShop.DataBase
                     {
                         NameFieldByTable = "@" + nameof(FindByValueOrder.idUser);
                         command = new MySqlCommand("SELECT * FROM `order` WHERE " + NameFieldByTable + " = idUser", db.IsConnection());
-                        Collection = ReadOrdersByParametr(db, command, adapter, table, parametr, NameFieldByTable);
+                        Collection = ReadOrdersByParametr(command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
                 case FindByValueOrder.Quantity:
@@ -61,7 +52,7 @@ namespace GameShop.DataBase
                     {
                         NameFieldByTable = "@" + nameof(FindByValueOrder.Quantity);
                         command = new MySqlCommand("SELECT * FROM `order` WHERE " + NameFieldByTable + " = Quantity", db.IsConnection());
-                        Collection = ReadOrdersByParametr(db, command, adapter, table, parametr, NameFieldByTable);
+                        Collection = ReadOrdersByParametr(command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
                 case FindByValueOrder.Price:
@@ -69,7 +60,7 @@ namespace GameShop.DataBase
                     {
                         NameFieldByTable = "@" + nameof(FindByValueOrder.Price);
                         command = new MySqlCommand("SELECT * FROM `order` WHERE " + NameFieldByTable + " = Price", db.IsConnection());
-                        Collection = ReadOrdersByParametr(db, command, adapter, table, parametr, NameFieldByTable);
+                        Collection = ReadOrdersByParametr(command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
                 case FindByValueOrder.Status:
@@ -77,7 +68,7 @@ namespace GameShop.DataBase
                     {
                         NameFieldByTable = "@" + nameof(FindByValueOrder.Status);
                         command = new MySqlCommand("SELECT * FROM `order` WHERE " + NameFieldByTable + " = Status", db.IsConnection());
-                        Collection = ReadOrdersByParametr(db, command, adapter, table, parametr, NameFieldByTable);
+                        Collection = ReadOrdersByParametr(command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
                 case FindByValueOrder.idCheck:
@@ -85,24 +76,34 @@ namespace GameShop.DataBase
                     {
                         NameFieldByTable = "@" + nameof(FindByValueOrder.idCheck);
                         command = new MySqlCommand("SELECT * FROM `order` WHERE " + NameFieldByTable + " = idCheck", db.IsConnection());
-                        Collection = ReadOrdersByParametr(db, command, adapter, table, parametr, NameFieldByTable);
-                    }
-                    break;
-                case FindByValueOrder.None:
-                    if (parametr == null)
-                    {
-                        command = new MySqlCommand("SELECT * FROM `order`", db.IsConnection());
-                        Collection = ReadOrdersByParametr(db, command, adapter, table);
+                        Collection = ReadOrdersByParametr(command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
             }
 
-            db.CloseConnection();
+            command.Parameters.Clear();
             return Collection;
-
         }
 
-        private static ObservableCollection<Order> ReadOrdersByParametr(DataBaseConnect db, MySqlCommand command, MySqlDataAdapter adapter, DataTable table, object parametr = null, string NameFieldByTable = null)
+        public static ObservableCollection<Order> ReadingDataOrder()
+        {
+            DataBaseConnect db = new DataBaseConnect();
+            MySqlCommand command = new MySqlCommand();
+            DataTable table = new DataTable();
+            MySqlDataAdapter adapter = new MySqlDataAdapter();
+
+
+            command.Parameters.Clear();
+            ObservableCollection<Order> Collection = new ObservableCollection<Order>();
+
+            command = new MySqlCommand("SELECT * FROM `order`", db.IsConnection());
+            Collection = ReadOrdersByParametr(command, adapter, table);
+
+            command.Parameters.Clear();
+            return Collection;
+        }
+
+        private static ObservableCollection<Order> ReadOrdersByParametr<T>(MySqlCommand command, MySqlDataAdapter adapter, DataTable table, T parametr, string NameFieldByTable = null)
         {
             if (parametr != null)
             {
@@ -152,7 +153,35 @@ namespace GameShop.DataBase
             }
 
             command.Parameters.Clear();
-            db.CloseConnection();
+            return Collection;
+        }
+
+        private static ObservableCollection<Order> ReadOrdersByParametr( MySqlCommand command, MySqlDataAdapter adapter, DataTable table)
+        {
+
+            adapter.SelectCommand = command;
+            adapter.Fill(table);
+
+            ObservableCollection<Order> Collection = new ObservableCollection<Order>();
+            if (table.Rows.Count > 0)
+            {
+                MySqlDataReader readerBy = command.ExecuteReader();
+                for (int i = 0; readerBy.Read(); i++)
+                {
+                    Order order = new Order();
+                    Collection.Add(order);
+                    Collection[i].idOrder = int.Parse(readerBy["idOrder"].ToString());
+                    Collection[i].idProduct = int.Parse(readerBy["idProduct"].ToString());
+                    Collection[i].idUser = int.Parse(readerBy["idUser"].ToString());
+                    Collection[i].Quantity = int.Parse(readerBy["Quantity"].ToString());
+                    Collection[i].Price = double.Parse(readerBy["Price"].ToString());
+                    Collection[i].Discount = int.Parse(readerBy["Discount"].ToString());
+                    Collection[i].Status = bool.Parse(readerBy["Status"].ToString());
+                    Collection[i].idCheck = int.Parse(readerBy["idCheck"].ToString());
+                }
+            }
+
+            command.Parameters.Clear();
             return Collection;
         }
 
@@ -173,41 +202,110 @@ namespace GameShop.DataBase
                     command.Parameters.Add("@idCheck", MySqlDbType.Int32).Value = value.idCheck;
 
                     if (command.ExecuteNonQuery() == 7)
+                    {
+                        command.Parameters.Clear();
                         return true;
+                    }
+                    else
+                        command.Parameters.Clear();
                 }
 
                 return false;
             });
 
+
         }
 
-        //public static string FindNameUserByidOrder(int idOrder)
-        //{
-        //    DataBaseConnect db = new DataBaseConnect();
-        //    MySqlCommand command = new MySqlCommand();
-        //    DataTable table = new DataTable();
-        //    MySqlDataAdapter adapter = new MySqlDataAdapter();
+        public static T FindValueByidOrder<T>(int idOrder, FindByValueOrder findBy)
+        {
+            DataBaseConnect db = new DataBaseConnect();
+            MySqlCommand command = new MySqlCommand();
+            DataTable table = new DataTable();
+            MySqlDataAdapter adapter = new MySqlDataAdapter();
 
-        //    string Name = "";
-        //    command = new MySqlCommand("SELECT Name FROM `order` WHERE @idOrder = idOrder", db.IsConnection());
+            command.Parameters.Clear();
 
-        //    command.Parameters.Add(new MySqlParameter("@idOrder", MySqlDbType.Int32));
-        //    command.Parameters["@idOrder"].Value = idOrder;
+            string NameField = "";
+            T Data = default;
+            switch (findBy)
+            {
+                case FindByValueOrder.idCheck:
+                    NameField = nameof(FindByValueOrder.idCheck);
+                    command = new MySqlCommand($"SELECT {NameField} FROM `order` WHERE @idOrder = idOrder", db.IsConnection());
+                    break;
+                case FindByValueOrder.idUser:
+                    NameField = nameof(FindByValueOrder.idUser);
+                    command = new MySqlCommand($"SELECT {NameField} FROM `order` WHERE @idOrder = idOrder", db.IsConnection());
+                    break;
+                case FindByValueOrder.Status:
+                    NameField = nameof(FindByValueOrder.Status);
+                    command = new MySqlCommand($"SELECT {NameField} FROM `order` WHERE @idOrder = idOrder", db.IsConnection());
+                    break;
+                case FindByValueOrder.Quantity:
+                    NameField = nameof(FindByValueOrder.Quantity);
+                    command = new MySqlCommand($"SELECT {NameField} FROM `order` WHERE @idOrder = idOrder", db.IsConnection());
+                    break;
+                case FindByValueOrder.Price:
+                    NameField = nameof(FindByValueOrder.Price);
+                    command = new MySqlCommand($"SELECT {NameField} FROM `order` WHERE @idOrder = idOrder", db.IsConnection());
+                    break;
+            }
 
-        //    adapter.SelectCommand = command;
-        //    adapter.Fill(table);
 
-        //    if (table.Rows.Count > 0)
-        //    {
-        //        MySqlDataReader readerBy = command.ExecuteReader();
-        //        for (int i = 0; readerBy.Read(); i++)
-        //        {
-        //            Name = readerBy["Name"].ToString();
-        //        }
-        //    }
+            command.Parameters.Add(new MySqlParameter("@idOrder", MySqlDbType.Int32));
+            command.Parameters["@idOrder"].Value = idOrder;
 
-        //    return Name;
-        //}
+            adapter.SelectCommand = command;
+            adapter.Fill(table);
+
+            if (table.Rows.Count > 0)
+            {
+                MySqlDataReader readerBy = command.ExecuteReader();
+                for (int i = 0; readerBy.Read(); i++)
+                {
+                    Data = (T)readerBy[NameField];
+                }
+            }
+
+            command.Parameters.Clear();
+            return Data;
+        }
+
+        public static void UpdateItemInTableOrder<T>(FindByValueOrder findBy, T newValue, int IdPrimaryKey)
+        {
+            DataBaseConnect db = new DataBaseConnect();
+            MySqlCommand command = new MySqlCommand();
+
+            command.Parameters.Add(new MySqlParameter("@idOrder", MySqlDbType.Int32));
+            command.Parameters["@idOrder"].Value = IdPrimaryKey;
+
+            try
+            {
+                command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Int32));
+                command.Parameters["@newValue"].Value = newValue;
+            }
+            catch
+            {
+
+                try
+                {
+                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Double));
+                    command.Parameters["@newValue"].Value = newValue;
+                }
+                catch
+                {
+
+                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.VarChar));
+                    command.Parameters["@newValue"].Value = newValue;
+                }
+            }
+
+            command = new MySqlCommand($"UPDATE `check` SET `{nameof(findBy)}` = @newValue WHERE `{nameof(FindByValueOrder.idOrder)}` = @idOrder", db.IsConnection());
+
+            command.ExecuteNonQuery();
+
+            command.Parameters.Clear();
+        }
 
     }
 }

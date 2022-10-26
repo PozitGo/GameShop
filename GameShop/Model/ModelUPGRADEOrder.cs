@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GameShop.Model.ModelTableInDataBase
 {
-    public class OrderUPGRADE : Order
+    public class ModelUPGRADEOrder : Order
     {
         public string NameProduct { get; set; }
         public string LoginUser { get; set; }

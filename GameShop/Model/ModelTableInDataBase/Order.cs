@@ -17,10 +17,5 @@ namespace GameShop.Model
         public int Discount { get; set; }
         public bool Status { get; set; }
         public int idCheck { get; set; }
-
-        public Order()
-        {
-            Status = true;
-        }
     }
 }

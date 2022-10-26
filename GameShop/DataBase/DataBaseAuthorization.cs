@@ -13,15 +13,13 @@ using static GameShop.DataBase.DataBaseRequstUser;
 
 namespace GameShop.DataBase
 {
-    public class DataBaseAuthorization : DataBaseConnect
+    public struct DataBaseAuthorization 
     {
         public static UserAccount CurrentUser;
 
-        public static ReadingDataUserInCollection ReadingDataUserInCollectionHandeler { get; set; }
-
         public delegate UserAccount ReturnCurrentUserDelegate();
 
-        public static UserAccount ReturnCurrentUser()
+        private UserAccount ReturnCurrentUser()
         {
             return CurrentUser;
         }
@@ -59,8 +57,6 @@ namespace GameShop.DataBase
                 AuthBar.Wrong();
                 command.Parameters.Clear();
             }
-            
-            db.CloseConnection();
         }
 
         public static bool LogUser(string LoginLog, string PasswordLog, AuthInfoBar AuthBar = null)
@@ -78,13 +74,11 @@ namespace GameShop.DataBase
                 adapter.Fill(table);
                 if (table.Rows.Count > 0)
                 {
-                    ReadingDataUserInCollectionHandeler = new ReadingDataUserInCollection(ReadingDataUser);
-                    ObservableCollection<UserAccount> tempCollection = ReadingDataUserInCollectionHandeler(FindByValueUser.Login, LoginLog);
+                    ObservableCollection<UserAccount> tempCollection = ReadingDataUser(FindByValueUser.Login, LoginLog);
                     CurrentUser = tempCollection[0];
                     
                     if (AuthBar != null)
                     AuthBar.Successfully();
-                    db.CloseConnection();
                     command.Parameters.Clear();
                     return true;
                 } 
@@ -92,7 +86,6 @@ namespace GameShop.DataBase
                 {
                     if(AuthBar != null)
                     AuthBar.Wrong();
-                    db.CloseConnection();
                     command.Parameters.Clear();
                 }
             }
@@ -188,7 +181,6 @@ namespace GameShop.DataBase
                 return LoginCheck = true;
             }
 
-            db.CloseConnection();
             return LoginCheck;
         }
         
@@ -211,7 +203,6 @@ namespace GameShop.DataBase
                 return PhoneNumberCheck = false;
             }
 
-            db.CloseConnection();
             return PhoneNumberCheck;
         }
 
@@ -234,7 +225,6 @@ namespace GameShop.DataBase
                 return EmailCheck = true;
             }
             
-            db.CloseConnection();
             return EmailCheck;
         }
     }

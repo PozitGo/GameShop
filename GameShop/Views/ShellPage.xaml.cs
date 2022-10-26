@@ -1,6 +1,4 @@
-﻿using System;
-
-using GameShop.ViewModels;
+﻿using GameShop.ViewModels;
 
 using Windows.UI.Xaml.Controls;
 

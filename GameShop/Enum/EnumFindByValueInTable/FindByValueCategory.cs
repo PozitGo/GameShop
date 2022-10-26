@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GameShop.Enum
+﻿namespace GameShop.Enum
 {
     public enum FindByValueCategory
     {
         idCategory,
-        Name,
-        None
+        Name
     }
 }

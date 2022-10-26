@@ -27,7 +27,6 @@ namespace GameShop.DataBase
         
         public MySqlConnection IsConnection()
         {
-
             return Connection;
         }
 
@@ -45,6 +44,11 @@ namespace GameShop.DataBase
                 Connection.Close();
             else
                 Debug.WriteLine("База данных уже закрыта");
+        }
+
+        ~DataBaseConnect()
+        {
+            CloseConnection();
         }
     }
 }

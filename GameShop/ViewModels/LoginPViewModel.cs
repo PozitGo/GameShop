@@ -76,14 +76,6 @@ namespace GameShop.ViewModels
                 if (AuthBar != null)
                     AuthBar.Wrong();
             }
-            //await ApplicationData.Current.LocalSettings.SaveAsync("Login", LoginLog);
-            //string data = await ApplicationData.Current.LocalSettings.ReadAsync<string>("Login");
-            //MyData data = new MyData() { Data1 = 2, Data2 = LoginLog, Data3 = PasswordLog};
-            //await ApplicationData.Current.LocalSettings.SaveAsync("Data1", data);
-            //var datadata = await ApplicationData.Current.LocalSettings.ReadAsync<MyData>("Data1");
-            //Debug.WriteLine(datadata.Data1);
-            //Debug.WriteLine(datadata.Data2);
-            //Debug.WriteLine(datadata.Data3);
         }
 
         class MyData

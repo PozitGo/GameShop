@@ -1,27 +1,28 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using GameShop.DataBase;
 using GameShop.Enum;
 using GameShop.Model;
 using GameShop.Model.ModelTableInDataBase;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
+using Microsoft.Toolkit.Uwp.UI.Controls;
+using NPOI.XWPF.UserModel;
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using static GameShop.DataBase.DataBaseRequestOrder;
 using static GameShop.DataBase.DataBaseRequstCheck;
 using static GameShop.DataBase.DataBaseRequstInTable.DataBaseRequstProduct;
-using static GameShop.DataBase.DataBaseRequstUser;
+using RelayCommand = GalaSoft.MvvmLight.Command.RelayCommand;
 
 namespace GameShop.ViewModels
 {
     public class ControlPanelViewModel : ObservableObject
     {
-        public ObservableCollection<OrderUPGRADE> OrderUPGRADECollection = new ObservableCollection<OrderUPGRADE>();
+        public ObservableCollection<ModelUPGRADEOrder> OrderUPGRADECollection = new ObservableCollection<ModelUPGRADEOrder>();
 
         public ObservableCollection<Order> OrderCollectionSettings = new ObservableCollection<Order>();
 
@@ -29,66 +30,17 @@ namespace GameShop.ViewModels
 
         public ObservableCollection<Check> CheckCollectionSettings = new ObservableCollection<Check>();
 
-        
-        public ReadingDataCheckInCollection ReadingDataCheckInCollectionHandeler { get; set; }
+        public ObservableCollection<int> AllidCheckCollection = new ObservableCollection<int>();
 
-        public ReadingDataOrderInCollection ReadingDataOrderInCollectionHandeler { get; set; }
+        public ObservableCollection<int> AllidProductCollection = new ObservableCollection<int>();
 
-        public SaveNewItemOrderByDBDelegate SaveNewItemOrderByDBHandler { get; set; }
-        
-        public SaveNewItemOrderByDBDelegate SaveNewItemCheckByDBHandler { get; set; }
+        public ObservableCollection<int> AllidUserCollection = new ObservableCollection<int>();
 
-        public FindNameByidProductDelegate FindNameByidProductDelegateHandler { get; set; }
+        public DataGrid DataGridOrderUPGRADE;
+        public DataGrid DataGridCheck;
+        public DataGrid DataGridOrderSettings;
+        public DataGrid DataGridCheckSettings;
 
-        public FindNameSurnameByidUserDelegate FindNameSurnameByidUserDelegateHandler { get; set; }
-
-        public FindLoginByidUserDelegate FindLoginByidUserDelegateHandler { get; set; }
-
-
-        private string _OrderCollectionIsVisibleDataGrid;
-        public string OrderCollectionIsVisibleDataGrid
-        {
-            get => _OrderCollectionIsVisibleDataGrid;
-            set => SetProperty(ref _OrderCollectionIsVisibleDataGrid, value);
-        }
-        
-        private string _CheckCollectionIsVisibleDataGrid;
-        public string CheckCollectionIsVisibleDataGrid
-        {
-            get => _CheckCollectionIsVisibleDataGrid;
-            set => SetProperty(ref _CheckCollectionIsVisibleDataGrid, value);
-        }
-
-        private bool _IsCheckedOrderMainTable;
-
-        public bool IsCheckedOrderMainTable
-        {
-            get => _IsCheckedOrderMainTable;
-            set => SetProperty(ref _IsCheckedOrderMainTable, value); 
-        }
-
-        private bool _IsCheckedCheckMainTable;
-
-        public bool IsCheckedCheckMainTable
-        {
-            get => _IsCheckedCheckMainTable;
-            set => SetProperty(ref _IsCheckedCheckMainTable, value);
-        }
-
-
-        private string _HorizontalAligamentOrderCollectionDataGrid;
-        public string HorizontalAligamentOrderCollectionDataGrid
-        {
-            get => _HorizontalAligamentOrderCollectionDataGrid;
-            set => SetProperty(ref _HorizontalAligamentOrderCollectionDataGrid, value);
-        }
-
-        private string _HorizontalAligamentCheckCollectionDataGrid;
-        public string HorizontalAligamentCheckCollectionDataGrid
-        {
-            get => _HorizontalAligamentCheckCollectionDataGrid;
-            set => SetProperty(ref _HorizontalAligamentCheckCollectionDataGrid, value);
-        }
 
         private string _VisibilitySaveButtonCommandBar;
         public string VisibilitySaveButtonCommandBar
@@ -96,177 +48,368 @@ namespace GameShop.ViewModels
             get => _VisibilitySaveButtonCommandBar;
             set => SetProperty(ref _VisibilitySaveButtonCommandBar, value);
         }
-
-        public ICommand ButtonMainTable;
-        public ICommand AppBarButtonAddOrder;
-        public ICommand AppBarButtonSaveButton;
-
-        private void AppBarButtonAddOrderClick()
+        private string _VisibilityCheckBoxUniteCheck;
+        private string _ContentSaveButtonCommandBar;
+        public string ContentSaveButtonCommandBar
         {
-            Order order = new Order();
-            OrderCollectionSettings.Add(order);
-            VisibilitySaveButtonCommandBar = "Visible";
+            get => _ContentSaveButtonCommandBar;
+            set => SetProperty(ref _ContentSaveButtonCommandBar, value);
         }
-        
-        private async void AppBarButtonSaveButtonClick()
+        public string VisibilityCheckBoxUniteCheck
         {
-            VisibilitySaveButtonCommandBar = "Collapsed";
+            get => _VisibilityCheckBoxUniteCheck;
+            set => SetProperty(ref _VisibilityCheckBoxUniteCheck, value);
+        }
+        private string _VisibilityTextBoxidOrderEditAndDelete;
+        public string VisibilityTextBoxidOrderEditAndDelete
+        {
+            get => _VisibilityTextBoxidOrderEditAndDelete;
+            set => SetProperty(ref _VisibilityTextBoxidOrderEditAndDelete, value);
+        }
+        private string _TextBoxTextidOrderEditAndDelete;
+        public string TextBoxTextidOrderEditAndDelete
+        {
+            get => _TextBoxTextidOrderEditAndDelete;
+            set => SetProperty(ref _TextBoxTextidOrderEditAndDelete, value);
+        }
+        private bool _IsCheckedCheckBoxUniteCheck;
+        public bool IsCheckedCheckBoxUniteCheck
+        {
+            get => _IsCheckedCheckBoxUniteCheck;
+            set => SetProperty(ref _IsCheckedCheckBoxUniteCheck, value);
+        }
+        private string _DataGridTextColumnVisibilitySettingsidCheck;
+        public string DataGridTextColumnVisibilitySettingsidCheck
+        {
+            get => _DataGridTextColumnVisibilitySettingsidCheck;
+            set => SetProperty(ref _DataGridTextColumnVisibilitySettingsidCheck, value);
+        }
+        private bool _IsOpenTeachingTipEdit;
+        public bool IsOpenTeachingTipEdit
+        {
+            get => _IsOpenTeachingTipEdit; 
+            set => SetProperty(ref _IsOpenTeachingTipEdit, value); 
+        }
 
-            for (int i = 0; i < OrderCollectionSettings.Count; i++)
+
+        private bool IsUPDATE;
+        private bool IsDELETE;
+        private bool IsADD;
+
+        private bool isOpenTableCheckSettings;
+
+
+        public ICommand AppBarButtonAddOrder => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(AppBarButtonAddOrderClick);
+        private async void AppBarButtonAddOrderClick(DataGrid data)
+        {
+            IsADD = true;
+
+
+            if (DataGridOrderSettings == null)
             {
-                AddNewOrder(OrderCollectionSettings[0]);
+                DataGridOrderSettings = data;
             }
+
+            DataGridOrderSettings.Visibility = Visibility.Visible;
+            Order order = new Order();
 
             await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-               OrderCollectionSettings.Clear();
-                
+                OrderCollectionSettings.Add(order);
             });
+
+            InitializationCollectionAllId();
+            ContentSaveButtonCommandBar = "Сохранить";
+            VisibilitySaveButtonCommandBar = "Visible";
+            VisibilityCheckBoxUniteCheck = "Visible";
+            VisibilityTextBoxidOrderEditAndDelete = "Collapsed";
         }
 
-        private void ButtonMainTableClick()
+        public ICommand AppBarButtonEditOrder => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(AppBarButtonEditOrderClick);
+        private void AppBarButtonEditOrderClick(DataGrid data)
         {
-            if(IsCheckedCheckMainTable)
+            DataGridOrderSettings = data;
+            IsUPDATE = true;
+            IsOpenTeachingTipEdit = true;
+
+            InitializationCollectionAllId();
+            VisibilityTextBoxidOrderEditAndDelete = "Visible";
+            ContentSaveButtonCommandBar = "Изменить";
+            VisibilitySaveButtonCommandBar = "Visible";
+            VisibilityCheckBoxUniteCheck = "Collapsed";
+        }
+
+        public ICommand IsVisibleCheckBoxUniteCheckCommand;
+        public void IsVisibleCheckBoxUniteCheck()
+        {
+
+            if (IsCheckedCheckBoxUniteCheck)
             {
-                OrderCollectionIsVisibleDataGrid = "Collapsed";
-                CheckCollectionIsVisibleDataGrid = "Visible";
+                DataGridOrderSettings.Columns[6].Visibility = Visibility.Collapsed;
             }
-            else if(IsCheckedOrderMainTable)
+            else
             {
-                CheckCollectionIsVisibleDataGrid = "Collapsed";
-                OrderCollectionIsVisibleDataGrid = "Visible";
+                DataGridOrderSettings.Columns[6].Visibility = Visibility.Visible;
             }
+        }
+
+        public ICommand AppBarButtonSaveButton;
+        private async void AppBarButtonSaveButtonClick()
+        {
+            if(IsADD)
+            {
+                VisibilityCheckBoxUniteCheck = "Collapsed";
+                VisibilitySaveButtonCommandBar = "Collapsed";
+                DataGridTextColumnVisibilitySettingsidCheck = "Visible";
+                DataGridOrderSettings.Visibility = Visibility.Collapsed;
+
+
+                for (int i = 0; i < OrderCollectionSettings.Count; i++)
+                {
+                    OrderCollectionSettings[i].idCheck = OrderUPGRADECollection.Max(x => x.idCheck) + 1;
+                }
+
+                for (int i = 0; i < OrderCollectionSettings.Count; i++)
+                {
+                    if (OrderCollectionSettings[i].idProduct != 0 && OrderCollectionSettings[i].Quantity != 0)
+                    {
+                        if (OrderCollectionSettings[i].Price == 0)
+                        {
+                            OrderCollectionSettings[i].Price = FindValueByidProduct<float>(OrderCollectionSettings[i].idProduct, FindByValueProduct.Price) * OrderCollectionSettings[i].Quantity;
+
+                            await Task.Factory.StartNew(() => AddNewOrder(OrderCollectionSettings[i]));
+                        }
+                    }
+
+                }
+
+                await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    OrderCollectionSettings.Clear();
+                });
+                
+                IsADD = false;
+            }
+
+            if(IsUPDATE)
+            {
+                ObservableCollection<Order> OrderCollectionSettingsOldItems = new ObservableCollection<Order>();
+
+                if (TextBoxTextidOrderEditAndDelete != default(String))
+                {
+
+                    foreach (var item in ReadingDataOrder(FindByValueOrder.idOrder, int.Parse(TextBoxTextidOrderEditAndDelete)))
+                    {
+                        await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                        {
+                            OrderCollectionSettings.Add(item);
+                        });
+                    }
+
+                    OrderCollectionSettingsOldItems = OrderCollectionSettings;
+                    UPDATEItemInCollectionOrder(OrderCollectionSettings, OrderCollectionSettingsOldItems);
+                }
+                IsUPDATE = false;
+            }
+        }
+
+        public ICommand OpenTableCheckSettingsCommand => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(OpenTableCheckSettings);
+        private void OpenTableCheckSettings(DataGrid data)
+        {
+            DataGridCheckSettings = data;
+            isOpenTableCheckSettings = true;
+            DataGridOrderSettings.Visibility = Visibility.Collapsed;
+            DataGridCheckSettings.Visibility = Visibility.Visible;
+        }
+
+        public ICommand OpenTableOrderSettingsCommand => new RelayCommand(OpenTableOrderSettings);
+        private void OpenTableOrderSettings()
+        {
+            isOpenTableCheckSettings = false;
+            DataGridOrderSettings.Visibility = Visibility.Visible;
+
+            if(DataGridCheckSettings != null)
+            DataGridCheckSettings.Visibility = Visibility.Collapsed;
+        }
+
+        public ICommand RadionButtonTableOrderCommand => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(RadionButtonTableOrder);
+        private void RadionButtonTableOrder(DataGrid data)
+        {
+            DataGridOrderUPGRADE = data;
+            InitializationCollectionOrderUPGRADE();
+            DataGridOrderUPGRADE.Visibility = Visibility.Visible;
+
+            if (DataGridCheck != null)
+                DataGridCheck.Visibility = Visibility.Collapsed;
+        }
+
+        public ICommand RadionButtonTableCheckCommand => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(RadionButtonTableCheck);
+        private void RadionButtonTableCheck(DataGrid data)
+        {
+            InitializationCollectionCheck();
+            DataGridCheck = data;
+            DataGridCheck.Visibility = Visibility.Visible;
+
+            if (DataGridOrderUPGRADE != null)
+                DataGridOrderUPGRADE.Visibility = Visibility.Collapsed;
         }
 
         public ControlPanelViewModel()
         {
+            IsVisibleCheckBoxUniteCheckCommand = new RelayCommand(IsVisibleCheckBoxUniteCheck);
             AppBarButtonSaveButton = new RelayCommand(AppBarButtonSaveButtonClick);
-            AppBarButtonAddOrder = new RelayCommand(AppBarButtonAddOrderClick);
-            ButtonMainTable = new RelayCommand(ButtonMainTableClick);
+            IsOpenTeachingTipEdit = false;
+            VisibilityTextBoxidOrderEditAndDelete = "Collapsed";
+            DataGridTextColumnVisibilitySettingsidCheck = "Visible";
+            VisibilityCheckBoxUniteCheck = "Collapsed";
             VisibilitySaveButtonCommandBar = "Collapsed";
-            HorizontalAligamentOrderCollectionDataGrid = "Left";
-            HorizontalAligamentCheckCollectionDataGrid = "Left";
-            OrderCollectionIsVisibleDataGrid = "Collapsed";
-            CheckCollectionIsVisibleDataGrid = "Collapsed";
-            Task.Factory.StartNew(() => InitializationCollection());
         }
 
-        private Task InitializationCollection()
+        private void InitializationCollectionOrderUPGRADE()
         {
-            OrderUPGRADECollection.Clear();
-            CheckCollection.Clear();
-
-            ReadingDataOrderInCollectionHandeler = new ReadingDataOrderInCollection(ReadingDataOrder);
-            ReadingDataCheckInCollectionHandeler = new ReadingDataCheckInCollection(ReadingDataCheck);
-            FindNameByidProductDelegateHandler = new FindNameByidProductDelegate(FindNameByidProduct);
-            FindNameSurnameByidUserDelegateHandler = new FindNameSurnameByidUserDelegate(FindNameSurnameByidUser);
-            FindLoginByidUserDelegateHandler = new FindLoginByidUserDelegate(FindLoginByidUser);
-
-
-            return Task.Factory.StartNew(() =>
+            DataGridOrderUPGRADE.UnloadingRowDetails += DataGridOrderUPGRADE_UnloadingRowDetails;
+            //DataGridOrderUPGRADE.LoadingRowDetails += DataGridOrderUPGRADE_LoadingRowDetails;
+            Windows.Foundation.IAsyncAction asyncAction = Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 ObservableCollection<Order> OrderCollection = new ObservableCollection<Order>();
-                foreach (var item in ReadingDataOrderInCollectionHandeler())
+                if (OrderUPGRADECollection.Count == 0)
                 {
-                    OrderCollection.Add(item);
-                }
-                
-                Task.Factory.StartNew(() =>
-                {
-                    for (int i = 0; i < OrderCollection.Count; i++)
-                    {
-                        OrderUPGRADE orderU = new OrderUPGRADE();
-                        OrderUPGRADECollection.Add(orderU);
-                        OrderUPGRADECollection[i].idOrder = OrderCollection[i].idOrder;
-                        OrderUPGRADECollection[i].idProduct = OrderCollection[i].idProduct;
-                        OrderUPGRADECollection[i].NameProduct = FindNameByidProductDelegateHandler(OrderCollection[i].idOrder);
-                        OrderUPGRADECollection[i].idUser = OrderCollection[i].idUser;
-                        OrderUPGRADECollection[i].LoginUser = FindLoginByidUserDelegateHandler(OrderCollection[i].idUser);
-                        var temp = FindNameSurnameByidUserDelegateHandler(OrderCollection[i].idUser);
-                        OrderUPGRADECollection[i].NameUser = temp.Name;
-                        OrderUPGRADECollection[i].SurnameUser = temp.Surname;
-                        OrderUPGRADECollection[i].NameSurnameUser = temp.Name + " " + temp.Surname;
-                        OrderUPGRADECollection[i].Quantity = OrderCollection[i].Quantity;
-                        OrderUPGRADECollection[i].Price = OrderCollection[i].Price;
-                        OrderUPGRADECollection[i].Discount = OrderCollection[i].Discount;
-                        OrderUPGRADECollection[i].Status = OrderCollection[i].Status;
-                        OrderUPGRADECollection[i].idCheck = OrderCollection[i].idCheck;
-                    }
-                });
 
-                foreach (var item in ReadingDataCheckInCollectionHandeler())
-                {
-                    CheckCollection.Add(item);
+                    Task task = Task.Factory.StartNew(() =>
+                    {
+                        foreach (var item in ReadingDataOrder())
+                        {
+                            OrderCollection.Add(item);
+                        }
+                    });
+
+                    task.Wait();
+                    foreach (var item in ConverOrderAndOrderUPGRADE.ConvertFromOrderCollectionInOrderUPGRADECollection(OrderCollection))
+                    {
+                        OrderUPGRADECollection.Add(item);
+                    }
                 }
             });
         }
-        private void AddNewOrder(Order item)
+
+        private void DataGridOrderUPGRADE_LoadingRowDetails(object sender, DataGridRowDetailsEventArgs e) => this.e = e;
+
+        private DataGridRowDetailsEventArgs e;
+
+        private void DataGridOrderUPGRADE_UnloadingRowDetails(object sender, DataGridRowDetailsEventArgs e) => e.Row.DetailsVisibility = Visibility.Collapsed;
+
+        public ICommand CloseDetailVisible => new RelayCommand(CloseDetailVisibleClick);
+        private void CloseDetailVisibleClick()
         {
-            SaveNewItemOrderByDBHandler = new SaveNewItemOrderByDBDelegate(SaveNewItemOrderByDB);
-            ReadingDataOrderInCollectionHandeler = new ReadingDataOrderInCollection(ReadingDataOrder);
-            FindNameByidProductDelegateHandler = new FindNameByidProductDelegate(FindNameByidProduct);
-            FindNameSurnameByidUserDelegateHandler = new FindNameSurnameByidUserDelegate(FindNameSurnameByidUser);
-            FindLoginByidUserDelegateHandler = new FindLoginByidUserDelegate(FindLoginByidUser);
-
-                OrderUPGRADE orderU = new OrderUPGRADE();
-
-                orderU.idOrder = OrderUPGRADECollection.Max(x => x.idOrder) + 1;
-                orderU.idProduct = item.idOrder;
-                orderU.NameProduct = FindNameByidProductDelegateHandler(orderU.idOrder);
-                orderU.idUser = item.idUser;
-                orderU.LoginUser = FindLoginByidUserDelegateHandler(item.idUser);
-                var temp = FindNameSurnameByidUserDelegateHandler(item.idUser);
-                orderU.NameUser = temp.Name;
-                orderU.SurnameUser = temp.Surname;
-                orderU.NameSurnameUser = temp.Name + " " + temp.Surname;
-                orderU.Quantity = item.Quantity;
-                orderU.Price = item.Price;
-                orderU.Discount = item.Discount;
-                orderU.Status = item.Status;
-                orderU.idCheck = item.idCheck;
-
-                SaveNewItemOrderByDBHandler(item);;
-
-                Windows.Foundation.IAsyncAction asyncAction = Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            if (e.Row.DetailsVisibility == Visibility.Visible)
+                e.Row.DetailsVisibility = Visibility.Collapsed;
+        }
+        private void InitializationCollectionCheck()
+        {
+            if (CheckCollection.Count == 0)
+                foreach (var item in ReadingDataCheck())
                 {
-                OrderUPGRADECollection.Add(orderU);
-                });
-
+                    Windows.Foundation.IAsyncAction asyncAction = Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        CheckCollection.Add(item);
+                    });
+                }
         }
 
-        private Task<bool> DeleteItemInCollectionOrder(OrderUPGRADE item)
+        private void InitializationCollectionAllId()
+        {
+            Task.Factory.StartNew(() =>
+            {
+                if (AllidProductCollection.Count == 0)
+                {
+                    foreach (var item in UniversalRequst.ReadingAllToIdFromTable("product", "idProduct"))
+                    {
+                        AllidProductCollection.Add(item);
+                    }
+                }
+
+                if (AllidUserCollection.Count == 0)
+                {
+                    foreach (var item in UniversalRequst.ReadingAllToIdFromTable("user", "idUser"))
+                    {
+                        AllidUserCollection.Add(item);
+                    }
+                }
+
+                if (AllidCheckCollection.Count == 0)
+                {
+                    foreach (var item in UniversalRequst.ReadingAllToIdFromTable("check", "idCheck"))
+                    {
+                        AllidCheckCollection.Add(item);
+                    }
+                }
+            });
+        }
+
+
+        private void AddNewOrder(Order item)
+        {
+
+            ModelUPGRADEOrder orderU = new ModelUPGRADEOrder();
+            orderU = ConverOrderAndOrderUPGRADE.ConvertFromOrderInOrderUPGRADE(item, OrderUPGRADECollection.Max(x => x.idOrder) + 1);
+            SaveNewItemOrderByDB(item);
+
+            Windows.Foundation.IAsyncAction asyncAction = Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                OrderUPGRADECollection.Add(orderU);
+            });
+        }
+
+        private Task<bool> DeleteItemInCollectionOrder(ModelUPGRADEOrder item)
         {
             //Проверка на существование 
             Task.Factory.StartNew(() =>
             {
-                
+
                 OrderUPGRADECollection.Remove(item);
                 //Вызов запроса на удаление из бд
             });
 
             return Task<bool>.Factory.StartNew(() => true);
         }
-
-        private Task<bool> UPDATEItemInCollectionOrder(FindByValueOrder value, int idOrder)
+        
+        private async void UPDATEItemInCollectionOrder(ObservableCollection<Order> Collection, ObservableCollection<Order> OrderCollectionSettingsOldItems)
         {
-            //Какой элемент менять, и что в нём менять 
-            Task.Factory.StartNew(() =>
+            await Task.Factory.StartNew(() =>
             {
-                var temp = ReadingDataOrderInCollectionHandeler(value, idOrder);
-                if (temp.Count > 0 && OrderUPGRADECollection[idOrder] != null)
+                for (int i = 0; i < Collection.Count; i++)
                 {
-                    //Изменение коллекции + вызов конкретики изменения + изменения в бд
-                    //В запрос не включаем те данные которые не изменяются, показываем данные на данный момент и проверяем изменились они либо нет, из этого формируем запрос
+                    if (Collection[i].idCheck != OrderCollectionSettingsOldItems[i].idCheck)
+                    {
+                        DataBaseRequestOrder.UpdateItemInTableOrder(FindByValueOrder.idCheck, Collection[i].idCheck, Collection[i].idOrder);
+                    }
+                    else if (Collection[i].idUser != OrderCollectionSettingsOldItems[i].idUser)
+                    {
+                        DataBaseRequestOrder.UpdateItemInTableOrder(FindByValueOrder.idUser, Collection[i].idUser, Collection[i].idOrder);
+                    }
+                    else if (Collection[i].Status != OrderCollectionSettingsOldItems[i].Status)
+                    {
+                        DataBaseRequestOrder.UpdateItemInTableOrder(FindByValueOrder.Status, Collection[i].Status, Collection[i].idOrder);
+                    }
+                    else if (Collection[i].Quantity != OrderCollectionSettingsOldItems[i].Quantity)
+                    {
+                        if(Collection[i].Price == OrderCollectionSettingsOldItems[i].Price)
+                        Collection[i].Price = FindValueByidProduct<float>(Collection[i].idProduct, FindByValueProduct.Price) * Collection[i].Quantity;
+                        
+                        DataBaseRequestOrder.UpdateItemInTableOrder(FindByValueOrder.Quantity, Collection[i].Quantity, Collection[i].idOrder);
+                    }
+                    else if (Collection[i].Price != OrderCollectionSettingsOldItems[i].Price)
+                    {
+                        DataBaseRequestOrder.UpdateItemInTableOrder(FindByValueOrder.Price, Collection[i].Price, Collection[i].idOrder);
+                    }
                 }
-                else
-                {
-                    Debug.WriteLine("Error");
-                }
-
             });
 
-            return Task<bool>.Factory.StartNew(() => true);
+            await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                OrderCollectionSettings.Clear();
+            });
         }
-       
+
     }
 }

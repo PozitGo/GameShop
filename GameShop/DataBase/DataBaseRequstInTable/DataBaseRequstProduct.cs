@@ -1,24 +1,15 @@
 ﻿using GameShop.Enum;
 using GameShop.Model;
 using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace GameShop.DataBase.DataBaseRequstInTable
 {
-    public class DataBaseRequstProduct
+    public struct DataBaseRequstProduct
     {
-        public delegate ObservableCollection<Product> ReadingDataProductInCollection(FindByValueProduct readBy = FindByValueProduct.None, object parametr = null);
-
-        public delegate string FindNameByidProductDelegate(int idProduct);
-
-        public delegate Task<bool> SaveNewItemProductByDBDelegate(Product product);
-        public static ObservableCollection<Product> ReadingDataProduct(FindByValueProduct readBy = FindByValueProduct.None, object parametr = null)
+        public static ObservableCollection<Product> ReadingDataProduct<T>(FindByValueProduct readBy, T parametr)
         {
             DataBaseConnect db = new DataBaseConnect();
             MySqlCommand command = new MySqlCommand();
@@ -35,7 +26,7 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                     {
                         NameFieldByTable = "@" + nameof(FindByValueProduct.idProduct);
                         command = new MySqlCommand("SELECT * FROM `product` WHERE " + NameFieldByTable + " = idProduct", db.IsConnection());
-                        Collection = ReadProductsByParametr(db, command, adapter, table, parametr, NameFieldByTable);
+                        Collection = ReadProductsByParametr(command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
                 case FindByValueProduct.idCategory:
@@ -43,7 +34,7 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                     {
                         NameFieldByTable = "@" + nameof(FindByValueProduct.idCategory);
                         command = new MySqlCommand("SELECT * FROM `product` WHERE " + NameFieldByTable + " = idCategory", db.IsConnection());
-                        Collection = ReadProductsByParametr(db, command, adapter, table, parametr, NameFieldByTable);
+                        Collection = ReadProductsByParametr(command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
                 case FindByValueProduct.Price:
@@ -51,7 +42,7 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                     {
                         NameFieldByTable = "@" + nameof(FindByValueProduct.Price);
                         command = new MySqlCommand("SELECT * FROM `product` WHERE " + NameFieldByTable + " = Price", db.IsConnection());
-                        Collection = ReadProductsByParametr(db, command, adapter, table, parametr, NameFieldByTable);
+                        Collection = ReadProductsByParametr(command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
                 case FindByValueProduct.Quantity:
@@ -59,7 +50,7 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                     {
                         NameFieldByTable = "@" + nameof(FindByValueProduct.Quantity);
                         command = new MySqlCommand("SELECT * FROM `product` WHERE " + NameFieldByTable + " = Quantity", db.IsConnection());
-                        Collection = ReadProductsByParametr(db, command, adapter, table, parametr, NameFieldByTable);
+                        Collection = ReadProductsByParametr(command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
                 case FindByValueProduct.Name:
@@ -67,7 +58,7 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                     {
                         NameFieldByTable = "@" + nameof(FindByValueProduct.Name);
                         command = new MySqlCommand("SELECT * FROM `product` WHERE " + NameFieldByTable + " = Name", db.IsConnection());
-                        Collection = ReadProductsByParametr(db, command, adapter, table, parametr, NameFieldByTable);
+                        Collection = ReadProductsByParametr(command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
                 case FindByValueProduct.Manufacturer:
@@ -75,7 +66,7 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                     {
                         NameFieldByTable = "@" + nameof(FindByValueProduct.Manufacturer);
                         command = new MySqlCommand("SELECT * FROM `product` WHERE " + NameFieldByTable + " = Manufacturer", db.IsConnection());
-                        Collection = ReadProductsByParametr(db, command, adapter, table, parametr, NameFieldByTable);
+                        Collection = ReadProductsByParametr(command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
                 case FindByValueProduct.BasicDescription:
@@ -83,24 +74,35 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                     {
                         NameFieldByTable = "@" + nameof(FindByValueProduct.BasicDescription);
                         command = new MySqlCommand("SELECT * FROM `product` WHERE " + NameFieldByTable + " = Description", db.IsConnection());
-                        Collection = ReadProductsByParametr(db, command, adapter, table, parametr, NameFieldByTable);
-                    }
-                    break;
-                case FindByValueProduct.None:
-                    if (parametr == null)
-                    {
-                        command = new MySqlCommand("SELECT * FROM `product`", db.IsConnection());
-                        Collection = ReadProductsByParametr(db, command, adapter, table);
+                        Collection = ReadProductsByParametr(command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
             }
 
-            db.CloseConnection();
+            command.Parameters.Clear();
             return Collection;
 
         }
 
-        private static ObservableCollection<Product> ReadProductsByParametr(DataBaseConnect db, MySqlCommand command, MySqlDataAdapter adapter, DataTable table, object parametr = null, string NameFieldByTable = null)
+        public static ObservableCollection<Product> ReadingDataProduct()
+        {
+            DataBaseConnect db = new DataBaseConnect();
+            MySqlCommand command = new MySqlCommand();
+            DataTable table = new DataTable();
+            MySqlDataAdapter adapter = new MySqlDataAdapter();
+
+            ObservableCollection<Product> Collection = new ObservableCollection<Product>();
+            
+            command = new MySqlCommand("SELECT * FROM `product`", db.IsConnection());
+            Collection = ReadProductsByParametr(command, adapter, table);
+
+
+            command.Parameters.Clear();
+            return Collection;
+
+        }
+
+        private static ObservableCollection<Product> ReadProductsByParametr<T>(MySqlCommand command, MySqlDataAdapter adapter, DataTable table, T parametr, string NameFieldByTable = null)
         {
             if (parametr != null)
             {
@@ -139,10 +141,10 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                 {
                     Product order = new Product();
                     Collection.Add(order);
-                    
+
                     Collection[i].idProduct = int.Parse(readerBy["idProduct"].ToString());
                     Collection[i].idCategory = int.Parse(readerBy["idCategory"].ToString());
-                    Collection[i].Price = double.Parse(readerBy["Price"].ToString());
+                    Collection[i].Price = float.Parse(readerBy["Price"].ToString());
                     Collection[i].Quantity = int.Parse(readerBy["Quantity"].ToString());
                     Collection[i].Name = readerBy["Name"].ToString();
                     Collection[i].Manufacturer = readerBy["Manufacturer"].ToString();
@@ -151,8 +153,38 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                 }
             }
 
-            command.Parameters.Clear();
-            db.CloseConnection();
+            command.Parameters.Clear(); ;
+            return Collection;
+        }
+
+        private static ObservableCollection<Product> ReadProductsByParametr(MySqlCommand command, MySqlDataAdapter adapter, DataTable table)
+        {
+
+            adapter.SelectCommand = command;
+            adapter.Fill(table);
+
+            ObservableCollection<Product> Collection = new ObservableCollection<Product>();
+            if (table.Rows.Count > 0)
+            {
+                MySqlDataReader readerBy = command.ExecuteReader();
+
+                for (int i = 0; readerBy.Read(); i++)
+                {
+                    Product order = new Product();
+                    Collection.Add(order);
+
+                    Collection[i].idProduct = int.Parse(readerBy["idProduct"].ToString());
+                    Collection[i].idCategory = int.Parse(readerBy["idCategory"].ToString());
+                    Collection[i].Price = float.Parse(readerBy["Price"].ToString());
+                    Collection[i].Quantity = int.Parse(readerBy["Quantity"].ToString());
+                    Collection[i].Name = readerBy["Name"].ToString();
+                    Collection[i].Manufacturer = readerBy["Manufacturer"].ToString();
+                    Collection[i].Rating = int.Parse(readerBy["Rating"].ToString());
+                    Collection[i].BasicDescription = readerBy["BasicDescription"].ToString();
+                }
+            }
+
+            command.Parameters.Clear(); ;
             return Collection;
         }
 
@@ -177,21 +209,49 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                     if (command.ExecuteNonQuery() == 7)
                         return true;
                 }
-
                 return false;
             });
-
         }
 
-        public static string FindNameByidProduct(int idProduct)
+        public static T FindValueByidProduct<T>(int idProduct, FindByValueProduct findBy)
         {
             DataBaseConnect db = new DataBaseConnect();
             MySqlCommand command = new MySqlCommand();
             DataTable table = new DataTable();
             MySqlDataAdapter adapter = new MySqlDataAdapter();
 
-            string Name = "";
-            command = new MySqlCommand("SELECT Name FROM `product` WHERE @idProduct = idProduct", db.IsConnection());
+            command.Parameters.Clear();
+
+            string NameField = "";
+            T Data = default;
+            switch (findBy)
+            {
+                case FindByValueProduct.idCategory:
+                    NameField = nameof(FindByValueProduct.idCategory);
+                    command = new MySqlCommand($"SELECT {NameField} FROM `product` WHERE @idProduct = idProduct", db.IsConnection());
+                    break;
+                case FindByValueProduct.Price:
+                    NameField = nameof(FindByValueProduct.Price);
+                    command = new MySqlCommand($"SELECT {NameField} FROM `product` WHERE @idProduct = idProduct", db.IsConnection());
+                    break;
+                case FindByValueProduct.Quantity:
+                    NameField = nameof(FindByValueProduct.Quantity);
+                    command = new MySqlCommand($"SELECT {NameField} FROM `product` WHERE @idProduct = idProduct", db.IsConnection());
+                    break;
+                case FindByValueProduct.Name:
+                    NameField = nameof(FindByValueProduct.Name);
+                    command = new MySqlCommand($"SELECT {NameField} FROM `product` WHERE @idProduct = idProduct", db.IsConnection());
+                    break;
+                case FindByValueProduct.Manufacturer:
+                    NameField = nameof(FindByValueProduct.Manufacturer);
+                    command = new MySqlCommand($"SELECT {NameField} FROM `product` WHERE @idProduct = idProduct", db.IsConnection());
+                    break;
+                case FindByValueProduct.BasicDescription:
+                    NameField = nameof(FindByValueProduct.BasicDescription);
+                    command = new MySqlCommand($"SELECT {NameField} FROM `product` WHERE @idProduct = idProduct", db.IsConnection());
+                    break;
+            }
+
 
             command.Parameters.Add(new MySqlParameter("@idProduct", MySqlDbType.Int32));
             command.Parameters["@idProduct"].Value = idProduct;
@@ -204,11 +264,48 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                 MySqlDataReader readerBy = command.ExecuteReader();
                 for (int i = 0; readerBy.Read(); i++)
                 {
-                    Name = readerBy["Name"].ToString();
+                    Data = (T)readerBy[NameField];
                 }
             }
 
-            return Name;
+            command.Parameters.Clear();
+            return Data;
+        }
+
+        public static void UpdateItemInTableProduct<T>(FindByValueProduct findBy, T newValue, int IdPrimaryKey)
+        {
+            DataBaseConnect db = new DataBaseConnect();
+            MySqlCommand command = new MySqlCommand();
+
+            command.Parameters.Add(new MySqlParameter("@idProduct", MySqlDbType.Int32));
+            command.Parameters["@idProduct"].Value = IdPrimaryKey;
+
+            try
+            {
+                command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Int32));
+                command.Parameters["@newValue"].Value = newValue;
+            }
+            catch
+            {
+
+                try
+                {
+                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Double));
+                    command.Parameters["@newValue"].Value = newValue;
+                }
+                catch
+                {
+
+                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.VarChar));
+                    command.Parameters["@newValue"].Value = newValue;
+                }
+            }
+
+            command = new MySqlCommand($"UPDATE `check` SET `{nameof(findBy)}` = @newValue WHERE `{nameof(FindByValueProduct.idProduct)}` = @idProduct", db.IsConnection());
+
+            command.ExecuteNonQuery();
+
+            command.Parameters.Clear();
         }
     }
 }

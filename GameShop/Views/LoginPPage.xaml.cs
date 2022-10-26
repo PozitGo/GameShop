@@ -1,6 +1,4 @@
-﻿using System;
-using GameShop.ViewModels;
-using Windows.UI.Core;
+﻿using GameShop.ViewModels;
 using Windows.UI.Xaml.Controls;
 
 namespace GameShop.Views
