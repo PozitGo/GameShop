@@ -92,7 +92,6 @@ namespace GameShop.DataBase
             DataTable table = new DataTable();
             MySqlDataAdapter adapter = new MySqlDataAdapter();
 
-
             command.Parameters.Clear();
             ObservableCollection<Order> Collection = new ObservableCollection<Order>();
 
@@ -276,6 +275,8 @@ namespace GameShop.DataBase
             DataBaseConnect db = new DataBaseConnect();
             MySqlCommand command = new MySqlCommand();
 
+            command = new MySqlCommand($"UPDATE `check` SET `{findBy.ToString()}` = @newValue WHERE `{nameof(FindByValueOrder.idOrder)}` = @idOrder", db.IsConnection());
+
             command.Parameters.Add(new MySqlParameter("@idOrder", MySqlDbType.Int32));
             command.Parameters["@idOrder"].Value = IdPrimaryKey;
 
@@ -299,8 +300,6 @@ namespace GameShop.DataBase
                     command.Parameters["@newValue"].Value = newValue;
                 }
             }
-
-            command = new MySqlCommand($"UPDATE `check` SET `{nameof(findBy)}` = @newValue WHERE `{nameof(FindByValueOrder.idOrder)}` = @idOrder", db.IsConnection());
 
             command.ExecuteNonQuery();
 

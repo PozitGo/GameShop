@@ -233,6 +233,8 @@ namespace GameShop.DataBase
             DataBaseConnect db = new DataBaseConnect();
             MySqlCommand command = new MySqlCommand();
 
+            command = new MySqlCommand($"UPDATE `check` SET `{findBy.ToString()}` = @newValue WHERE `{nameof(FindByValueUser.idUser)}` = @idUser", db.IsConnection());
+
             command.Parameters.Add(new MySqlParameter("@idUser", MySqlDbType.Int32));
             command.Parameters["@idUser"].Value = IdPrimaryKey;
 
@@ -256,8 +258,6 @@ namespace GameShop.DataBase
                     command.Parameters["@newValue"].Value = newValue;
                 }
             }
-
-            command = new MySqlCommand($"UPDATE `check` SET `{nameof(findBy)}` = @newValue WHERE `{nameof(FindByValueUser.idUser)}` = @idUser", db.IsConnection());
 
             command.ExecuteNonQuery();
 

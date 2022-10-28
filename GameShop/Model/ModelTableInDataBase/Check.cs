@@ -11,7 +11,7 @@ namespace GameShop.Model
     public class Check : ObservableObject
     {
         public int idCheck { get; set; }
-        public string Data { get; set; }
+        public DateTime Data { get; set; }
         public double Sum { get; set; }
     }
 }

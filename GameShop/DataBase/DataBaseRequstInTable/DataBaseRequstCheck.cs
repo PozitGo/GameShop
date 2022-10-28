@@ -1,6 +1,8 @@
 ﻿using GameShop.Enum;
 using GameShop.Model;
 using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Crypto.Generators;
+using System;
 using System.Collections.ObjectModel;
 using System.Data;
 
@@ -85,7 +87,7 @@ namespace GameShop.DataBase
                     try
                     {
                         command.Parameters.Clear();
-                        command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.VarChar));
+                        command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.DateTime));
                         command.Parameters[NameFieldByTable].Value = parametr;
                     }
                     catch
@@ -97,7 +99,7 @@ namespace GameShop.DataBase
                 }
 
             }
-            
+
             adapter.SelectCommand = command;
             adapter.Fill(table);
 
@@ -111,7 +113,7 @@ namespace GameShop.DataBase
                     Collection.Add(check);
 
                     Collection[i].idCheck = int.Parse(readerBy["idCheck"].ToString());
-                    Collection[i].Data = readerBy["Data"].ToString();
+                    Collection[i].Data = (DateTime)readerBy["Data"];
                     Collection[i].Sum = double.Parse(readerBy["Sum"].ToString());
                 }
             }
@@ -135,7 +137,7 @@ namespace GameShop.DataBase
                     Collection.Add(check);
 
                     Collection[i].idCheck = int.Parse(readerBy["idCheck"].ToString());
-                    Collection[i].Data = readerBy["Data"].ToString();
+                    Collection[i].Data = (DateTime)readerBy["Data"];
                     Collection[i].Sum = double.Parse(readerBy["Sum"].ToString());
                 }
             }
@@ -158,15 +160,14 @@ namespace GameShop.DataBase
             switch (findBy)
             {
                 case FindByValueCheck.Sum:
-                    NameField = nameof(FindByValueProduct.idCategory);
-                    command = new MySqlCommand($"SELECT {NameField} FROM `check` WHERE @idCheck = idCheck", db.IsConnection());
+                    NameField = nameof(FindByValueCheck.Sum);
+                    command = new MySqlCommand($"SELECT `{NameField}` FROM `check` WHERE @idCheck = idCheck", db.IsConnection());
                     break;
                 case FindByValueCheck.Data:
-                    NameField = nameof(FindByValueProduct.Price);
-                    command = new MySqlCommand($"SELECT {NameField} FROM `check` WHERE @idCheck = idCheck", db.IsConnection());
+                    NameField = nameof(FindByValueCheck.Data);
+                    command = new MySqlCommand($"SELECT `{NameField}` FROM `check` WHERE @idCheck = idCheck", db.IsConnection());
                     break;
             }
-
 
             command.Parameters.Add(new MySqlParameter("@idCheck", MySqlDbType.Int32));
             command.Parameters["@idCheck"].Value = idCheck;
@@ -187,10 +188,27 @@ namespace GameShop.DataBase
             return Data;
         }
 
+        public static void SaveNewItemCheckByDB(double value)
+        {
+            if (value != 0)
+            {
+                DataBaseConnect db = new DataBaseConnect();
+                MySqlCommand command = new MySqlCommand("INSERT INTO `check` (Sum) VALUES (@Sum)", db.IsConnection());
+                command.Parameters.Add("@Sum", MySqlDbType.Double).Value = Math.Round(value, 2);
+                if (command.ExecuteNonQuery() == 1)
+                {
+                    command.Parameters.Clear();
+                }
+                else
+                    command.Parameters.Clear();
+            }
+        }
         public static void UpdateItemInTableCheck<T>(FindByValueCheck findBy, T newValue, int IdPrimaryKey)
         {
             DataBaseConnect db = new DataBaseConnect();
             MySqlCommand command = new MySqlCommand();
+
+            command = new MySqlCommand($"UPDATE `check` SET `{findBy.ToString()}` = @newValue WHERE `{nameof(FindByValueCheck.idCheck)}` = @idCheck", db.IsConnection());
 
             command.Parameters.Add(new MySqlParameter("@idCheck", MySqlDbType.Int32));
             command.Parameters["@idCheck"].Value = IdPrimaryKey;
@@ -211,15 +229,42 @@ namespace GameShop.DataBase
                 catch
                 {
 
-                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.VarChar));
+                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.DateTime));
                     command.Parameters["@newValue"].Value = newValue;
                 }
             }
 
-            command = new MySqlCommand($"UPDATE `check` SET `{nameof(findBy)}` = @newValue WHERE `{nameof(FindByValueCheck.idCheck)}` = @idCheck", db.IsConnection());
-
             command.ExecuteNonQuery();
 
+            command.Parameters.Clear();
+        }
+
+        public static void DeleteItemFromCheckAndDeleteCheck(int idCheck, Order item = null)
+        {
+            DataBaseConnect db = new DataBaseConnect();
+            DataTable table = new DataTable();
+            MySqlDataAdapter adapter = new MySqlDataAdapter();
+            MySqlCommand command = new MySqlCommand();
+
+            command = new MySqlCommand($"SELECT COUNT(*) FROM `order` WHERE `{nameof(FindByValueCheck.idCheck)}` = @idCheck", db.IsConnection());
+
+            command.Parameters.Add("@idCheck", MySqlDbType.Int32).Value = idCheck;
+            command.Parameters["@idCheck"].Value = idCheck;
+
+            adapter.SelectCommand = command;
+            adapter.Fill(table);
+
+            if (table.Rows.Count >= 0 && table.Rows.Count < 2)
+            {
+                command = new MySqlCommand($"DELETE FROM `check` WHERE `{nameof(FindByValueCheck.idCheck)}` = @idCheck", db.IsConnection());
+                command.ExecuteNonQuery();
+            }
+            else
+            {
+               var newSumCheck = DataBaseRequstCheck.FindValueByidCheck<double>(idCheck, FindByValueCheck.Sum) - DataBaseRequestOrder.FindValueByidOrder<double>(item.idOrder, FindByValueOrder.Price);
+               DataBaseRequstCheck.UpdateItemInTableCheck<double>(FindByValueCheck.Sum, newSumCheck, idCheck);
+            }
+            //Ещё визуалку обновить 
             command.Parameters.Clear();
         }
 

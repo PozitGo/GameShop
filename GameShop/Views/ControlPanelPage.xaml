@@ -27,10 +27,10 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="8"></RowDefinition>
                             <RowDefinition Height="40"/>
-                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="225"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition  Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition  Width="4*"></ColumnDefinition>
                             <ColumnDefinition Width="2*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
 
@@ -51,8 +51,6 @@
                             <AppBarButton Icon="Accept" Label="Одобрить заказ" FontFamily="Cascadia Code SemiBold"/>
                             <AppBarSeparator/>
                             <AppBarButton Icon="Clear" Label="Отклонить заказ" FontFamily="Cascadia Code SemiBold"/>
-                            <AppBarSeparator/>
-                            <AppBarButton Icon="Refresh" Label="Обновить заказы" FontFamily="Cascadia Code SemiBold"/>
                             <AppBarSeparator/>
                             <AppBarButton Icon="Clear" Label="Очистить таблицы" FontFamily="Cascadia Code SemiBold"/>
                         </CommandBar>
@@ -84,22 +82,8 @@
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Right" Spacing="5" Padding="3">
-                            <TextBox FontFamily="Cascadia Code SemiBold" Header="Введите номер заказа" Visibility="{x:Bind ViewModel.VisibilityTextBoxidOrderEditAndDelete, Mode=TwoWay}" Text="{x:Bind ViewModel.TextBoxTextidOrderEditAndDelete, Mode=TwoWay}"/>
                             <CheckBox Content="Объеденить в один чек" FontFamily="Cascadia Code SemiBold" Visibility="{x:Bind ViewModel.VisibilityCheckBoxUniteCheck, Mode=TwoWay}" IsChecked="{x:Bind ViewModel.IsCheckedCheckBoxUniteCheck, Mode=TwoWay}" Command="{x:Bind ViewModel.IsVisibleCheckBoxUniteCheckCommand, Mode=TwoWay}"/>
                             <Button Content="{x:Bind ViewModel.ContentSaveButtonCommandBar, Mode=TwoWay}" Visibility="{x:Bind ViewModel.VisibilitySaveButtonCommandBar, Mode=TwoWay}" Command="{ x:Bind ViewModel.AppBarButtonSaveButton, Mode=TwoWay}" HorizontalAlignment="Right"/>
-                            <muxc:TeachingTip
-                                Title="Таблица для изменения"
-                                Subtitle ="Выберете таблицу для изменения какого-то чека, либо заказа"
-                                PreferredPlacement="Auto"
-	                            PlacementMargin="20"
-                                IsLightDismissEnabled="True"
-                                ActionButtonContent="Таблица заказы"
-                                ActionButtonCommand="{x:Bind ViewModel.OpenTableOrderSettingsCommand, Mode=OneWay}"
-	                            CloseButtonContent="Таблица чек"
-                                CloseButtonCommand="{x:Bind ViewModel.OpenTableCheckSettingsCommand, Mode=OneWay}"
-                                CloseButtonCommandParameter="{x:Bind CheckSettingsTable, Mode=OneWay}"
-                                IsOpen="{x:Bind ViewModel.IsOpenTeachingTipEdit, Mode=TwoWay}"/>
-
 
                         </StackPanel>
 
@@ -108,13 +92,14 @@
                             Height="200"
                             x:Name="OrderSettingsTable"
                             AutoGenerateColumns="False"
-                            Visibility="Collapsed"
                             HorizontalAlignment="Left"
                             GridLinesVisibility="All"
                             VerticalScrollBarVisibility="Visible"
                             HorizontalScrollBarVisibility="Visible"
                             ItemsSource="{x:Bind ViewModel.OrderCollectionSettings, Mode=OneWay}"
-                            IsReadOnly="False">
+                            IsReadOnly="False"
+                            SelectionMode="Extended"
+                            Visibility="Visible">
 
                             <controls:DataGrid.Columns>
                                 <controls:DataGridComboBoxColumn Header="Номер товара" IsReadOnly="False" Binding="{Binding idProduct}"  Width="Auto" FontFamily="Cascadia Code SemiBold" ItemsSource="{x:Bind ViewModel.AllidProductCollection}"/>
@@ -127,25 +112,6 @@
                             </controls:DataGrid.Columns>
                         </controls:DataGrid>
                     </Grid>
-
-                    <controls:DataGrid
-                            Grid.Row="2"
-                            Visibility="Visible"
-                            x:Name="CheckSettingsTable"
-                            AutoGenerateColumns="False"
-                            HorizontalAlignment="Left"
-                            GridLinesVisibility="All"
-                            VerticalScrollBarVisibility="Visible"
-                            HorizontalScrollBarVisibility="Visible"
-                            ItemsSource="{x:Bind ViewModel.CheckCollectionSettings, Mode=OneWay}"
-                            IsReadOnly="False">
-
-                        <controls:DataGrid.Columns>
-                            <controls:DataGridTextColumn Header="Дата создания чека" IsReadOnly="False" Binding="{Binding Data}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
-                            <controls:DataGridTextColumn Header="Сумма покупок" IsReadOnly="False" Binding="{Binding Sum}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
-
-                        </controls:DataGrid.Columns>
-                    </controls:DataGrid>
 
                     <controls:DataGrid Grid.Row="0" Grid.Column="0"
                             Height="690"

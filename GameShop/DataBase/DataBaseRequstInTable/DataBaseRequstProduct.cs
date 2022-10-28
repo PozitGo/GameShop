@@ -280,6 +280,8 @@ namespace GameShop.DataBase.DataBaseRequstInTable
             command.Parameters.Add(new MySqlParameter("@idProduct", MySqlDbType.Int32));
             command.Parameters["@idProduct"].Value = IdPrimaryKey;
 
+            command = new MySqlCommand($"UPDATE `check` SET `{findBy.ToString()}` = @newValue WHERE `{nameof(FindByValueProduct.idProduct)}` = @idProduct", db.IsConnection());
+
             try
             {
                 command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Int32));
@@ -300,8 +302,6 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                     command.Parameters["@newValue"].Value = newValue;
                 }
             }
-
-            command = new MySqlCommand($"UPDATE `check` SET `{nameof(findBy)}` = @newValue WHERE `{nameof(FindByValueProduct.idProduct)}` = @idProduct", db.IsConnection());
 
             command.ExecuteNonQuery();
 
