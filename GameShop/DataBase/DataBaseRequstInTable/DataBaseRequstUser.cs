@@ -76,7 +76,7 @@ namespace GameShop.DataBase
                         command = new MySqlCommand($"SELECT idUser, Login,PhoneNumber, Email, Name, Surname, Status, PathAvatar FROM `user` " + NameFieldByTable + " = Status", db.IsConnection());
                         Collection = ReadUsersByParametr(command, adapter, table, parametr, NameFieldByTable);
                     }
-                    break; 
+                    break;
             }
 
             command.Parameters.Clear();
@@ -147,7 +147,7 @@ namespace GameShop.DataBase
         {
             adapter.SelectCommand = command;
             adapter.Fill(table);
-            
+
             ObservableCollection<UserAccount> Collection = new ObservableCollection<UserAccount>();
             if (table.Rows.Count > 0)
             {
@@ -233,7 +233,7 @@ namespace GameShop.DataBase
             DataBaseConnect db = new DataBaseConnect();
             MySqlCommand command = new MySqlCommand();
 
-            command = new MySqlCommand($"UPDATE `check` SET `{findBy.ToString()}` = @newValue WHERE `{nameof(FindByValueUser.idUser)}` = @idUser", db.IsConnection());
+            command = new MySqlCommand($"UPDATE `user` SET `{findBy.ToString()}` = @newValue WHERE `{nameof(FindByValueUser.idUser)}` = @idUser", db.IsConnection());
 
             command.Parameters.Add(new MySqlParameter("@idUser", MySqlDbType.Int32));
             command.Parameters["@idUser"].Value = IdPrimaryKey;
@@ -242,24 +242,19 @@ namespace GameShop.DataBase
             {
                 command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Int32));
                 command.Parameters["@newValue"].Value = newValue;
+                command.ExecuteNonQuery();
             }
             catch
             {
+                command.Parameters.Clear();
 
-                try
-                {
-                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Double));
-                    command.Parameters["@newValue"].Value = newValue;
-                }
-                catch
-                {
+                command.Parameters.Add(new MySqlParameter("@idUser", MySqlDbType.Int32));
+                command.Parameters["@idUser"].Value = IdPrimaryKey;
 
-                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.VarChar));
-                    command.Parameters["@newValue"].Value = newValue;
-                }
+                command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.VarChar));
+                command.Parameters["@newValue"].Value = newValue;
+                command.ExecuteNonQuery();
             }
-
-            command.ExecuteNonQuery();
 
             command.Parameters.Clear();
         }

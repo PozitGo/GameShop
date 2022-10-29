@@ -8,6 +8,7 @@
         Quantity,
         Price,
         Status,
-        idCheck
+        idCheck,
+        Discount
     }
 }

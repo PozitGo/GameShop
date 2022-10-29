@@ -192,7 +192,7 @@
     <Compile Include="Activation\DefaultActivationHandler.cs" />
     <Compile Include="Services\NavigationService.cs" />
     <Compile Include="ViewModels\ControlPanelViewModel.cs" />
-    <Compile Include="Convert\ConverOrderAndOrderUPGRADE.cs" />
+    <Compile Include="Convert\ConvertOrderAndOrderUPGRADE.cs" />
     <Compile Include="ViewModels\LoginPViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />

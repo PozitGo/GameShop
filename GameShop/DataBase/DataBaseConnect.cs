@@ -12,7 +12,7 @@ namespace GameShop.DataBase
     {
         private MySqlConnection Connection;
 
-        private string _PathConnection = "server=localhost;port=3366;username=root;password=root;database=gameshop";
+        private string _PathConnection = "server=localhost;port=3366;username=root;password=root;database=gameshop;charset=utf8";
 
         public string PathConnection
         {

@@ -15,7 +15,12 @@ namespace GameShop.Model
         public int Quantity { get; set; }
         public double Price { get; set; }
         public int Discount { get; set; }
-        public bool Status { get; set; }
+        public string Status { get; set; }
         public int idCheck { get; set; }
+
+        public Order()
+        {
+            Status = "Одобрен";
+        }
     }
 }

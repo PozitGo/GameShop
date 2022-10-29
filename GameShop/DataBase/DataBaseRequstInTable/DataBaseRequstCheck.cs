@@ -1,10 +1,12 @@
 ﻿using GameShop.Enum;
 using GameShop.Model;
 using MySql.Data.MySqlClient;
-using Org.BouncyCastle.Crypto.Generators;
+using NPOI.SS.Formula.Functions;
+using NPOI.XWPF.UserModel;
 using System;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Windows.Input;
 
 namespace GameShop.DataBase
 {
@@ -79,7 +81,7 @@ namespace GameShop.DataBase
                 try
                 {
                     command.Parameters.Clear();
-                    command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Int32));
+                    command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Double));
                     command.Parameters[NameFieldByTable].Value = parametr;
                 }
                 catch
@@ -93,7 +95,7 @@ namespace GameShop.DataBase
                     catch
                     {
                         command.Parameters.Clear();
-                        command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Double));
+                        command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Int32));
                         command.Parameters[NameFieldByTable].Value = parametr;
                     }
                 }
@@ -188,13 +190,14 @@ namespace GameShop.DataBase
             return Data;
         }
 
-        public static void SaveNewItemCheckByDB(double value)
+        public static void SaveNewItemCheckByDB(int idCheck, double value)
         {
             if (value != 0)
             {
                 DataBaseConnect db = new DataBaseConnect();
-                MySqlCommand command = new MySqlCommand("INSERT INTO `check` (Sum) VALUES (@Sum)", db.IsConnection());
+                MySqlCommand command = new MySqlCommand("INSERT INTO `check` (Sum, idCheck) VALUES (@Sum, @idCheck)", db.IsConnection());
                 command.Parameters.Add("@Sum", MySqlDbType.Double).Value = Math.Round(value, 2);
+                command.Parameters.Add("@idCheck", MySqlDbType.Double).Value = idCheck;
                 if (command.ExecuteNonQuery() == 1)
                 {
                     command.Parameters.Clear();
@@ -215,59 +218,176 @@ namespace GameShop.DataBase
 
             try
             {
-                command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Int32));
+                command.Parameters.Clear();
+
+                command.Parameters.Add(new MySqlParameter("@idCheck", MySqlDbType.Int32));
+                command.Parameters["@idCheck"].Value = IdPrimaryKey;
+
+                command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Double));
                 command.Parameters["@newValue"].Value = newValue;
+                command.ExecuteNonQuery();
             }
             catch
             {
 
                 try
                 {
-                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Double));
+                    command.Parameters.Clear();
+
+                    command.Parameters.Add(new MySqlParameter("@idCheck", MySqlDbType.Int32));
+                    command.Parameters["@idCheck"].Value = IdPrimaryKey;
+
+                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Int32));
                     command.Parameters["@newValue"].Value = newValue;
+                    command.ExecuteNonQuery();
                 }
                 catch
                 {
+                    command.Parameters.Clear();
+
+                    command.Parameters.Add(new MySqlParameter("@idCheck", MySqlDbType.Int32));
+                    command.Parameters["@idCheck"].Value = IdPrimaryKey;
 
                     command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.DateTime));
                     command.Parameters["@newValue"].Value = newValue;
+                    command.ExecuteNonQuery();
                 }
             }
-
-            command.ExecuteNonQuery();
 
             command.Parameters.Clear();
         }
 
-        public static void DeleteItemFromCheckAndDeleteCheck(int idCheck, Order item = null)
+        public static (Check newSumOldCheck, Check newSumNewCheck) MoveItemFromCheck(int idCheck, int newCheck, Order item)
         {
             DataBaseConnect db = new DataBaseConnect();
             DataTable table = new DataTable();
             MySqlDataAdapter adapter = new MySqlDataAdapter();
             MySqlCommand command = new MySqlCommand();
 
-            command = new MySqlCommand($"SELECT COUNT(*) FROM `order` WHERE `{nameof(FindByValueCheck.idCheck)}` = @idCheck", db.IsConnection());
+            command.Parameters.Clear();
+            Check newSumOldCheck = new Check();
+            Check newSumNewCheck = new Check();
 
-            command.Parameters.Add("@idCheck", MySqlDbType.Int32).Value = idCheck;
+            command = new MySqlCommand($"SELECT COUNT(*) FROM `order` WHERE `idCheck` = @idCheck", db.IsConnection());
+
+            command.Parameters.Add(new MySqlParameter("@idCheck", MySqlDbType.Int32));
             command.Parameters["@idCheck"].Value = idCheck;
 
             adapter.SelectCommand = command;
             adapter.Fill(table);
 
-            if (table.Rows.Count >= 0 && table.Rows.Count < 2)
+            if (table.Rows.Count == 1)
             {
-                command = new MySqlCommand($"DELETE FROM `check` WHERE `{nameof(FindByValueCheck.idCheck)}` = @idCheck", db.IsConnection());
-                command.ExecuteNonQuery();
+                Int64 count = (Int64)command.ExecuteScalar();
+                if (count > 0 && count < 2)
+                {
+                    command.Parameters.Clear();
+
+                    command = new MySqlCommand($"DELETE FROM `order` WHERE `idOrder` = @idOrder", db.IsConnection());
+
+                    command.Parameters.Add(new MySqlParameter("@idOrder", MySqlDbType.Int32));
+                    command.Parameters["@idOrder"].Value = item.idOrder;
+
+                    if (command.ExecuteNonQuery() != 0)
+                    {
+                        command.Parameters.Clear();
+                        command = new MySqlCommand($"DELETE FROM `check` WHERE `idCheck` = @idCheck", db.IsConnection());
+
+                        command.Parameters.Add(new MySqlParameter("@idCheck", MySqlDbType.Int32));
+                        command.Parameters["@idCheck"].Value = idCheck;
+
+                        command.ExecuteNonQuery();
+                        newSumOldCheck.idCheck = idCheck;
+                        newSumOldCheck.Sum = -1;
+                    }
+                }
+                else
+                {
+                    if (item != null)
+                    {
+                        var newSumCheckOld = DataBaseRequstCheck.FindValueByidCheck<double>(idCheck, FindByValueCheck.Sum) - DataBaseRequestOrder.FindValueByidOrder<double>(item.idOrder, FindByValueOrder.Price);
+                        DataBaseRequstCheck.UpdateItemInTableCheck<double>(FindByValueCheck.Sum, newSumCheckOld, idCheck);
+
+                        newSumOldCheck.idCheck = idCheck;
+                        newSumOldCheck.Sum = newSumCheckOld;
+                    }
+                }
+
+                if (newCheck != 0 && item != null)
+                {
+                    newSumNewCheck.Sum = FindValueByidCheck<double>(newCheck, FindByValueCheck.Sum) + item.Price;
+                    newSumNewCheck.idCheck = newCheck;
+                    DataBaseRequstCheck.UpdateItemInTableCheck<double>(FindByValueCheck.Sum, newSumNewCheck.Sum, newCheck);
+                }
+
+
             }
-            else
-            {
-               var newSumCheck = DataBaseRequstCheck.FindValueByidCheck<double>(idCheck, FindByValueCheck.Sum) - DataBaseRequestOrder.FindValueByidOrder<double>(item.idOrder, FindByValueOrder.Price);
-               DataBaseRequstCheck.UpdateItemInTableCheck<double>(FindByValueCheck.Sum, newSumCheck, idCheck);
-            }
-            //Ещё визуалку обновить 
+
             command.Parameters.Clear();
+            return (newSumOldCheck, newSumNewCheck);
         }
 
+        public static int[] DeleteCheckAndAllOrders(int idCheck)
+        {
+            DataBaseConnect db = new DataBaseConnect();
+            DataTable table = new DataTable();
+            MySqlDataAdapter adapter = new MySqlDataAdapter();
+            MySqlCommand command = new MySqlCommand();
+            int[] IdNullOrders = new int[1] { -1};
+
+            command = new MySqlCommand($"SELECT COUNT(*) FROM `order` WHERE `idCheck` = @idCheck", db.IsConnection());
+
+            command.Parameters.Add(new MySqlParameter("@idCheck", MySqlDbType.Int32));
+            command.Parameters["@idCheck"].Value = idCheck;
+
+            adapter.SelectCommand = command;
+            adapter.Fill(table);
+
+            if (table.Rows.Count == 1)
+            {
+                Int64 count = (Int64)command.ExecuteScalar();
+                int[] IdOrders = new int[count];
+                command.Parameters.Clear();
+
+                command = new MySqlCommand($"SELECT idOrder FROM `order` WHERE `idCheck` = @idCheck", db.IsConnection());
+
+                command.Parameters.Add(new MySqlParameter("@idCheck", MySqlDbType.Int32));
+                command.Parameters["@idCheck"].Value = idCheck;
+
+                MySqlDataReader readerBy = command.ExecuteReader();
+
+                for (int j = 0; readerBy.Read(); j++)
+                {
+                    IdOrders[j] = (int)readerBy["idOrder"];
+                }
+
+                readerBy.Close();
+                command.Parameters.Clear();
+                for (int i = 0; i < count; i++)
+                {
+                    command = new MySqlCommand($"DELETE FROM `order` WHERE `idOrder` = @idOrder", db.IsConnection());
+
+                    command.Parameters.Add(new MySqlParameter("@idOrder", MySqlDbType.Int32));
+                    command.Parameters["@idOrder"].Value = IdOrders[i];
+
+                    command.ExecuteNonQuery();
+
+                    command.Parameters.Clear();
+                }
+
+                command = new MySqlCommand($"DELETE FROM `check` WHERE `idCheck` = @idCheck", db.IsConnection());
+
+                command.Parameters.Add(new MySqlParameter("@idCheck", MySqlDbType.Int32));
+                command.Parameters["@idCheck"].Value = idCheck;
+
+                command.ExecuteNonQuery();
+                command.Parameters.Clear();
+                
+                return IdOrders;
+            }
+
+            return IdNullOrders;
+        }
     }
 }
 

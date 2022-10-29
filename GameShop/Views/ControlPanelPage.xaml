@@ -30,7 +30,7 @@
                             <RowDefinition Height="225"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition  Width="4*"></ColumnDefinition>
+                            <ColumnDefinition  Width="5*"></ColumnDefinition>
                             <ColumnDefinition Width="2*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
 
@@ -46,13 +46,15 @@
                             <AppBarSeparator/>
                             <AppBarButton Icon="Edit" Label="Изменить заказ" FontFamily="Cascadia Code SemiBold" Command="{x:Bind ViewModel.AppBarButtonEditOrder, Mode=OneWay}" CommandParameter="{x:Bind OrderSettingsTable, Mode=OneWay}"/>
                             <AppBarSeparator/>
-                            <AppBarButton Icon="Delete" Label="Удалить заказ" FontFamily="Cascadia Code SemiBold"/>
+                            <AppBarButton Icon="Delete" Label="Удалить заказ" FontFamily="Cascadia Code SemiBold" Command="{x:Bind ViewModel.AppBarButtonDeleteOrder, Mode=OneWay}" CommandParameter="{x:Bind OrderSettingsTable, Mode=OneWay}"/>
                             <AppBarSeparator/>
-                            <AppBarButton Icon="Accept" Label="Одобрить заказ" FontFamily="Cascadia Code SemiBold"/>
+                            <AppBarButton Icon="Accept" Label="Одобрить заказ" FontFamily="Cascadia Code SemiBold" Command="{x:Bind ViewModel.AppBarButtonAccept, Mode=OneWay}" CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}"/>
                             <AppBarSeparator/>
-                            <AppBarButton Icon="Clear" Label="Отклонить заказ" FontFamily="Cascadia Code SemiBold"/>
+                            <AppBarButton Icon="Clear" Label="Отклонить заказ" FontFamily="Cascadia Code SemiBold" Command="{x:Bind ViewModel.AppBarButtonClearOrder, Mode=OneWay}" CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}"/>
                             <AppBarSeparator/>
-                            <AppBarButton Icon="Clear" Label="Очистить таблицы" FontFamily="Cascadia Code SemiBold"/>
+                            <AppBarButton Icon="Clear" Label="Очистить таблицы" FontFamily="Cascadia Code SemiBold" Command="{x:Bind ViewModel.AppBarButtonClearSettingsTable, Mode=OneWay}" CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}"/>
+                            <AppBarSeparator/>
+                            <AppBarButton Icon="Refresh" Label="Обновить" FontFamily="Cascadia Code SemiBold" Command="{x:Bind ViewModel.AppBarButtonRefresh, Mode=OneWay}" CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}"/>
                         </CommandBar>
 
                         <Button Content="Настройки фильтрации" Grid.Row="1" Grid.Column="1"  VerticalAlignment="Top" HorizontalAlignment="Left">
@@ -82,7 +84,7 @@
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Right" Spacing="5" Padding="3">
-                            <CheckBox Content="Объеденить в один чек" FontFamily="Cascadia Code SemiBold" Visibility="{x:Bind ViewModel.VisibilityCheckBoxUniteCheck, Mode=TwoWay}" IsChecked="{x:Bind ViewModel.IsCheckedCheckBoxUniteCheck, Mode=TwoWay}" Command="{x:Bind ViewModel.IsVisibleCheckBoxUniteCheckCommand, Mode=TwoWay}"/>
+                            <CheckBox FontFamily="Cascadia Code SemiBold" Visibility="{x:Bind ViewModel.VisibilityCheckBoxUniteCheck, Mode=TwoWay}" IsChecked="{x:Bind ViewModel.IsCheckedCheckBoxUniteCheck, Mode=TwoWay}" Command="{x:Bind ViewModel.IsVisibleCheckBoxUniteCheckCommand, Mode=TwoWay}" Content="{x:Bind ViewModel.ContentCheckBoxUniteCheck, Mode=TwoWay}"/>
                             <Button Content="{x:Bind ViewModel.ContentSaveButtonCommandBar, Mode=TwoWay}" Visibility="{x:Bind ViewModel.VisibilitySaveButtonCommandBar, Mode=TwoWay}" Command="{ x:Bind ViewModel.AppBarButtonSaveButton, Mode=TwoWay}" HorizontalAlignment="Right"/>
 
                         </StackPanel>
@@ -107,7 +109,7 @@
                                 <controls:DataGridTextColumn Header="Количество" IsReadOnly="False" Binding="{Binding Quantity}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                                 <controls:DataGridTextColumn Header="Цена" IsReadOnly="False" Binding="{Binding Price}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                                 <controls:DataGridTextColumn Header="Процент скидки" IsReadOnly="False" Binding="{Binding Discount}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
-                                <controls:DataGridTextColumn Header="Статус" IsReadOnly="False" Binding="{Binding Status}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
+                                <controls:DataGridComboBoxColumn Header="Статус" IsReadOnly="False" Binding="{Binding Status}" Width="Auto" FontFamily="Cascadia Code SemiBold" ItemsSource="{x:Bind ViewModel.answerOrder}"/>
                                 <controls:DataGridComboBoxColumn Header="Номер чека" IsReadOnly="False" Binding="{Binding idCheck}" Width="Auto" FontFamily="Cascadia Code SemiBold" ItemsSource="{x:Bind ViewModel.AllidCheckCollection}"/>
                             </controls:DataGrid.Columns>
                         </controls:DataGrid>
@@ -170,7 +172,7 @@
                         </controls:DataGrid.RowDetailsTemplate>
 
                         <controls:DataGrid.Columns>
-                            <controls:DataGridComboBoxColumn Header="Номер заказа" IsReadOnly="False" Binding="{Binding idOrder}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
+                            <controls:DataGridTextColumn Header="Номер заказа" IsReadOnly="False" Binding="{Binding idOrder}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                             <controls:DataGridTextColumn Header="Название товара" IsReadOnly="False" Binding="{Binding NameProduct}"  Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                             <controls:DataGridTextColumn Header="Логин пользователя" IsReadOnly="False" Binding="{Binding LoginUser}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                             <controls:DataGridTextColumn Header="Количество" IsReadOnly="False" Binding="{Binding Quantity}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>

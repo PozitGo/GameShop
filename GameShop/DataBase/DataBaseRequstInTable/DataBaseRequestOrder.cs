@@ -109,7 +109,7 @@ namespace GameShop.DataBase
                 try
                 {
                     command.Parameters.Clear();
-                    command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Int32));
+                    command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Double));
                     command.Parameters[NameFieldByTable].Value = parametr;
                 }
                 catch
@@ -117,7 +117,7 @@ namespace GameShop.DataBase
                     try
                     {
                         command.Parameters.Clear();
-                        command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Double));
+                        command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Int32));
                         command.Parameters[NameFieldByTable].Value = parametr;
                     }
                     catch
@@ -146,7 +146,7 @@ namespace GameShop.DataBase
                     Collection[i].Quantity = int.Parse(readerBy["Quantity"].ToString());
                     Collection[i].Price = double.Parse(readerBy["Price"].ToString());
                     Collection[i].Discount = int.Parse(readerBy["Discount"].ToString());
-                    Collection[i].Status = bool.Parse(readerBy["Status"].ToString());
+                    Collection[i].Status = readerBy["Status"].ToString();
                     Collection[i].idCheck = int.Parse(readerBy["idCheck"].ToString());
                 }
             }
@@ -155,7 +155,7 @@ namespace GameShop.DataBase
             return Collection;
         }
 
-        private static ObservableCollection<Order> ReadOrdersByParametr( MySqlCommand command, MySqlDataAdapter adapter, DataTable table)
+        private static ObservableCollection<Order> ReadOrdersByParametr(MySqlCommand command, MySqlDataAdapter adapter, DataTable table)
         {
 
             adapter.SelectCommand = command;
@@ -175,7 +175,7 @@ namespace GameShop.DataBase
                     Collection[i].Quantity = int.Parse(readerBy["Quantity"].ToString());
                     Collection[i].Price = double.Parse(readerBy["Price"].ToString());
                     Collection[i].Discount = int.Parse(readerBy["Discount"].ToString());
-                    Collection[i].Status = bool.Parse(readerBy["Status"].ToString());
+                    Collection[i].Status = readerBy["Status"].ToString();
                     Collection[i].idCheck = int.Parse(readerBy["idCheck"].ToString());
                 }
             }
@@ -191,13 +191,15 @@ namespace GameShop.DataBase
                 if (value != null)
                 {
                     DataBaseConnect db = new DataBaseConnect();
-                    MySqlCommand command = new MySqlCommand("INSERT INTO `Order` (idProduct, idUser, Quantity, Price, Discount, Status, idCheck) VALUES (@idProduct, @idUser, @Quantity, @Price, @Discount, @Status, @idCheck)", db.IsConnection());
+                    MySqlCommand command = new MySqlCommand("INSERT INTO `Order` (idOrder, idProduct, idUser, Quantity, Price, Discount, Status, idCheck) VALUES (@idOrder, @idProduct, @idUser, @Quantity, @Price, @Discount, @Status, @idCheck)", db.IsConnection());
+
+                    command.Parameters.Add("@idOrder", MySqlDbType.Int32).Value = value.idOrder;
                     command.Parameters.Add("@idProduct", MySqlDbType.Int32).Value = value.idProduct;
                     command.Parameters.Add("@idUser", MySqlDbType.Int32).Value = value.idUser;
                     command.Parameters.Add("@Quantity", MySqlDbType.Int32).Value = value.Quantity;
                     command.Parameters.Add("@Price", MySqlDbType.Double).Value = value.Price;
                     command.Parameters.Add("@Discount", MySqlDbType.Int32).Value = value.Discount;
-                    command.Parameters.Add("@Status", MySqlDbType.VarChar).Value = value.Status.ToString();
+                    command.Parameters.Add("@Status", MySqlDbType.VarChar).Value = value.Status;
                     command.Parameters.Add("@idCheck", MySqlDbType.Int32).Value = value.idCheck;
 
                     if (command.ExecuteNonQuery() == 7)
@@ -275,35 +277,84 @@ namespace GameShop.DataBase
             DataBaseConnect db = new DataBaseConnect();
             MySqlCommand command = new MySqlCommand();
 
-            command = new MySqlCommand($"UPDATE `check` SET `{findBy.ToString()}` = @newValue WHERE `{nameof(FindByValueOrder.idOrder)}` = @idOrder", db.IsConnection());
+            command = new MySqlCommand($"UPDATE `order` SET `{findBy.ToString()}` = @newValue WHERE `{nameof(FindByValueOrder.idOrder)}` = @idOrder", db.IsConnection());
 
             command.Parameters.Add(new MySqlParameter("@idOrder", MySqlDbType.Int32));
             command.Parameters["@idOrder"].Value = IdPrimaryKey;
-
             try
             {
-                command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Int32));
+                command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Double));
                 command.Parameters["@newValue"].Value = newValue;
+                command.ExecuteNonQuery();
             }
             catch
             {
 
                 try
                 {
-                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Double));
+                    command.Parameters.Clear();
+
+                    command.Parameters.Add(new MySqlParameter("@idOrder", MySqlDbType.Int32));
+                    command.Parameters["@idOrder"].Value = IdPrimaryKey;
+
+                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Int32));
                     command.Parameters["@newValue"].Value = newValue;
+                    command.ExecuteNonQuery();
                 }
                 catch
                 {
+                    command.Parameters.Clear();
+
+                    command.Parameters.Add(new MySqlParameter("@idOrder", MySqlDbType.Int32));
+                    command.Parameters["@idOrder"].Value = IdPrimaryKey;
 
                     command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.VarChar));
                     command.Parameters["@newValue"].Value = newValue;
+                    command.ExecuteNonQuery();
                 }
             }
 
-            command.ExecuteNonQuery();
-
             command.Parameters.Clear();
+        }
+
+        public static bool DeleteItemInTableOrder(int idOrder, int iCheckToOrder, int CountItemsToCheck)
+        {
+            DataBaseConnect db = new DataBaseConnect();
+            
+            if (CountItemsToCheck > 1)
+            {
+                MySqlCommand command = new MySqlCommand($"DELETE FROM `order` WHERE `{nameof(FindByValueOrder.idOrder)}` = @idOrder", db.IsConnection());
+
+                command.Parameters.Add(new MySqlParameter("@idOrder", MySqlDbType.Int32));
+                command.Parameters["@idOrder"].Value = idOrder;
+
+                command.ExecuteNonQuery();
+
+                command.Parameters.Clear();
+            }
+            else if (CountItemsToCheck == 1)
+            {
+                MySqlCommand command = new MySqlCommand($"DELETE FROM `order` WHERE `idOrder` = @idOrder", db.IsConnection());
+
+                command.Parameters.Add(new MySqlParameter("@idOrder", MySqlDbType.Int32));
+                command.Parameters["@idOrder"].Value = idOrder;
+
+                if (command.ExecuteNonQuery() != 0)
+                {
+                    command.Parameters.Clear();
+                    command = new MySqlCommand($"DELETE FROM `check` WHERE `idCheck` = @idCheck", db.IsConnection());
+
+                    command.Parameters.Add(new MySqlParameter("@idCheck", MySqlDbType.Int32));
+                    command.Parameters["@idCheck"].Value = iCheckToOrder;
+
+                    command.ExecuteNonQuery();
+
+                    command.Parameters.Clear();
+                    return false;
+                }
+            }
+            
+            return true;
         }
 
     }

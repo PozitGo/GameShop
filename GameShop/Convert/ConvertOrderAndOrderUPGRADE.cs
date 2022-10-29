@@ -8,7 +8,7 @@ using static GameShop.DataBase.DataBaseRequstUser;
 
 namespace GameShop.ViewModels
 {
-    public struct ConverOrderAndOrderUPGRADE
+    public struct ConvertOrderAndOrderUPGRADE
     {
         public static ObservableCollection<ModelUPGRADEOrder> ConvertFromOrderCollectionInOrderUPGRADECollection(ObservableCollection<Order> OrderCollection)
         {
@@ -23,7 +23,7 @@ namespace GameShop.ViewModels
 
                     OrderUPGRADECollection[i].idOrder = OrderCollection[i].idOrder;
                     OrderUPGRADECollection[i].idProduct = OrderCollection[i].idProduct;
-                    OrderUPGRADECollection[i].NameProduct = FindValueByidProduct<string>(OrderCollection[i].idOrder, FindByValueProduct.Name);
+                    OrderUPGRADECollection[i].NameProduct = FindValueByidProduct<string>(OrderCollection[i].idProduct, FindByValueProduct.Name);
                     OrderUPGRADECollection[i].idUser = OrderCollection[i].idUser;
                     OrderUPGRADECollection[i].LoginUser = FindValueByidUser<string>(OrderCollection[i].idUser, FindByValueUser.Login);
                     OrderUPGRADECollection[i].NameUser = FindValueByidUser<string>(OrderCollection[i].idUser, FindByValueUser.Name);
@@ -70,15 +70,18 @@ namespace GameShop.ViewModels
 
             if (idOrder == -1)
             {
-                orderU.idOrder = order.idOrder;
+                if (order.idOrder != 0)
+                    orderU.idOrder = order.idOrder;
+                else
+                    orderU.idOrder = 1;
             }
             else
             {
                 orderU.idOrder = idOrder;
             }
 
-            orderU.idProduct = order.idOrder;
-            orderU.NameProduct = FindValueByidProduct<string>(orderU.idOrder, FindByValueProduct.Name);
+            orderU.idProduct = order.idProduct;
+            orderU.NameProduct = FindValueByidProduct<string>(orderU.idProduct, FindByValueProduct.Name);
             orderU.idUser = order.idUser;
             orderU.LoginUser = FindValueByidUser<string>(order.idUser, FindByValueUser.Login);
             orderU.NameUser = FindValueByidUser<string>(order.idUser, FindByValueUser.Name);

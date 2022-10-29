@@ -92,7 +92,7 @@ namespace GameShop.DataBase.DataBaseRequstInTable
             MySqlDataAdapter adapter = new MySqlDataAdapter();
 
             ObservableCollection<Product> Collection = new ObservableCollection<Product>();
-            
+
             command = new MySqlCommand("SELECT * FROM `product`", db.IsConnection());
             Collection = ReadProductsByParametr(command, adapter, table);
 
@@ -109,15 +109,16 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                 try
                 {
                     command.Parameters.Clear();
-                    command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Int32));
+                    command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Double));
                     command.Parameters[NameFieldByTable].Value = parametr;
+
                 }
                 catch
                 {
                     try
                     {
                         command.Parameters.Clear();
-                        command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Double));
+                        command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Int32));
                         command.Parameters[NameFieldByTable].Value = parametr;
                     }
                     catch
@@ -277,33 +278,44 @@ namespace GameShop.DataBase.DataBaseRequstInTable
             DataBaseConnect db = new DataBaseConnect();
             MySqlCommand command = new MySqlCommand();
 
+
+            command = new MySqlCommand($"UPDATE `product` SET `{findBy.ToString()}` = @newValue WHERE `{nameof(FindByValueProduct.idProduct)}` = @idProduct", db.IsConnection());
+
             command.Parameters.Add(new MySqlParameter("@idProduct", MySqlDbType.Int32));
             command.Parameters["@idProduct"].Value = IdPrimaryKey;
 
-            command = new MySqlCommand($"UPDATE `check` SET `{findBy.ToString()}` = @newValue WHERE `{nameof(FindByValueProduct.idProduct)}` = @idProduct", db.IsConnection());
-
             try
             {
-                command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Int32));
+                command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Double));
                 command.Parameters["@newValue"].Value = newValue;
+                command.ExecuteNonQuery();
             }
             catch
             {
 
                 try
                 {
-                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Double));
+                    command.Parameters.Clear();
+
+                    command.Parameters.Add(new MySqlParameter("@idProduct", MySqlDbType.Int32));
+                    command.Parameters["@idProduct"].Value = IdPrimaryKey;
+
+                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Int32));
                     command.Parameters["@newValue"].Value = newValue;
+                    command.ExecuteNonQuery();
                 }
                 catch
                 {
+                    command.Parameters.Clear();
+
+                    command.Parameters.Add(new MySqlParameter("@idProduct", MySqlDbType.Int32));
+                    command.Parameters["@idProduct"].Value = IdPrimaryKey;
 
                     command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.VarChar));
                     command.Parameters["@newValue"].Value = newValue;
+                    command.ExecuteNonQuery();
                 }
             }
-
-            command.ExecuteNonQuery();
 
             command.Parameters.Clear();
         }
