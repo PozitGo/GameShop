@@ -108,9 +108,11 @@ namespace GameShop.DataBase
             {
                 try
                 {
-                    command.Parameters.Clear();
                     command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Double));
                     command.Parameters[NameFieldByTable].Value = parametr;
+
+                    adapter.SelectCommand = command;
+                    adapter.Fill(table);
                 }
                 catch
                 {
@@ -119,18 +121,22 @@ namespace GameShop.DataBase
                         command.Parameters.Clear();
                         command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Int32));
                         command.Parameters[NameFieldByTable].Value = parametr;
+
+                        adapter.SelectCommand = command;
+                        adapter.Fill(table);
                     }
                     catch
                     {
                         command.Parameters.Clear();
                         command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.VarChar));
                         command.Parameters[NameFieldByTable].Value = parametr;
+
+                        adapter.SelectCommand = command;
+                        adapter.Fill(table);
                     }
                 }
             }
 
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
 
             ObservableCollection<Order> Collection = new ObservableCollection<Order>();
             if (table.Rows.Count > 0)
@@ -320,7 +326,7 @@ namespace GameShop.DataBase
         public static bool DeleteItemInTableOrder(int idOrder, int iCheckToOrder, int CountItemsToCheck)
         {
             DataBaseConnect db = new DataBaseConnect();
-            
+
             if (CountItemsToCheck > 1)
             {
                 MySqlCommand command = new MySqlCommand($"DELETE FROM `order` WHERE `{nameof(FindByValueOrder.idOrder)}` = @idOrder", db.IsConnection());
@@ -353,9 +359,46 @@ namespace GameShop.DataBase
                     return false;
                 }
             }
-            
+
             return true;
         }
+
+        public static ObservableCollection<Order> ReadingOrderPriceByMinValueAndMaxValue(double MinValue, double MaxValue)
+        {
+            DataBaseConnect db = new DataBaseConnect();
+            MySqlCommand command = new MySqlCommand();
+            DataTable table = new DataTable();
+            MySqlDataAdapter adapter = new MySqlDataAdapter();
+
+            ObservableCollection<Order> Collection = new ObservableCollection<Order>();
+
+            command = new MySqlCommand($"SELECT * FROM `Order` WHERE `Price` BETWEEN {MinValue} AND {MaxValue + 1}", db.IsConnection());
+
+            adapter.SelectCommand = command;
+            adapter.Fill(table);
+
+            if (table.Rows.Count > 0)
+            {
+                MySqlDataReader readerBy = command.ExecuteReader();
+                for (int i = 0; readerBy.Read(); i++)
+                {
+                    Collection.Add(new Order
+                    {
+                        idOrder = int.Parse(readerBy["idOrder"].ToString()),
+                        idProduct = int.Parse(readerBy["idProduct"].ToString()),
+                        idUser = int.Parse(readerBy["idUser"].ToString()),
+                        Status = readerBy["Status"].ToString(),
+                        Quantity = int.Parse(readerBy["Quantity"].ToString()),
+                        Price = double.Parse(readerBy["Price"].ToString()),
+                        Discount = int.Parse(readerBy["Discount"].ToString()),
+                        idCheck = int.Parse(readerBy["idCheck"].ToString())
+                    });
+                }
+            }
+
+            return Collection;
+        }
+
 
     }
 }

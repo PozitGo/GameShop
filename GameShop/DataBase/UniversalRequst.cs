@@ -1,14 +1,7 @@
-﻿using GameShop.Enum;
+﻿using GameShop.Model;
 using MySql.Data.MySqlClient;
-using MySqlX.XDevAPI;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Configuration;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameShop.DataBase
 {
@@ -39,6 +32,5 @@ namespace GameShop.DataBase
 
             return Collection;
         }
-
     }
 }

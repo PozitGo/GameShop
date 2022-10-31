@@ -2,8 +2,10 @@
 using GameShop.Enum;
 using GameShop.Model;
 using GameShop.Model.ModelTableInDataBase;
+using GameShop.ViewModels.InfoBars;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Uwp.UI.Controls;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -22,6 +24,10 @@ namespace GameShop.ViewModels
     public class ControlPanelViewModel : ObservableObject
     {
         public ObservableCollection<ModelUPGRADEOrder> OrderUPGRADECollection = new ObservableCollection<ModelUPGRADEOrder>();
+
+        public ObservableCollection<ModelUPGRADEOrder> TempOrderUPGRADECollection = new ObservableCollection<ModelUPGRADEOrder>();
+
+        public ObservableCollection<Check> TempCheckCollection = new ObservableCollection<Check>();
 
         public ObservableCollection<Order> OrderCollectionSettings = new ObservableCollection<Order>();
 
@@ -84,6 +90,55 @@ namespace GameShop.ViewModels
             set => SetProperty(ref _ContentCheckBoxUniteCheck, value);
         }
 
+        private bool _IsOpenInfoBar;
+
+        public bool IsOpenInfoBar
+        {
+            get => _IsOpenInfoBar;
+            set => SetProperty(ref _IsOpenInfoBar, value);
+        }
+
+        private InfoBarSeverity _SeverityInfoBar;
+
+        public InfoBarSeverity SeverityInfoBar
+        {
+            get => _SeverityInfoBar;
+            set => SetProperty(ref _SeverityInfoBar, value);
+        }
+
+        private string _TitleInfoBar;
+
+        public string TitleInfoBar
+        {
+            get
+            {
+                return _TitleInfoBar;
+            }
+            set
+            {
+                SetProperty(ref _TitleInfoBar, value);
+            }
+        }
+
+        private string _MessageInfoBar;
+
+        public string MessageInfoBar
+        {
+            get => _MessageInfoBar;
+            set
+            {
+                SetProperty(ref _MessageInfoBar, value);
+            }
+        }
+
+        public void ShowInfoBar(InfoBar bar)
+        {
+            TitleInfoBar = bar.Title;
+            MessageInfoBar = bar.Message;
+            SeverityInfoBar = bar.Severity;
+            IsOpenInfoBar = bar.IsOpen;
+        }
+
         private bool IsUPDATE;
         private bool IsDELETE;
         private bool IsADD;
@@ -97,7 +152,8 @@ namespace GameShop.ViewModels
         public ICommand AppBarButtonAddOrder => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(AppBarButtonAddOrderClick);
         private async void AppBarButtonAddOrderClick(DataGrid data)
         {
-
+            DataGridOrderSettings = data;
+            DataGridOrderSettings.Visibility = Visibility.Visible;
             if (DataGridOrderSettings == null)
             {
                 DataGridOrderSettings = data;
@@ -136,6 +192,7 @@ namespace GameShop.ViewModels
         private async void AppBarButtonEditOrderClick(DataGrid data)
         {
             DataGridOrderSettings = data;
+            DataGridOrderSettings.Visibility = Visibility.Visible;
             IsUPDATE = true;
             IsADD = false;
             IsDELETE = false;
@@ -181,6 +238,7 @@ namespace GameShop.ViewModels
         private async void AppBarButtonDeleteClick(DataGrid data)
         {
             DataGridOrderUPGRADE = data;
+            DataGridOrderSettings.Visibility = Visibility.Visible;
 
             if (DataGridOrderSettings == null)
                 DataGridOrderSettings = data;
@@ -558,11 +616,15 @@ namespace GameShop.ViewModels
             DataGridTextColumnVisibilitySettingsidCheck = "Visible";
             VisibilityCheckBoxUniteCheck = "Collapsed";
             VisibilitySaveButtonCommandBar = "Collapsed";
+            IsOpenInfoBar = false;
         }
 
         private void InitializationCollectionOrderUPGRADE()
         {
-            DataGridOrderUPGRADE.UnloadingRowDetails += DataGridOrderUPGRADE_UnloadingRowDetails;
+            if (DataGridOrderUPGRADE != null)
+                DataGridOrderUPGRADE.UnloadingRowDetails += DataGridOrderUPGRADE_UnloadingRowDetails;
+            else
+                ShowInfoBar(ControlPageInfoBar.Warning("Коллекция заказов пустая", "Выберете таблицу заказы и повторите попытку"));
             Windows.Foundation.IAsyncAction asyncAction = Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 ObservableCollection<Order> OrderCollection = new ObservableCollection<Order>();
@@ -584,9 +646,10 @@ namespace GameShop.ViewModels
                     }
                 }
             });
-
-            DataGridOrderUPGRADE.SelectionChanged += DataGridOrderUPGRADE_SelectionChanged;
-
+            if (DataGridOrderUPGRADE != null)
+                DataGridOrderUPGRADE.SelectionChanged += DataGridOrderUPGRADE_SelectionChanged;
+            else
+                ShowInfoBar(ControlPageInfoBar.Warning("Коллекция заказов пустая", "Выберете таблицу заказы и повторите попытку"));
         }
 
         private void DataGridOrderUPGRADE_SelectionChanged(object sender, SelectionChangedEventArgs e) => this.SelectItemsOrder = e;
@@ -919,6 +982,424 @@ namespace GameShop.ViewModels
                     }
                 }
             }
+        }
+
+        public ICommand SortActiveOrderCollection => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(SortActiveOrderCollectionClick);
+        private async void SortActiveOrderCollectionClick(DataGrid data)
+        {
+            DataGridOrderUPGRADE = data;
+            InitializationCollectionOrderUPGRADE();
+            DataGridOrderUPGRADE.Visibility = Visibility.Visible;
+
+            if (DataGridCheck != null)
+                DataGridCheck.Visibility = Visibility.Collapsed;
+            else
+                ShowInfoBar(ControlPageInfoBar.Warning("Коллекция чеков пустая", "Выберете таблицу чек и повторите попытку"));
+
+            await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                var SortCollection = ReadingDataOrder(FindByValueOrder.Status, "Ожидает оплаты");
+
+                if (TempOrderUPGRADECollection.Count == 0)
+                {
+                    TempOrderUPGRADECollection = OrderUPGRADECollection;
+                }
+
+                OrderUPGRADECollection.Clear();
+
+                foreach (var item in ConvertOrderAndOrderUPGRADE.ConvertFromOrderCollectionInOrderUPGRADECollection(SortCollection))
+                {
+                    OrderUPGRADECollection.Add(item);
+                }
+            });
+        }
+
+        public ICommand SortByidCheck => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(SortByidCheckClick);
+        private async void SortByidCheckClick(DataGrid data)
+        {
+            DataGridOrderUPGRADE = data;
+            int idCheck = 0;
+            bool isClosed = false;
+
+            InitializationCollectionOrderUPGRADE();
+            TextBox textBox = new TextBox();
+            textBox.Visibility = Visibility.Visible;
+            textBox.Header = "Введите номер чека";
+
+            ContentDialog SortIdCheck = new ContentDialog()
+            {
+                Title = "Сортировка по номеру чека",
+                Content = "Введите номер чека и нажмите кнопку сортировать",
+                CloseButtonText = "Отмена",
+                CloseButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() => { isClosed = true; }),
+                PrimaryButtonText = "Сортировать",
+
+                PrimaryButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() =>
+                {
+                    int.TryParse(textBox.Text, out idCheck);
+                }),
+            };
+
+            SortIdCheck.Content = textBox;
+            await SortIdCheck.ShowAsync();
+
+            DataGridOrderUPGRADE.Visibility = Visibility.Visible;
+            if (DataGridCheck != null)
+                DataGridCheck.Visibility = Visibility.Collapsed;
+            else
+                ShowInfoBar(ControlPageInfoBar.Warning("Коллекция чеков пустая", "Выберете таблицу чек и повторите попытку"));
+            DataGridOrderUPGRADE.Visibility = Visibility.Visible;
+            textBox.Visibility = Visibility.Collapsed;
+            if (!isClosed && idCheck != 0)
+            {
+                await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    var SortCollection = ReadingDataOrder(FindByValueOrder.idCheck, idCheck);
+
+                    OrderUPGRADECollection.Clear();
+
+                    foreach (var item in ConvertOrderAndOrderUPGRADE.ConvertFromOrderCollectionInOrderUPGRADECollection(SortCollection))
+                    {
+                        OrderUPGRADECollection.Add(item);
+                    }
+                });
+            }
+        }
+
+        public ICommand SortByRangeSumOrder => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(SortByRangeSumOrderClick);
+        private async void SortByRangeSumOrderClick(DataGrid data)
+        {
+            DataGridOrderUPGRADE = data;
+            double MinSum = -1;
+            double MaxSum = 0;
+            InitializationCollectionOrderUPGRADE();
+            bool isClosed = false;
+
+            StackPanel stackPanel = new StackPanel();
+
+            CheckBox check = new CheckBox();
+            check.Content = "До макс существующего";
+            check.IsChecked = false;
+
+            TextBox textBoxMax = new TextBox();
+            textBoxMax.Visibility = Visibility.Visible;
+            textBoxMax.Header = "До";
+
+            TextBox textBoxMin = new TextBox();
+            textBoxMin.Header = "От";
+            textBoxMin.Visibility = Visibility.Visible;
+
+            stackPanel.Children.Add(textBoxMin);
+            stackPanel.Children.Add(textBoxMax);
+            stackPanel.Children.Add(check);
+
+            stackPanel.Spacing = 10;
+            stackPanel.Orientation = Orientation.Horizontal;
+
+            check.Checked += (s, e) =>
+            {
+                if (check.IsChecked == true) textBoxMax.IsEnabled = false;
+            };
+
+            ContentDialog SortIdCheck = new ContentDialog()
+            {
+                Title = "Сортировка по диапазону суммы",
+                Content = "Введите минимальную и максимальную сумму",
+                CloseButtonText = "Отмена",
+                CloseButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() => { isClosed = true; }),
+                PrimaryButtonText = "Сортировать",
+                PrimaryButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() =>
+                {
+                    if (textBoxMax.IsEnabled == true)
+                        double.TryParse(textBoxMax.Text, out MaxSum);
+                    else
+                    {
+                        MaxSum = OrderUPGRADECollection.Max(x => x.Price);
+                    }
+                    double.TryParse(textBoxMin.Text, out MinSum);
+                }),
+            };
+
+            SortIdCheck.Content = stackPanel;
+            await SortIdCheck.ShowAsync();
+
+            stackPanel.Visibility = Visibility.Collapsed;
+
+            if (MaxSum > 0 && MinSum != -1 && !isClosed)
+            {
+                DataGridOrderUPGRADE.Visibility = Visibility.Visible;
+                if (DataGridCheck != null)
+                    DataGridCheck.Visibility = Visibility.Collapsed;
+                else
+                    ShowInfoBar(ControlPageInfoBar.Error("Коллекция чеков пустая", "Выберете таблицу чеков и повторите попытку"));
+                await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    var SortCollection = ReadingOrderPriceByMinValueAndMaxValue(MinSum, MaxSum);
+
+                    OrderUPGRADECollection.Clear();
+
+                    foreach (var item in ConvertOrderAndOrderUPGRADE.ConvertFromOrderCollectionInOrderUPGRADECollection(SortCollection))
+                    {
+                        OrderUPGRADECollection.Add(item);
+                    }
+
+                });
+            }
+        }
+
+        public ICommand SortByRangeSumCheck => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(SortByRangeSumCheckClick);
+        private async void SortByRangeSumCheckClick(DataGrid data)
+        {
+            DataGridCheck = data;
+            InitializationCollectionCheck();
+            double MinSum = -1;
+            double MaxSum = 0;
+            bool isClosed = false;
+
+            StackPanel stackPanel = new StackPanel();
+
+            CheckBox check = new CheckBox();
+            check.Content = "До макс существующего";
+            check.IsChecked = false;
+
+            TextBox textBoxMax = new TextBox();
+            textBoxMax.Visibility = Visibility.Visible;
+            textBoxMax.Header = "До";
+
+            TextBox textBoxMin = new TextBox();
+            textBoxMin.Header = "От";
+            textBoxMin.Visibility = Visibility.Visible;
+
+            stackPanel.Children.Add(textBoxMin);
+            stackPanel.Children.Add(textBoxMax);
+            stackPanel.Children.Add(check);
+
+            stackPanel.Spacing = 10;
+            stackPanel.Orientation = Orientation.Horizontal;
+
+            check.Checked += (s, e) =>
+            {
+                if (check.IsChecked == true) textBoxMax.IsEnabled = false;
+            };
+
+            ContentDialog SortIdCheck = new ContentDialog()
+            {
+                Title = "Сортировка по диапазону суммы",
+                Content = "Введите минимальную и максимальную сумму",
+                CloseButtonText = "Отмена",
+                CloseButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() => { isClosed = true; }),
+                PrimaryButtonText = "Сортировать",
+                PrimaryButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() =>
+                {
+                    if (textBoxMax.IsEnabled == true)
+                        double.TryParse(textBoxMax.Text, out MaxSum);
+                    else
+                    {
+                        MaxSum = CheckCollection.Max(x => x.Sum);
+                    }
+
+                    double.TryParse(textBoxMin.Text, out MinSum);
+                }),
+            };
+
+            SortIdCheck.Content = stackPanel;
+            await SortIdCheck.ShowAsync();
+
+            stackPanel.Visibility = Visibility.Collapsed;
+
+            if (MaxSum > 0 && MinSum != -1 && !isClosed)
+            {
+                DataGridCheck.Visibility = Visibility.Visible;
+                if (DataGridOrderUPGRADE != null)
+                    DataGridOrderUPGRADE.Visibility = Visibility.Collapsed;
+                else
+                    ShowInfoBar(ControlPageInfoBar.Error("Коллекция заказов пустая", "Выберете таблицу заказов и повторите попытку"));
+                await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    var SortCollection = ReadingSumCheckByMinValueAndMaxValue(MinSum, MaxSum);
+
+                    CheckCollection.Clear();
+
+                    foreach (var item in SortCollection)
+                    {
+                        CheckCollection.Add(item);
+                    }
+
+                });
+            }
+        }
+
+        public ICommand SortByDataCheck => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(SortByDataCheckClick);
+        private async void SortByDataCheckClick(DataGrid data)
+        {
+            DataGridCheck = data;
+            bool isClosed = false;
+            DateTime tempdata = new DateTime();
+            DatePicker date = new DatePicker();
+            date.Header = "Выберете дату";
+            date.Visibility = Visibility.Visible;
+
+            ContentDialog SortData = new ContentDialog()
+            {
+                Title = "Поиск чека по дате",
+                CloseButtonText = "Отмена",
+                CloseButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() => { isClosed = true; }),
+                PrimaryButtonText = "Сортировать",
+
+                PrimaryButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() =>
+                {
+                    tempdata = date.Date.DateTime;
+                }),
+            };
+
+            SortData.Content = date;
+            await SortData.ShowAsync();
+
+            if (!isClosed && tempdata != default)
+            {
+                DataGridCheck.Visibility = Visibility.Visible;
+                if (DataGridOrderUPGRADE != null)
+                    DataGridOrderUPGRADE.Visibility = Visibility.Collapsed;
+                else
+                    ShowInfoBar(ControlPageInfoBar.Error("Ошибка", "Не выбрана таблица заказов"));
+
+                var SortCollection = ReadingDataCheck(FindByValueCheck.Data, tempdata);
+
+                CheckCollection.Clear();
+
+                foreach (var item in SortCollection)
+                {
+                    CheckCollection.Add(item);
+                }
+
+            }
+        }
+
+        public ICommand SortOrdersByLoginUser => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(SortOrdersByLoginUserClick);
+        private async void SortOrdersByLoginUserClick(DataGrid data)
+        {
+            DataGridOrderUPGRADE = data;
+            string Login = null;
+            bool isClosed = false;
+            TextBox textBox = new TextBox();
+            textBox.Header = "Введите логин";
+            textBox.Visibility = Visibility.Visible;
+
+            ContentDialog SortLogin = new ContentDialog()
+            {
+                Title = "Поиск заказов по логину",
+                CloseButtonText = "Отмена",
+                CloseButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() => { isClosed = true; }),
+                PrimaryButtonText = "Сортировать",
+
+                PrimaryButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() =>
+                {
+                    Login = textBox.Text;
+                }),
+            };
+
+            SortLogin.Content = textBox;
+            await SortLogin.ShowAsync();
+
+            if (!isClosed && Login != null)
+            {
+                DataGridOrderUPGRADE.Visibility = Visibility.Visible;
+                if (DataGridCheck != null)
+                    DataGridCheck.Visibility = Visibility.Collapsed;
+
+                ObservableCollection<UserAccount> idUser = new ObservableCollection<UserAccount>();
+                try
+                {
+                    idUser = DataBaseRequstUser.ReadingDataUser(FindByValueUser.Login, Login);
+                }
+                catch
+                {
+                    ShowInfoBar(ControlPageInfoBar.Error("Логин не найден", "Введите другой логин и повторите попытку"));
+                }
+
+                bool LoginCorrect = true;
+                ObservableCollection<Order> SortCollection = new ObservableCollection<Order>();
+
+                try
+                {
+                    SortCollection = ReadingDataOrder(FindByValueOrder.idUser, idUser[0].idUser);
+                }
+                catch
+                {
+                    LoginCorrect = false;
+                    ShowInfoBar(ControlPageInfoBar.Error("Логин не найден", "Введите другой логин и повторите попытку"));
+                }
+
+                if (LoginCorrect)
+                {
+                    OrderUPGRADECollection.Clear();
+
+                    foreach (var item in ConvertOrderAndOrderUPGRADE.ConvertFromOrderCollectionInOrderUPGRADECollection(SortCollection))
+                    {
+                        OrderUPGRADECollection.Add(item);
+                    }
+                }
+            }
+        }
+        public ICommand SortCheckByIdOrder => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(SortCheckByIdOrderClick);
+        private async void SortCheckByIdOrderClick(DataGrid data)
+        {
+            DataGridCheck = data;
+            bool isClosed = false;
+            int idOrder = 0;
+
+            TextBox textBoxidOrder = new TextBox();
+            textBoxidOrder.Header = "Введите номер заказа";
+            textBoxidOrder.Visibility = Visibility.Visible;
+
+            ContentDialog SortCheckByIdOrder = new ContentDialog()
+            {
+                Title = "Поиск по номеру заказа",
+                CloseButtonText = "Отмена",
+                CloseButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() => { isClosed = true; }),
+                PrimaryButtonText = "Сортировать",
+
+                PrimaryButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() =>
+                {
+                    int.TryParse(textBoxidOrder.Text, out idOrder);
+                }),
+            };
+
+            SortCheckByIdOrder.Content = textBoxidOrder;
+            await SortCheckByIdOrder.ShowAsync();
+
+
+            if (!isClosed && idOrder != 0)
+            {
+                DataGridCheck.Visibility = Visibility.Visible;
+                if (DataGridOrderUPGRADE != null)
+                    DataGridOrderUPGRADE.Visibility = Visibility.Collapsed;
+                else
+                    ShowInfoBar(ControlPageInfoBar.Error("Ошибка", "Не выбрана таблица заказов"));
+
+                int idCheck = FindValueByidOrder<int>(idOrder, FindByValueOrder.idCheck);
+
+                var SortCollection = ReadingDataCheck(FindByValueCheck.idCheck, idCheck);
+
+                CheckCollection.Clear();
+
+                foreach (var item in SortCollection)
+                {
+                    CheckCollection.Add(item);
+                }
+            }
+        }
+
+        public ICommand ClearFilters => new RelayCommand(ClearFiltersClick);
+
+        private void ClearFiltersClick()
+        {
+            OrderUPGRADECollection.Clear();
+            CheckCollection.Clear();
+
+            InitializationCollectionOrderUPGRADE();
+
+            InitializationCollectionCheck();
         }
     }
 }

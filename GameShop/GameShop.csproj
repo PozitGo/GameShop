@@ -168,6 +168,7 @@
     <Compile Include="Enum\EnumFindByValueInTable\FindByValueCategory.cs" />
     <Compile Include="Enum\EnumFindByValueInTable\FindByValuePhotoProduct.cs" />
     <Compile Include="Enum\EnumFindByValueInTable\FindByValueProduct.cs" />
+    <Compile Include="Enum\EnumFindByValueInTable\OrderStatus.cs" />
     <Compile Include="Enum\ListOfTablesInDataBase.cs" />
     <Compile Include="Enum\ReturnIsType.cs" />
     <Compile Include="Enum\EnumFindByValueInTable\FindByValueCheck.cs" />
@@ -187,12 +188,13 @@
     <Compile Include="Services\JsonObjectSerializer.cs" />
     <Compile Include="Services\UserSessionService.cs" />
     <Compile Include="ViewModels\AccountsViewModel.cs" />
-    <Compile Include="ViewModels\AuthInfoBar.cs" />
+    <Compile Include="ViewModels\InfoBars\AuthInfoBar.cs" />
     <Compile Include="Services\ActivationService.cs" />
     <Compile Include="Activation\DefaultActivationHandler.cs" />
     <Compile Include="Services\NavigationService.cs" />
     <Compile Include="ViewModels\ControlPanelViewModel.cs" />
     <Compile Include="Convert\ConvertOrderAndOrderUPGRADE.cs" />
+    <Compile Include="ViewModels\InfoBars\ControlPageInfoBar.cs" />
     <Compile Include="ViewModels\LoginPViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />

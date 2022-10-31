@@ -44,9 +44,11 @@ namespace GameShop.DataBase
                 case FindByValueCheck.Data:
                     if (parametr != null)
                     {
+                        DateTime data = new DateTime();
+                        data = DateTime.Parse(parametr.ToString());
                         NameFieldByTable = "@" + nameof(FindByValueCheck.Data);
-                        command = new MySqlCommand("SELECT * FROM `check` WHERE " + NameFieldByTable + " = Data", db.IsConnection());
-                        Collection = ReadCheckByParametr(command, adapter, table, parametr, NameFieldByTable);
+                        command = new MySqlCommand($"SELECT * FROM `check` WHERE Data LIKE '{data.Year}-{data.Month}-{data.Day}%'", db.IsConnection());
+                        Collection = ReadCheckByParametr(command, adapter, table);
                     }
                     break;
             }
@@ -80,30 +82,21 @@ namespace GameShop.DataBase
             {
                 try
                 {
-                    command.Parameters.Clear();
                     command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Double));
                     command.Parameters[NameFieldByTable].Value = parametr;
+                    adapter.SelectCommand = command;
+                    adapter.Fill(table);
                 }
                 catch
                 {
-                    try
-                    {
-                        command.Parameters.Clear();
-                        command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.DateTime));
-                        command.Parameters[NameFieldByTable].Value = parametr;
-                    }
-                    catch
-                    {
-                        command.Parameters.Clear();
-                        command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Int32));
-                        command.Parameters[NameFieldByTable].Value = parametr;
-                    }
+                    command.Parameters.Clear();
+                    command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Int32));
+                    command.Parameters[NameFieldByTable].Value = parametr;
+                    adapter.SelectCommand = command;
+                    adapter.Fill(table);
                 }
 
             }
-
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
 
             ObservableCollection<Check> Collection = new ObservableCollection<Check>();
             if (table.Rows.Count > 0)
@@ -387,6 +380,36 @@ namespace GameShop.DataBase
             }
 
             return IdNullOrders;
+        }
+
+        public static ObservableCollection<Check> ReadingSumCheckByMinValueAndMaxValue(double MinValue, double MaxValue)
+        {
+            DataBaseConnect db = new DataBaseConnect();
+            MySqlCommand command = new MySqlCommand();
+            DataTable table = new DataTable();
+            MySqlDataAdapter adapter = new MySqlDataAdapter();
+
+            ObservableCollection<Check> Collection = new ObservableCollection<Check>();
+
+            command = new MySqlCommand($"SELECT * FROM `check` WHERE `Sum` BETWEEN {MinValue} AND {MaxValue + 1}", db.IsConnection());
+
+            adapter.SelectCommand = command;
+            adapter.Fill(table);
+
+            if (table.Rows.Count > 0)
+            {
+                MySqlDataReader readerBy = command.ExecuteReader();
+                for (int i = 0; readerBy.Read(); i++)
+                {
+                    Collection.Add(new Check
+                    {
+                        idCheck = int.Parse(readerBy["idCheck"].ToString()),
+                        Sum = double.Parse(readerBy["Sum"].ToString()),
+                        Data = (DateTime)readerBy["Data"],
+                    });
+                }
+            }
+            return Collection;
         }
     }
 }
