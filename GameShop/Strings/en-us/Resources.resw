@@ -126,7 +126,7 @@
     <comment>Application description</comment>
   </data>
   <data name="Shell_Main.Content" xml:space="preserve">
-    <value>Main</value>
+    <value>Главная</value>
     <comment>Navigation view item name for Main</comment>
   </data>
   <data name="Shell_LoginP.Content" xml:space="preserve">
@@ -134,11 +134,11 @@
     <comment>Navigation view item name for LoginP</comment>
   </data>
   <data name="Shell_Accounts.Content" xml:space="preserve">
-    <value>Accounts</value>
+    <value>Аккаунт</value>
     <comment>Navigation view item name for Accounts</comment>
   </data>
   <data name="Shell_ControlPanel.Content" xml:space="preserve">
-    <value>ControlPanel</value>
+    <value>Панель управления</value>
     <comment>Navigation view item name for ControlPanel</comment>
   </data>
 </root>

@@ -1,6 +1,7 @@
 ﻿using GameShop.ViewModels;
 
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
 
 namespace GameShop.Views
 {
@@ -14,6 +15,7 @@ namespace GameShop.Views
             InitializeComponent();
             DataContext = ViewModel;
             ViewModel.Initialize(shellFrame, navigationView, KeyboardAccelerators);
+         
         }
     }
 }

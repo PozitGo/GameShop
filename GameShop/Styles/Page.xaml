@@ -3,5 +3,9 @@
     <Style x:Key="PageStyle" TargetType="Page">
         <Setter Property="Background" Value="{ThemeResource SystemControlAltHighAcrylicWindowBrush}" />
     </Style>
+    <Style x:Key="PageStyle2" TargetType="Page">
+        <Setter Property="Background" Value="{ThemeResource SystemControlAltLowAcrylicWindowBrush}" />
+    </Style>
+
 
 </ResourceDictionary>

@@ -68,7 +68,6 @@
                             <TextBox
                                 FontFamily="Cascadia Code SemiBold"
                                 Header="Логин"
-                                PlaceholderText="Логин"
                                 MaxLength="20"
                                 Text="{x:Bind ViewModel.LoginReg, Mode=TwoWay}" />
 
@@ -95,8 +94,7 @@
                                 FontFamily="Cascadia Code SemiBold"
                                 Header="Пароль"
                                 MaxLength="50"
-                                Password="{x:Bind ViewModel.PasswordReg, Mode=TwoWay}"
-                                PlaceholderText="Пароль" />
+                                Password="{x:Bind ViewModel.PasswordReg, Mode=TwoWay}" />
 
                             <TextBox
                                 FontFamily="Cascadia Code SemiBold"

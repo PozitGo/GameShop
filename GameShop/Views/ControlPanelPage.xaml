@@ -11,10 +11,11 @@
     x:Name="PageRoot"
     mc:Ignorable="d">
 
-    <Grid x:Name="ContentArea" Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}">
-        <muxc:TabView IsAddTabButtonVisible="False" CloseButtonOverlayMode="OnPointerOver">
-            <muxc:TabViewItem Header="Панель управления" FontFamily="Cascadia Code SemiBold">
-                <Grid>
+    <!--Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}"-->
+    <Grid x:Name="ContentArea" BorderBrush="{ThemeResource SystemControlAltHighAcrylicWindowBrush}" BorderThickness="2" CornerRadius="20">
+        <muxc:TabView IsAddTabButtonVisible="False" CloseButtonOverlayMode="OnPointerOver" Background="{ThemeResource SystemControlAltHighAcrylicWindowBrush}">
+            <muxc:TabViewItem Header="Управление покупками" FontFamily="Cascadia Code SemiBold">
+                <Grid Background="{ThemeResource SystemControlAltHighAcrylicWindowBrush}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="20*"></RowDefinition>
                         <RowDefinition Height="2*"></RowDefinition>
@@ -91,7 +92,7 @@
                         </StackPanel>
                         <muxc:InfoBar Grid.Row="2" Grid.Column="2"
                                       VerticalAlignment="Center"
-                                      Margin="0,60,0,0"
+                                      Margin="0,80,0,0"
                                       IsOpen="{x:Bind ViewModel.IsOpenInfoBar, Mode=TwoWay}"
                                       Severity="{x:Bind ViewModel.SeverityInfoBar, Mode=TwoWay}"
                                       Title="{x:Bind ViewModel.TitleInfoBar, Mode=TwoWay}"
@@ -116,7 +117,7 @@
                             ItemsSource="{x:Bind ViewModel.OrderCollectionSettings, Mode=OneWay}"
                             IsReadOnly="False"
                             SelectionMode="Extended"
-                            Visibility="Visible">
+                            Visibility="Collapsed">
 
                             <controls:DataGrid.Columns>
                                 <controls:DataGridComboBoxColumn Header="Номер товара" IsReadOnly="False" Binding="{Binding idProduct}"  Width="Auto" FontFamily="Cascadia Code SemiBold" ItemsSource="{x:Bind ViewModel.AllidProductCollection}"/>
@@ -136,6 +137,7 @@
                             AutoGenerateColumns="False"
                             GridLinesVisibility="All"
                             VerticalScrollBarVisibility="Visible"
+                            HorizontalScrollBarVisibility="Visible"
                             ItemsSource="{x:Bind ViewModel.CheckCollection, Mode=OneWay}"
                             IsReadOnly="True"
                             HorizontalAlignment="Left"
@@ -161,6 +163,7 @@
                             HorizontalAlignment="Left"
                             GridLinesVisibility="All"
                             VerticalScrollBarVisibility="Visible"
+                            HorizontalScrollBarVisibility="Visible"
                             ItemsSource="{x:Bind ViewModel.OrderUPGRADECollection, Mode=OneWay}"
                             IsReadOnly="True"
                             Visibility="Collapsed">
@@ -171,17 +174,15 @@
                                     <StackPanel Padding="10" Spacing="5">
                                         <TextBlock Text="Номер товара:" FontFamily="Cascadia Code SemiBold"/>
                                         <TextBlock Text="Номер пользователя:" FontFamily="Cascadia Code SemiBold"/>
-                                        <TextBlock Text="Заказов под данным номером чека найденно:" FontFamily="Cascadia Code SemiBold"/>
-                                        <Button Content="Отобразить заказы" FontFamily="Cascadia Code SemiBold" Padding="10"/>
+                                        <TextBlock Text="Имя и фамилия пользователя:" FontFamily="Cascadia Code SemiBold"/>
+                                        <!--<TextBlock Text="Заказов под данным номером чека найденно:" FontFamily="Cascadia Code SemiBold"/>
+                                        <Button Content="Отобразить заказы" FontFamily="Cascadia Code SemiBold" Padding="10"/>-->
                                     </StackPanel>
                                     <StackPanel Padding="10" Spacing="5">
                                         <TextBlock Text="{Binding idProduct}" FontFamily="Cascadia Code SemiBold"/>
                                         <TextBlock Text="{Binding idUser}" FontFamily="Cascadia Code SemiBold"/>
-                                        <TextBlock Text="" FontFamily="Cascadia Code SemiBold"/>
+                                        <TextBlock Text="{Binding NameSurnameUser}" FontFamily="Cascadia Code SemiBold"/>
                                     </StackPanel>
-                                    <CommandBar Background="Transparent" DefaultLabelPosition="Right" VerticalAlignment="Bottom" HorizontalAlignment="Right">
-                                        <AppBarButton Icon="Cancel"  Command="{Binding ElementName=PageRoot, Path=CloseDetailVisible}"/>
-                                    </CommandBar>
                                 </StackPanel>
                             </DataTemplate>
                         </controls:DataGrid.RowDetailsTemplate>
@@ -191,7 +192,7 @@
                             <controls:DataGridTextColumn Header="Название товара" IsReadOnly="False" Binding="{Binding NameProduct}"  Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                             <controls:DataGridTextColumn Header="Логин пользователя" IsReadOnly="False" Binding="{Binding LoginUser}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                             <controls:DataGridTextColumn Header="Количество" IsReadOnly="False" Binding="{Binding Quantity}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
-                            <controls:DataGridTextColumn Header="Цена" IsReadOnly="False" Binding="{Binding Price}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
+                            <controls:DataGridTextColumn Header="Цена за ед." IsReadOnly="False" Binding="{Binding Price}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                             <controls:DataGridTextColumn Header="Процент скидки" IsReadOnly="False" Binding="{Binding Discount}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                             <controls:DataGridTextColumn Header="Статус" IsReadOnly="False" Binding="{Binding Status}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                             <controls:DataGridTextColumn Header="Номер чека" IsReadOnly="False" Binding="{Binding idCheck}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>

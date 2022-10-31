@@ -4,10 +4,6 @@ namespace GameShop.ViewModels.InfoBars
 {
     public static class ControlPageInfoBar
     {
-        //public static bool IsOpen { get; set; }
-        //public static InfoBarSeverity Severity { get; set; }
-        //public static string Title { get; set; }
-        //public static string Message { get; set; }
 
         public static InfoBar bar = new InfoBar();
         public static InfoBar IsNull()

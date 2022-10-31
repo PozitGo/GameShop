@@ -25,10 +25,6 @@ namespace GameShop.ViewModels
     {
         public ObservableCollection<ModelUPGRADEOrder> OrderUPGRADECollection = new ObservableCollection<ModelUPGRADEOrder>();
 
-        public ObservableCollection<ModelUPGRADEOrder> TempOrderUPGRADECollection = new ObservableCollection<ModelUPGRADEOrder>();
-
-        public ObservableCollection<Check> TempCheckCollection = new ObservableCollection<Check>();
-
         public ObservableCollection<Order> OrderCollectionSettings = new ObservableCollection<Order>();
 
         public ObservableCollection<Check> CheckCollection = new ObservableCollection<Check>();
@@ -131,6 +127,17 @@ namespace GameShop.ViewModels
             }
         }
 
+        private string _Texts;
+
+        public string Texts
+        {
+            get => _Texts;
+            set
+            {
+                SetProperty(ref _Texts, value);
+            }
+        }
+
         public void ShowInfoBar(InfoBar bar)
         {
             TitleInfoBar = bar.Title;
@@ -158,6 +165,8 @@ namespace GameShop.ViewModels
             {
                 DataGridOrderSettings = data;
             }
+            if (!BeInCheck && !BeInOrder)
+                ShowInfoBar(ControlPageInfoBar.Warning("У вас не выбрана ни одна таблица", "Выберите таблицу"));
 
             IsCheckedCheckBoxUniteCheck = false;
             DataGridOrderSettings.Columns[6].Visibility = Visibility.Visible;
@@ -192,10 +201,13 @@ namespace GameShop.ViewModels
         private async void AppBarButtonEditOrderClick(DataGrid data)
         {
             DataGridOrderSettings = data;
-            DataGridOrderSettings.Visibility = Visibility.Visible;
+
             IsUPDATE = true;
             IsADD = false;
             IsDELETE = false;
+
+            if (!BeInCheck && !BeInOrder)
+                ShowInfoBar(ControlPageInfoBar.Warning("У вас не выбрана ни одна таблица", "Выберите таблицу"));
 
             IsCheckedCheckBoxUniteCheck = false;
             DataGridOrderSettings.Columns[6].Visibility = Visibility.Visible;
@@ -203,11 +215,6 @@ namespace GameShop.ViewModels
             DataGridOrderSettings.Columns[0].Visibility = Visibility.Collapsed;
             InitializationCollectionCheck();
             InitializationCollectionAllId();
-
-            ContentSaveButtonCommandBar = "Изменить";
-            VisibilitySaveButtonCommandBar = "Visible";
-            VisibilityCheckBoxUniteCheck = "Visible";
-            ContentCheckBoxUniteCheck = "Вынести в новый чек";
 
             await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
@@ -218,30 +225,44 @@ namespace GameShop.ViewModels
 
             if (SelectItemsOrder != null)
             {
+                DataGridOrderSettings.Visibility = Visibility.Visible;
+
+                ContentSaveButtonCommandBar = "Изменить";
+                VisibilitySaveButtonCommandBar = "Visible";
+                VisibilityCheckBoxUniteCheck = "Visible";
+                ContentCheckBoxUniteCheck = "Вынести в новый чек";
+
                 try
                 {
-                    ModelUPGRADEOrder tempOrderAdd = SelectItemsOrder.AddedItems[0] as ModelUPGRADEOrder;
+                    ModelUPGRADEOrder tempOrderAdd = null;
+
+                    tempOrderAdd = SelectItemsOrder.AddedItems[0] as ModelUPGRADEOrder;
 
                     OrderCollectionSettings.Add(tempOrderAdd);
 
                     OrderCollectionSettingsOldItems.Add(ConvertOrderAndOrderUPGRADE.ConvertFromOrderUPGRADEInOrder(OrderUPGRADECollection.First(x => x.idOrder == tempOrderAdd.idOrder)));
 
-                }
-                catch (System.ArgumentOutOfRangeException)
-                {
 
                 }
+                catch (Exception ex)
+                {
+                    ShowInfoBar(ControlPageInfoBar.Warning("Ошибка", ex.Message));
+                }
             }
+            else
+                ShowInfoBar(ControlPageInfoBar.Error("Заказ для изменения не выбран", "Выберете заказ и повторите попытку"));
         }
 
         public ICommand AppBarButtonDeleteOrder => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(AppBarButtonDeleteClick);
         private async void AppBarButtonDeleteClick(DataGrid data)
         {
             DataGridOrderUPGRADE = data;
-            DataGridOrderSettings.Visibility = Visibility.Visible;
+
 
             if (DataGridOrderSettings == null)
                 DataGridOrderSettings = data;
+            if (!BeInCheck && !BeInOrder)
+                ShowInfoBar(ControlPageInfoBar.Warning("У вас не выбрана ни одна таблица", "Выберите таблицу"));
 
             IsCheckedCheckBoxUniteCheck = false;
             DataGridOrderSettings.Columns[6].Visibility = Visibility.Visible;
@@ -261,58 +282,79 @@ namespace GameShop.ViewModels
             if (CheckCollection.Count == 0)
                 InitializationCollectionCheck();
 
-            if (BeInOrder)
+            if (SelectItemsCheck != null || SelectItemsOrder != null)
             {
-                VisibilityCheckBoxUniteCheck = "Collapsed";
-                ContentSaveButtonCommandBar = "Подтвердить удаление";
-                VisibilitySaveButtonCommandBar = "Visible";
-            }
-
-            if (BeInCheck && SelectItemsCheck != null)
-            {
-                Check check = SelectItemsCheck.AddedItems[0] as Check;
-                ContentDialog noWifiDialog = new ContentDialog()
+                if (BeInOrder)
                 {
-                    Title = "Удаление",
-                    Content = "Подтвердите удаление всех заказов под выбранным чеком",
-                    CloseButtonText = "Отмена",
-                    PrimaryButtonText = "Подтвердить",
-                    PrimaryButtonCommand = DeleteAllOrdersOnIdCheckCommand,
-                    PrimaryButtonCommandParameter = check
-                };
+                    VisibilityCheckBoxUniteCheck = "Collapsed";
+                    ContentSaveButtonCommandBar = "Подтвердить удаление";
+                    VisibilitySaveButtonCommandBar = "Visible";
+                }
 
-                await noWifiDialog.ShowAsync();
-            }
-
-            if (BeInOrder && SelectItemsOrder != null)
-            {
-                for (int i = 0; i < SelectItemsOrder.AddedItems.Count; i++)
+                if (BeInCheck && SelectItemsCheck != null)
                 {
-                    OrderCollectionSettings.Add(SelectItemsOrder.AddedItems[i] as ModelUPGRADEOrder);
+                    Check check = SelectItemsCheck.AddedItems[0] as Check;
+                    ContentDialog noWifiDialog = new ContentDialog()
+                    {
+                        Title = "Удаление",
+                        Content = "Подтвердите удаление всех заказов под выбранным чеком",
+                        CloseButtonText = "Отмена",
+                        PrimaryButtonText = "Подтвердить",
+                        PrimaryButtonCommand = DeleteAllOrdersOnIdCheckCommand,
+                        PrimaryButtonCommandParameter = check
+                    };
+
+                    await noWifiDialog.ShowAsync();
+                }
+                else
+                    DataGridOrderSettings.Visibility = Visibility.Visible;
+
+                if (BeInOrder && SelectItemsOrder != null)
+                {
+                    for (int i = 0; i < SelectItemsOrder.AddedItems.Count; i++)
+                    {
+                        OrderCollectionSettings.Add(SelectItemsOrder.AddedItems[i] as ModelUPGRADEOrder);
+                    }
                 }
             }
+            else
+                ShowInfoBar(ControlPageInfoBar.Error("У вас не выбран заказ/чек для изменения", "Выберете заказ/чек и повторите попытку"));
         }
 
         public ICommand AppBarButtonAccept => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(AppBarButtonAcceptClick);
         private void AppBarButtonAcceptClick(DataGrid data)
         {
             DataGridOrderUPGRADE = data;
-
-            ModelUPGRADEOrder tempOrderAdd = SelectItemsOrder.AddedItems[0] as ModelUPGRADEOrder;
-
-            int idOrder = tempOrderAdd.idOrder;
-            tempOrderAdd.Status = "Одобрен";
-
-            Task.Factory.StartNew(() => UpdateItemInTableOrder(FindByValueOrder.Status, tempOrderAdd.Status, idOrder));
-
-            for (int i = 0; i < OrderUPGRADECollection.Count; i++)
+            if (!BeInCheck && !BeInOrder)
+                ShowInfoBar(ControlPageInfoBar.Error("У вас не выбрана ни одна таблица", "Выберите таблицу"));
+            else
             {
-                if (idOrder == OrderUPGRADECollection[i].idOrder)
+                ModelUPGRADEOrder tempOrderAdd = null;
+                if (SelectItemsOrder != null)
+                    tempOrderAdd = SelectItemsOrder.AddedItems[0] as ModelUPGRADEOrder;
+                else
+
+                    ShowInfoBar(ControlPageInfoBar.Error("У вас не выбран заказ", "Выберите и повторите попытку"));
+
+                if (tempOrderAdd != null)
                 {
-                    OrderUPGRADECollection.Insert(i, tempOrderAdd);
-                    OrderUPGRADECollection.RemoveAt(i + 1);
+                    int idOrder = tempOrderAdd.idOrder;
+                    tempOrderAdd.Status = "Одобрен";
+
+
+                    Task.Factory.StartNew(() => UpdateItemInTableOrder(FindByValueOrder.Status, tempOrderAdd.Status, idOrder));
+
+                    for (int i = 0; i < OrderUPGRADECollection.Count; i++)
+                    {
+                        if (idOrder == OrderUPGRADECollection[i].idOrder)
+                        {
+                            OrderUPGRADECollection.Insert(i, tempOrderAdd);
+                            OrderUPGRADECollection.RemoveAt(i + 1);
+                        }
+                    }
                 }
             }
+
         }
 
         public ICommand AppBarButtonClearOrder => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(AppBarButtonClearClick);
@@ -320,19 +362,31 @@ namespace GameShop.ViewModels
         {
             DataGridOrderUPGRADE = data;
 
-            ModelUPGRADEOrder tempOrderClear = SelectItemsOrder.AddedItems[0] as ModelUPGRADEOrder;
+            ModelUPGRADEOrder tempOrderClear = null;
+            if (SelectItemsOrder != null)
+                tempOrderClear = SelectItemsOrder.AddedItems[0] as ModelUPGRADEOrder;
+            else
+                ShowInfoBar(ControlPageInfoBar.Error("У вас не выбран заказ", "Выберите и повторите попытку"));
 
-            int idOrder = tempOrderClear.idOrder;
-            tempOrderClear.Status = "Ожидает оплаты";
-
-            Task.Factory.StartNew(() => UpdateItemInTableOrder(FindByValueOrder.Status, tempOrderClear.Status, idOrder));
-
-            for (int i = 0; i < OrderUPGRADECollection.Count; i++)
+            if (tempOrderClear != null)
             {
-                if (idOrder == OrderUPGRADECollection[i].idOrder)
+                int idOrder = tempOrderClear.idOrder;
+                tempOrderClear.Status = "Ожидает оплаты";
+
+                if (!BeInCheck && !BeInOrder)
+                    ShowInfoBar(ControlPageInfoBar.Error("У вас не выбрана ни одна таблица", "Выберите таблицу"));
+                else
                 {
-                    OrderUPGRADECollection.Insert(i, tempOrderClear);
-                    OrderUPGRADECollection.RemoveAt(i + 1);
+                    Task.Factory.StartNew(() => UpdateItemInTableOrder(FindByValueOrder.Status, tempOrderClear.Status, idOrder));
+
+                    for (int i = 0; i < OrderUPGRADECollection.Count; i++)
+                    {
+                        if (idOrder == OrderUPGRADECollection[i].idOrder)
+                        {
+                            OrderUPGRADECollection.Insert(i, tempOrderClear);
+                            OrderUPGRADECollection.RemoveAt(i + 1);
+                        }
+                    }
                 }
             }
         }
@@ -341,6 +395,9 @@ namespace GameShop.ViewModels
         private void AppBarButtonRefreshClick(DataGrid data)
         {
             DataGridOrderUPGRADE = data;
+
+            if (!BeInCheck && !BeInOrder)
+                ShowInfoBar(ControlPageInfoBar.Warning("У вас не выбрана ни одна таблица", "Выберите таблицу"));
 
             InitializationCollectionAllId();
             InitializationCollectionCheck();
@@ -407,6 +464,7 @@ namespace GameShop.ViewModels
         {
             VisibilitySaveButtonCommandBar = "Collapsed";
             VisibilityCheckBoxUniteCheck = "Collapsed";
+            DataGridOrderSettings.Visibility = Visibility.Collapsed;
 
             if (IsADD)
             {
@@ -566,6 +624,9 @@ namespace GameShop.ViewModels
         private void AppBarButtonClearSettingsTableClick(DataGrid data)
         {
             DataGridOrderUPGRADE = data;
+
+            if (!BeInCheck && !BeInOrder)
+                ShowInfoBar(ControlPageInfoBar.Warning("У вас не выбрана ни одна таблица", "Выберите таблицу"));
             Windows.Foundation.IAsyncAction asyncAction = Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 if (OrderCollectionSettingsOldItems.Count != 0)
@@ -578,6 +639,8 @@ namespace GameShop.ViewModels
                     OrderCollectionSettings.Clear();
                 }
             });
+
+            DataGridOrderSettings.Visibility = Visibility.Collapsed;
 
             VisibilitySaveButtonCommandBar = "Collapsed";
             VisibilityCheckBoxUniteCheck = "Collapsed";
@@ -609,6 +672,12 @@ namespace GameShop.ViewModels
                 DataGridOrderUPGRADE.Visibility = Visibility.Collapsed;
         }
 
+        public ICommand Test => new RelayCommand(TestClick);
+        private void TestClick()
+        {
+
+        }
+
         public ControlPanelViewModel()
         {
             IsVisibleCheckBoxUniteCheckCommand = new RelayCommand(IsVisibleCheckBoxUniteCheck);
@@ -617,6 +686,8 @@ namespace GameShop.ViewModels
             VisibilityCheckBoxUniteCheck = "Collapsed";
             VisibilitySaveButtonCommandBar = "Collapsed";
             IsOpenInfoBar = false;
+
+            Texts = "Проверка";
         }
 
         private void InitializationCollectionOrderUPGRADE()
@@ -994,16 +1065,11 @@ namespace GameShop.ViewModels
             if (DataGridCheck != null)
                 DataGridCheck.Visibility = Visibility.Collapsed;
             else
-                ShowInfoBar(ControlPageInfoBar.Warning("Коллекция чеков пустая", "Выберете таблицу чек и повторите попытку"));
+                ShowInfoBar(ControlPageInfoBar.Error("Коллекция чеков пустая", "Выберете таблицу чек и повторите попытку"));
 
             await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 var SortCollection = ReadingDataOrder(FindByValueOrder.Status, "Ожидает оплаты");
-
-                if (TempOrderUPGRADECollection.Count == 0)
-                {
-                    TempOrderUPGRADECollection = OrderUPGRADECollection;
-                }
 
                 OrderUPGRADECollection.Clear();
 

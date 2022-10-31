@@ -10,7 +10,8 @@
     xmlns:views="using:GameShop.Views"
     xmlns:ic="using:Microsoft.Xaml.Interactions.Core"
     xmlns:i="using:Microsoft.Xaml.Interactivity"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    Style="{StaticResource PageStyle2}">
 
     <i:Interaction.Behaviors>
         <ic:EventTriggerBehavior EventName="Loaded">
@@ -23,10 +24,9 @@
         IsBackButtonVisible="Visible"
         IsBackEnabled="{x:Bind ViewModel.IsBackEnabled, Mode=OneWay}"
         SelectedItem="{x:Bind ViewModel.Selected, Mode=OneWay}"
-        IsSettingsVisible="False"
-        Background="{ThemeResource SystemControlBackgroundAltHighBrush}">
+        IsSettingsVisible="False">
         <winui:NavigationView.FooterMenuItems>
-            <winui:NavigationViewItem x:Uid="Shell_ControlPanel" Icon="Manage" helpers:NavHelper.NavigateTo="views:ControlPanelPage"/>
+            <winui:NavigationViewItem x:Uid="Shell_ControlPanel" Icon="Manage" helpers:NavHelper.NavigateTo="views:ControlPanelPage" />
             <winui:NavigationViewItem x:Uid="Shell_Accounts" Icon="People" helpers:NavHelper.NavigateTo="views:AccountsPage"/>
         </winui:NavigationView.FooterMenuItems>
             <winui:NavigationView.MenuItems>

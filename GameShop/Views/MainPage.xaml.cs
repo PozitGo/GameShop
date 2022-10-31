@@ -10,6 +10,7 @@ namespace GameShop.Views
 
         public MainPage()
         {
+
             InitializeComponent();
         }
     }
