@@ -141,4 +141,8 @@
     <value>Панель управления</value>
     <comment>Navigation view item name for ControlPanel</comment>
   </data>
+  <data name="Shell_ControlPanelStaff.Content" xml:space="preserve">
+    <value>ControlPanelStaff</value>
+    <comment>Navigation view item name for ControlPanelStaff</comment>
+  </data>
 </root>

@@ -1,9 +1,13 @@
-﻿using GameShop.DataBase;
+﻿using GalaSoft.MvvmLight.Views;
+using GameShop.DataBase;
 using GameShop.Enum;
 using GameShop.Model;
 using GameShop.Model.ModelTableInDataBase;
+using GameShop.Services;
 using GameShop.ViewModels.InfoBars;
+using GameShop.Views;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -17,7 +21,7 @@ using Windows.UI.Xaml.Controls;
 using static GameShop.DataBase.DataBaseRequestOrder;
 using static GameShop.DataBase.DataBaseRequstCheck;
 using static GameShop.DataBase.DataBaseRequstInTable.DataBaseRequstProduct;
-using RelayCommand = GalaSoft.MvvmLight.Command.RelayCommand;
+using NavigationService = GameShop.Services.NavigationService;
 
 namespace GameShop.ViewModels
 {
@@ -1467,5 +1471,9 @@ namespace GameShop.ViewModels
 
             InitializationCollectionCheck();
         }
+
+        public ICommand NavigateToStaffPage => new RelayCommand(NavigateToStaffPageClick);
+
+        private void NavigateToStaffPageClick() => NavigationService.Navigate(typeof(ControlPanelStaffPage));
     }
 }

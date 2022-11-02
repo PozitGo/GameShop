@@ -188,6 +188,7 @@
     <Compile Include="Services\JsonObjectSerializer.cs" />
     <Compile Include="Services\UserSessionService.cs" />
     <Compile Include="ViewModels\AccountsViewModel.cs" />
+    <Compile Include="ViewModels\ControlPanelStaffViewModel.cs" />
     <Compile Include="ViewModels\InfoBars\AuthInfoBar.cs" />
     <Compile Include="Services\ActivationService.cs" />
     <Compile Include="Activation\DefaultActivationHandler.cs" />
@@ -203,6 +204,9 @@
     </Compile>
     <Compile Include="Views\ControlPanelPage.xaml.cs">
       <DependentUpon>ControlPanelPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ControlPanelStaffPage.xaml.cs">
+      <DependentUpon>ControlPanelStaffPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\LoginPPage.xaml.cs">
       <DependentUpon>LoginPPage.xaml</DependentUpon>
@@ -258,6 +262,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\ControlPanelPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ControlPanelStaffPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

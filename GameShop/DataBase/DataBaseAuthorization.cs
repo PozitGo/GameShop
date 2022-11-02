@@ -74,7 +74,7 @@ namespace GameShop.DataBase
                 adapter.Fill(table);
                 if (table.Rows.Count > 0)
                 {
-                    ObservableCollection<UserAccount> tempCollection = ReadingDataUser(FindByValueUser.Login, LoginLog);
+                      ObservableCollection<UserAccount> tempCollection = ReadingDataUser(FindByValueUser.Login, LoginLog);
                     CurrentUser = tempCollection[0];
                     
                     if (AuthBar != null)

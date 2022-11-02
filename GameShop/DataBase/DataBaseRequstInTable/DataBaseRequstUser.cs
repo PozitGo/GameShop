@@ -73,7 +73,7 @@ namespace GameShop.DataBase
                     if (parametr != null)
                     {
                         NameFieldByTable = "@" + nameof(FindByValueUser.Status);
-                        command = new MySqlCommand($"SELECT idUser, Login,PhoneNumber, Email, Name, Surname, Status, PathAvatar FROM `user` " + NameFieldByTable + " = Status", db.IsConnection());
+                        command = new MySqlCommand($"SELECT idUser, Login,PhoneNumber, Email, Name, Surname, Status, PathAvatar FROM `user` WHERE" + NameFieldByTable + " = `Status`", db.IsConnection());
                         Collection = ReadUsersByParametr(command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
@@ -106,19 +106,34 @@ namespace GameShop.DataBase
             {
                 try
                 {
-                    command.Parameters.Clear();
-                    command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.VarChar));
+                    command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Enum));
                     command.Parameters[NameFieldByTable].Value = parametr;
+
+                    adapter.SelectCommand = command;
+                    adapter.Fill(table);
                 }
                 catch
                 {
-                    command.Parameters.Clear();
-                    command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Int32));
-                    command.Parameters[NameFieldByTable].Value = parametr;
-                }
+                    try
+                    {
+                        command.Parameters.Clear();
 
-                adapter.SelectCommand = command;
-                adapter.Fill(table);
+                        command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.Int32));
+                        command.Parameters[NameFieldByTable].Value = parametr;
+
+                        adapter.SelectCommand = command;
+                        adapter.Fill(table);
+                    }
+                    catch 
+                    {
+                        command.Parameters.Clear();
+                        command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.VarChar));
+                        command.Parameters[NameFieldByTable].Value = parametr;
+
+                        adapter.SelectCommand = command;
+                        adapter.Fill(table);
+                    }
+                }
             }
             ObservableCollection<UserAccount> Collection = new ObservableCollection<UserAccount>();
             if (table.Rows.Count > 0)
@@ -136,7 +151,7 @@ namespace GameShop.DataBase
                     Collection[i].Name = readerBy["Name"].ToString();
                     Collection[i].Surname = readerBy["Surname"].ToString();
                     Collection[i].PathAvatar = readerBy["PathAvatar"].ToString();
-                    Collection[i].Status = (Status)int.Parse(readerBy["Status"].ToString());
+                    Collection[i].Status = Status.Parse<Status>(readerBy["Status"].ToString());
                 }
             }
             command.Parameters.Clear();
@@ -164,7 +179,7 @@ namespace GameShop.DataBase
                     Collection[i].Name = readerBy["Name"].ToString();
                     Collection[i].Surname = readerBy["Surname"].ToString();
                     Collection[i].PathAvatar = readerBy["PathAvatar"].ToString();
-                    Collection[i].Status = (Status)int.Parse(readerBy["Status"].ToString());
+                    Collection[i].Status = Status.Parse<Status>(readerBy["Status"].ToString());
                 }
             }
             command.Parameters.Clear();
@@ -240,20 +255,36 @@ namespace GameShop.DataBase
 
             try
             {
-                command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Int32));
+                command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Enum));
                 command.Parameters["@newValue"].Value = newValue;
                 command.ExecuteNonQuery();
+
             }
             catch
             {
-                command.Parameters.Clear();
+                try
+                {
+                    command.Parameters.Clear();
 
-                command.Parameters.Add(new MySqlParameter("@idUser", MySqlDbType.Int32));
-                command.Parameters["@idUser"].Value = IdPrimaryKey;
+                    command.Parameters.Add(new MySqlParameter("@idUser", MySqlDbType.Int32));
+                    command.Parameters["@idUser"].Value = IdPrimaryKey;
 
-                command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.VarChar));
-                command.Parameters["@newValue"].Value = newValue;
-                command.ExecuteNonQuery();
+                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.VarChar));
+                    command.Parameters["@newValue"].Value = newValue;
+                    command.ExecuteNonQuery();
+                }
+                catch 
+                {
+
+                    command.Parameters.Clear();
+
+                    command.Parameters.Add(new MySqlParameter("@idUser", MySqlDbType.Int32));
+                    command.Parameters["@idUser"].Value = IdPrimaryKey;
+
+                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Int32));
+                    command.Parameters["@newValue"].Value = newValue;
+                    command.ExecuteNonQuery();
+                }
             }
 
             command.Parameters.Clear();
