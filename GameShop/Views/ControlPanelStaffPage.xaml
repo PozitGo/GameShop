@@ -54,11 +54,11 @@
                 <AppBarSeparator Visibility="{x:Bind ViewModel.VisibilityAppBarEditingMode, Mode=TwoWay}"/>
                 <AppBarButton Icon="Delete" Label="Удалить выбранного пользователя" FontFamily="Cascadia Code SemiBold" Visibility="{x:Bind ViewModel.VisibilityAppBarEditingMode, Mode=TwoWay}" Command="{x:Bind ViewModel.DeleteUser, Mode=OneWay}" CommandParameter="{x:Bind UsersMainTable, Mode=OneWay}"/>
                 <AppBarSeparator Visibility="{x:Bind ViewModel.VisibilityAppBarEditingMode, Mode=TwoWay}"/>
-                <AppBarButton Icon="Save" Label="Сохранить изменения" FontFamily="Cascadia Code SemiBold" Visibility="{x:Bind ViewModel.VisibilityAppBarEditingMode, Mode=TwoWay}" CommandParameter="{x:Bind UsersMainTable, Mode=OneWay}"/>
+                <AppBarButton Icon="Save" Label="Сохранить изменения" FontFamily="Cascadia Code SemiBold" Visibility="{x:Bind ViewModel.VisibilityAppBarEditingMode, Mode=TwoWay}" Command="{x:Bind ViewModel.SaveChanges, Mode=OneWay}" CommandParameter="{x:Bind UsersMainTable, Mode=OneWay}"/>
                 <AppBarSeparator Visibility="{x:Bind ViewModel.VisibilityAppBarEditingMode, Mode=TwoWay}"/>
                 <AppBarButton Icon="Clear" Label="Выйти из режима редактирования" FontFamily="Cascadia Code SemiBold" Visibility="{x:Bind ViewModel.VisibilityAppBarEditingMode, Mode=TwoWay}" Command="{x:Bind ViewModel.NoEditingMode, Mode=OneWay}" CommandParameter="{x:Bind UsersMainTable, Mode=OneWay}"/>
                 <AppBarSeparator/>
-                <AppBarButton Icon="Refresh" Label="Обновить" FontFamily="Cascadia Code SemiBold" CommandParameter="{x:Bind UsersMainTable, Mode=OneWay}"/>
+                <AppBarButton Icon="Refresh" Label="Обновить" FontFamily="Cascadia Code SemiBold" Command="{x:Bind ViewModel.RefreshTable, Mode=OneWay}" CommandParameter="{x:Bind UsersMainTable, Mode=OneWay}"/>
             </CommandBar>
 
             <controls:DataGrid

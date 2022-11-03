@@ -26,7 +26,7 @@ namespace GameShop.DataBase
         public static void RegUser(string LoginReg, string PasswordReg, string PhoneNumberReg, string NameReg, string SurnameReg, string EmailReg, AuthInfoBar AuthBar)
         {
             DataBaseConnect db = new DataBaseConnect();
-            MySqlCommand command = new MySqlCommand("INSERT INTO `user` (Login, Password, Name, Surname, Email, PhoneNumber) VALUES (@login, UPPER(SHA1(CONCAT(UPPER(@login),':',UPPER(@password)))), @name, @surname, @email, @phonenumber)", db.IsConnection());
+            MySqlCommand command = new MySqlCommand("INSERT INTO `user` (Login, Password, Name, Surname, Email, PhoneNumber) VALUES (@login, @password, @name, @surname, @email, @phonenumber)", db.IsConnection());
             command.Parameters.Add("@login", MySqlDbType.VarChar).Value = LoginReg;
             command.Parameters.Add("@password", MySqlDbType.VarChar).Value = PasswordReg;
             command.Parameters.Add("@name", MySqlDbType.VarChar).Value = NameReg;
@@ -34,22 +34,11 @@ namespace GameShop.DataBase
             command.Parameters.Add("@email", MySqlDbType.VarChar).Value = EmailReg;
             command.Parameters.Add("@phonenumber", MySqlDbType.VarChar).Value = PhoneNumberReg;
 
-            CurrentUser.Login = LoginReg;
-            CurrentUser.Surname = SurnameReg;
-            CurrentUser.Email = EmailReg;
-            CurrentUser.PhoneNumber = PhoneNumberReg;
-            CurrentUser.Name = NameReg;
-            CurrentUser.Status = Status.User;
-            
             if (command.ExecuteNonQuery() > 0)
             {
-                AuthBar.Successfully();
-                CurrentUser.Login = LoginReg;
-                CurrentUser.Surname = SurnameReg;
-                CurrentUser.Email = EmailReg;
-                CurrentUser.PhoneNumber = PhoneNumberReg;
-                CurrentUser.Name = NameReg;
-                CurrentUser.Status = Status.User;
+                var temp = DataBaseRequstUser.ReadingDataUser(FindByValueUser.Login, LoginReg);
+                CurrentUser = temp[0];
+                temp.Clear();
                 command.Parameters.Clear();
             }
             else
@@ -67,18 +56,16 @@ namespace GameShop.DataBase
                 DataTable table = new DataTable();
                 MySqlDataAdapter adapter = new MySqlDataAdapter();
 
-                MySqlCommand command = new MySqlCommand("SELECT Login, Password FROM `user` WHERE @log = Login AND UPPER(SHA1(CONCAT(UPPER(@log),':',UPPER(@pass)))) = Password", db.IsConnection());
+                MySqlCommand command = new MySqlCommand("SELECT Login, Password FROM `user` WHERE @log = Login AND @pass = Password", db.IsConnection());
                 command.Parameters.Add("@log", MySqlDbType.VarChar).Value = LoginLog;
                 command.Parameters.Add("@pass", MySqlDbType.VarChar).Value = PasswordLog;
                 adapter.SelectCommand = command;
                 adapter.Fill(table);
                 if (table.Rows.Count > 0)
                 {
-                      ObservableCollection<UserAccount> tempCollection = ReadingDataUser(FindByValueUser.Login, LoginLog);
+                    ObservableCollection<UserAccount> tempCollection = ReadingDataUser(FindByValueUser.Login, LoginLog);
                     CurrentUser = tempCollection[0];
                     
-                    if (AuthBar != null)
-                    AuthBar.Successfully();
                     command.Parameters.Clear();
                     return true;
                 } 
@@ -200,7 +187,7 @@ namespace GameShop.DataBase
             adapter.Fill(table);
             if(table.Rows.Count > 0)
             {
-                return PhoneNumberCheck = false;
+                return PhoneNumberCheck = true;
             }
 
             return PhoneNumberCheck;

@@ -1,9 +1,7 @@
-﻿using GalaSoft.MvvmLight.Views;
-using GameShop.DataBase;
+﻿using GameShop.DataBase;
 using GameShop.Enum;
 using GameShop.Model;
 using GameShop.Model.ModelTableInDataBase;
-using GameShop.Services;
 using GameShop.ViewModels.InfoBars;
 using GameShop.Views;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
@@ -694,13 +692,14 @@ namespace GameShop.ViewModels
             Texts = "Проверка";
         }
 
-        private void InitializationCollectionOrderUPGRADE()
+        private async void InitializationCollectionOrderUPGRADE()
         {
             if (DataGridOrderUPGRADE != null)
                 DataGridOrderUPGRADE.UnloadingRowDetails += DataGridOrderUPGRADE_UnloadingRowDetails;
             else
                 ShowInfoBar(ControlPageInfoBar.Warning("Коллекция заказов пустая", "Выберете таблицу заказы и повторите попытку"));
-            Windows.Foundation.IAsyncAction asyncAction = Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            
+            await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 ObservableCollection<Order> OrderCollection = new ObservableCollection<Order>();
                 if (OrderUPGRADECollection.Count == 0)
@@ -732,16 +731,19 @@ namespace GameShop.ViewModels
 
         private void DataGridOrderUPGRADE_UnloadingRowDetails(object sender, DataGridRowDetailsEventArgs e) => e.Row.DetailsVisibility = Visibility.Collapsed;
 
-        private void InitializationCollectionCheck()
+        private async void InitializationCollectionCheck()
         {
             if (CheckCollection.Count == 0)
-                foreach (var item in ReadingDataCheck())
+
+                await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
-                    Windows.Foundation.IAsyncAction asyncAction = Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    foreach (var item in ReadingDataCheck())
                     {
                         CheckCollection.Add(item);
-                    });
-                }
+                    }
+
+                });
+            
             if (DataGridCheck != null)
                 DataGridCheck.SelectionChanged += DataGridCheck_SelectionChanged;
         }
@@ -773,7 +775,7 @@ namespace GameShop.ViewModels
                     AllidCheckCollection.Add(item);
                 }
 
-                answerOrder.Add("Одобрить");
+                answerOrder.Add("Одобрен");
                 answerOrder.Add("Ожидает оплаты");
             });
 
@@ -1098,11 +1100,11 @@ namespace GameShop.ViewModels
 
             ContentDialog SortIdCheck = new ContentDialog()
             {
-                Title = "Сортировка по номеру чека",
-                Content = "Введите номер чека и нажмите кнопку сортировать",
+                Title = "Фильтр по номеру чека",
+                Content = "Введите номер чека и нажмите кнопку найти",
                 CloseButtonText = "Отмена",
                 CloseButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() => { isClosed = true; }),
-                PrimaryButtonText = "Сортировать",
+                PrimaryButtonText = "Найти",
 
                 PrimaryButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() =>
                 {
@@ -1173,11 +1175,11 @@ namespace GameShop.ViewModels
 
             ContentDialog SortIdCheck = new ContentDialog()
             {
-                Title = "Сортировка по диапазону суммы",
+                Title = "Фильтр по диапазону суммы",
                 Content = "Введите минимальную и максимальную сумму",
                 CloseButtonText = "Отмена",
                 CloseButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() => { isClosed = true; }),
-                PrimaryButtonText = "Сортировать",
+                PrimaryButtonText = "Найти",
                 PrimaryButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() =>
                 {
                     if (textBoxMax.IsEnabled == true)
@@ -1254,11 +1256,11 @@ namespace GameShop.ViewModels
 
             ContentDialog SortIdCheck = new ContentDialog()
             {
-                Title = "Сортировка по диапазону суммы",
+                Title = "Фильтр по диапазону суммы",
                 Content = "Введите минимальную и максимальную сумму",
                 CloseButtonText = "Отмена",
                 CloseButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() => { isClosed = true; }),
-                PrimaryButtonText = "Сортировать",
+                PrimaryButtonText = "Найти",
                 PrimaryButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() =>
                 {
                     if (textBoxMax.IsEnabled == true)
@@ -1314,7 +1316,7 @@ namespace GameShop.ViewModels
                 Title = "Поиск чека по дате",
                 CloseButtonText = "Отмена",
                 CloseButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() => { isClosed = true; }),
-                PrimaryButtonText = "Сортировать",
+                PrimaryButtonText = "Найти",
 
                 PrimaryButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() =>
                 {
@@ -1360,7 +1362,7 @@ namespace GameShop.ViewModels
                 Title = "Поиск заказов по логину",
                 CloseButtonText = "Отмена",
                 CloseButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() => { isClosed = true; }),
-                PrimaryButtonText = "Сортировать",
+                PrimaryButtonText = "Найти",
 
                 PrimaryButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() =>
                 {
@@ -1427,7 +1429,7 @@ namespace GameShop.ViewModels
                 Title = "Поиск по номеру заказа",
                 CloseButtonText = "Отмена",
                 CloseButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() => { isClosed = true; }),
-                PrimaryButtonText = "Сортировать",
+                PrimaryButtonText = "Найти",
 
                 PrimaryButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() =>
                 {

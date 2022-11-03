@@ -73,7 +73,7 @@ namespace GameShop.DataBase
                     if (parametr != null)
                     {
                         NameFieldByTable = "@" + nameof(FindByValueUser.Status);
-                        command = new MySqlCommand($"SELECT idUser, Login,PhoneNumber, Email, Name, Surname, Status, PathAvatar FROM `user` WHERE" + NameFieldByTable + " = `Status`", db.IsConnection());
+                        command = new MySqlCommand($"SELECT idUser, Login,PhoneNumber, Email, Name, Surname, Status, PathAvatar FROM `user` WHERE " + NameFieldByTable + " = `Status`", db.IsConnection());
                         Collection = ReadUsersByParametr(command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
@@ -124,7 +124,7 @@ namespace GameShop.DataBase
                         adapter.SelectCommand = command;
                         adapter.Fill(table);
                     }
-                    catch 
+                    catch
                     {
                         command.Parameters.Clear();
                         command.Parameters.Add(new MySqlParameter(NameFieldByTable, MySqlDbType.VarChar));
@@ -253,42 +253,50 @@ namespace GameShop.DataBase
             command.Parameters.Add(new MySqlParameter("@idUser", MySqlDbType.Int32));
             command.Parameters["@idUser"].Value = IdPrimaryKey;
 
-            try
+            if (findBy == FindByValueUser.Status)
             {
                 command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Enum));
                 command.Parameters["@newValue"].Value = newValue;
                 command.ExecuteNonQuery();
+            }
 
+            try
+            {
+
+                command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.VarChar));
+                command.Parameters["@newValue"].Value = newValue;
+                command.ExecuteNonQuery();
             }
             catch
             {
-                try
-                {
-                    command.Parameters.Clear();
 
-                    command.Parameters.Add(new MySqlParameter("@idUser", MySqlDbType.Int32));
-                    command.Parameters["@idUser"].Value = IdPrimaryKey;
+                command.Parameters.Clear();
 
-                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.VarChar));
-                    command.Parameters["@newValue"].Value = newValue;
-                    command.ExecuteNonQuery();
-                }
-                catch 
-                {
+                command.Parameters.Add(new MySqlParameter("@idUser", MySqlDbType.Int32));
+                command.Parameters["@idUser"].Value = IdPrimaryKey;
 
-                    command.Parameters.Clear();
-
-                    command.Parameters.Add(new MySqlParameter("@idUser", MySqlDbType.Int32));
-                    command.Parameters["@idUser"].Value = IdPrimaryKey;
-
-                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Int32));
-                    command.Parameters["@newValue"].Value = newValue;
-                    command.ExecuteNonQuery();
-                }
+                command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Int32));
+                command.Parameters["@newValue"].Value = newValue;
+                command.ExecuteNonQuery();
             }
 
             command.Parameters.Clear();
+
+
         }
 
+        public static void DeleteUser(int idUser)
+        {
+            DataBaseConnect db = new DataBaseConnect();
+
+            MySqlCommand command = new MySqlCommand($"DELETE FROM `user` WHERE `idUser` = @idUser", db.IsConnection());
+
+            command.Parameters.Add(new MySqlParameter("@idUser", MySqlDbType.Int32));
+            command.Parameters["@idUser"].Value = idUser;
+
+            command.ExecuteNonQuery();
+            command.Parameters.Clear();
+        }
     }
 }
+    

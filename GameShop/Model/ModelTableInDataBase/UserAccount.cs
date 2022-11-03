@@ -51,6 +51,16 @@ namespace GameShop.Model
 
         public Status Status { get; set; }
 
+        public UserAccount(int idUser, string Login, string PhoneNumber, string Name, string Surname, string Email, string PathAvatar, Status Status)
+        {
+            this.idUser = idUser; this.Login = Login; this.PhoneNumber = PhoneNumber; this.Name = Name; this.Surname = Surname; this.Email = Email; this.PathAvatar = PathAvatar; this.Status = Status;
+        }
+
+        public UserAccount()
+        {
+                
+        }
+
     }
 
 }

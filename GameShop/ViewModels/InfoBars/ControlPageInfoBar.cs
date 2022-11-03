@@ -26,6 +26,17 @@ namespace GameShop.ViewModels.InfoBars
             return bar;
         }
 
+        public static InfoBar Accept(string InputTitle, string InputMessage)
+        {
+
+            bar.IsOpen = true;
+            bar.Severity = InfoBarSeverity.Success;
+            bar.Title = InputTitle;
+            bar.Message = InputMessage;
+            
+            return bar;
+        }
+
         public static InfoBar Error(string InputTitle, string InputMessage)
         {
             bar.IsOpen = true;

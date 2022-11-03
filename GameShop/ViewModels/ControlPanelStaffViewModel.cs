@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
 
 namespace GameShop.ViewModels
 {
@@ -19,7 +18,7 @@ namespace GameShop.ViewModels
     {
         public ObservableCollection<UserAccount> UserCollection = new ObservableCollection<UserAccount>();
 
-        ObservableCollection<UserAccount> UserSettings = new ObservableCollection<UserAccount>();
+        UserAccount UserSettings;
 
         DataGrid DataGridUser = new DataGrid();
 
@@ -89,76 +88,71 @@ namespace GameShop.ViewModels
         public ICommand RefreshTable => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(RefreshTableMethod);
 
         //Кнопку понижения и повышения статусов сделать видной только админам
-        private async void UpStatusUserMethod(DataGrid obj)
+        //В режиме редактирования обновлять только пользователя которого редактируют
+        private void UpStatusUserMethod(DataGrid obj)
         {
             DataGridUser = obj;
 
             if (DataGridUser.SelectedItem != null)
             {
+                int Index = DataGridUser.SelectedIndex;
                 UserAccount tempUser = (UserAccount)DataGridUser.SelectedItem;
-                DataGridUser.ReleasePointerCaptures();
-                DataGridUser.RemoveFocusEngagement();
+
                 if (tempUser.Status != Status.Admin)
                 {
-                    if (tempUser.Status == Status.User)
-                        tempUser.Status = Status.Personal;
-                    else if (tempUser.Status == Status.Personal)
-                        tempUser.Status = Status.Admin;
+                    UserCollection.Remove((UserAccount)DataGridUser.SelectedItem);
+                    tempUser.Status++;
+                    Task.Factory.StartNew(() => DataBaseRequstUser.UpdateItemInTableUser(FindByValueUser.Status, tempUser.Status, tempUser.idUser));
 
-                    await Task.Factory.StartNew(() => DataBaseRequstUser.UpdateItemInTableUser(FindByValueUser.Status, tempUser.Status, tempUser.idUser));
+                    UserCollection.Insert(Index, new UserAccount(tempUser.idUser, tempUser.Login, tempUser.PhoneNumber, tempUser.Name, tempUser.Surname, tempUser.Email, tempUser.PathAvatar, tempUser.Status));
 
-                    for (int i = 0; i < UserCollection.Count; i++)
-                    {
-                        if (tempUser.idUser == UserCollection[i].idUser)
-                        {   
-                            UserCollection.Insert(i, tempUser);
-                            UserCollection.RemoveAt(i + 1);
-                            break;
-                        }
-                    }
+                    ShowInfoBar(ControlPageInfoBar.Accept($"Статус {tempUser.Login} успешно повышен", ""));
                 }
                 else
                 {
-                    ShowInfoBar(ControlPageInfoBar.Error("У пользователя максимальный статус", "Повышение невозможно"));
+                    ShowInfoBar(ControlPageInfoBar.Error($"У {tempUser.Login} максимальный статус", "Повышение невозможно"));
                 }
             }
             else
             {
-               ShowInfoBar(ControlPageInfoBar.Error("Не выбран пользователь", "Выберете пользователя для повышения и попробуйте снова"));
+                ShowInfoBar(ControlPageInfoBar.Error("Не выбран пользователь", "Выберете пользователя для повышения и попробуйте снова"));
             }
 
         }
 
-        private async void DownStatusUserMethod(DataGrid obj)
+        private bool IsVisibleAllCollection;
+        private bool IsVisibleStaffCollection;
+
+        private bool isDelete;
+        private bool isEdit;
+
+        private void DownStatusUserMethod(DataGrid obj)
         {
             DataGridUser = obj;
 
-            if(DataGridUser.SelectedItem != null)
+            if (DataGridUser.SelectedItem != null)
             {
+                int Index = DataGridUser.SelectedIndex;
                 UserAccount tempUser = (UserAccount)DataGridUser.SelectedItem;
 
                 if (tempUser.Status != Status.User)
                 {
-                    if (tempUser.Status == Status.Personal)
-                        tempUser.Status = Status.User;
-                    else if (tempUser.Status == Status.Admin)
-                        tempUser.Status = Status.Personal;
+                    UserCollection.Remove((UserAccount)DataGridUser.SelectedItem);
+                    tempUser.Status--;
+                    Task.Factory.StartNew(() => DataBaseRequstUser.UpdateItemInTableUser(FindByValueUser.Status, tempUser.Status, tempUser.idUser));
 
-                    await Task.Factory.StartNew(() => DataBaseRequstUser.UpdateItemInTableUser(FindByValueUser.Status, tempUser.Status, tempUser.idUser));
+                    UserCollection.Insert(Index, new UserAccount(tempUser.idUser, tempUser.Login, tempUser.PhoneNumber, tempUser.Name, tempUser.Surname, tempUser.Email, tempUser.PathAvatar, tempUser.Status));
 
-                    for (int i = 0; i < UserCollection.Count; i++)
+                    if (IsVisibleStaffCollection && tempUser.Status == Status.User)
                     {
-                        if (UserCollection[i].idUser == tempUser.idUser)
-                        {
-                            UserCollection.Insert(i, tempUser);
-                            UserCollection.RemoveAt(i + 1);
-                            break;
-                        }
+                        UserCollection.Remove((UserAccount)DataGridUser.SelectedItem);
                     }
+
+                    ShowInfoBar(ControlPageInfoBar.Accept($"Статус {tempUser.Login} успешно понижен", ""));
                 }
                 else
                 {
-                    ShowInfoBar(ControlPageInfoBar.Error("У пользователя минимальный статус", "Понижение невозможно"));
+                    ShowInfoBar(ControlPageInfoBar.Error($"У {tempUser.Login} минимальный статус", "Понижение невозможно"));
                 }
             }
             else
@@ -183,27 +177,12 @@ namespace GameShop.ViewModels
 
         private void EditingModeMethod(DataGrid obj)
         {
-
             DataGridUser = obj;
 
-            bool IsEditing = true;
-
-            UserAccount tempUser = null;
-
-            DataGridUser.IsReadOnly = false;
-
-            try
+            if (DataGridUser.SelectedItem != null)
             {
-                tempUser = (UserAccount)DataGridUser.SelectedItem;
-            }
-            catch
-            {
-                IsEditing = false;
-                ShowInfoBar(ControlPageInfoBar.Error("Не выбран пользователь", "Выберете пользователя для редактирования и попробуйте снова"));
-            }
+                UserAccount tempUser = (UserAccount)DataGridUser.SelectedItem;
 
-            if (IsEditing)
-            {
                 DataGridUser.Columns[6].Visibility = Visibility.Collapsed;
                 Windows.Foundation.IAsyncAction asyncAction = Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
@@ -213,32 +192,202 @@ namespace GameShop.ViewModels
 
                 VisibilityAppBarNoEditingMode = Visibility.Collapsed;
                 VisibilityAppBarEditingMode = Visibility.Visible;
+
+                ShowInfoBar(ControlPageInfoBar.Information("Режим редактирования включен", ""));
+            }
+            else
+            {
+                ShowInfoBar(ControlPageInfoBar.Error("Не выбран пользователь", "Выберете пользователя для редактирования и попробуйте снова"));
             }
         }
 
         private void EditUserMethod(DataGrid obj)
         {
             DataGridUser = obj;
-            throw new NotImplementedException();
+            isEdit = true;
+            isDelete = false;
+
+            DataGridUser.IsReadOnly = false;
+            DataGridUser.Columns[0].Visibility = Visibility.Collapsed;
+            DataGridUser.Columns[6].Visibility = Visibility.Collapsed;
+
+            UserSettings = new UserAccount(UserCollection[0].idUser, UserCollection[0].Login, UserCollection[0].PhoneNumber, UserCollection[0].Name, UserCollection[0].Surname, UserCollection[0].Email, UserCollection[0].PathAvatar, UserCollection[0].Status);
         }
 
+        private ReturnResultEditUser EditingUser()
+        {
+            int CountEditDate = 0;
+
+            if (UserCollection[0].Login != UserSettings.Login)
+            {
+                if (!DataBaseAuthorization.CheckSpace(UserCollection[0].Login) && UserCollection[0].Login != null && UserCollection[0].Login != "")
+                {
+                    if (!DataBaseAuthorization.LoginCheck(UserCollection[0].Login))
+                    {
+                        UserSettings.Login = UserCollection[0].Login;
+
+                        Task.Factory.StartNew(() => DataBaseRequstUser.UpdateItemInTableUser(FindByValueUser.Login, UserSettings.Login, UserSettings.idUser));
+                        CountEditDate++;
+                    }
+                    else
+                    {
+                        ShowInfoBar(ControlPageInfoBar.Error($"Логин {UserCollection[0].Login} занят", "Введите другой и повторите попытку"));
+                        return ReturnResultEditUser.DataRegistered;
+                    }
+                }
+                else
+                {
+                    ShowInfoBar(ControlPageInfoBar.Error("Некорректно введены данные", "Повторите попытку"));
+                    return ReturnResultEditUser.IncorrectData;
+                }
+            }
+
+            if (UserCollection[0].Name != UserSettings.Name)
+            {
+                if (!DataBaseAuthorization.CheckSpace(UserCollection[0].Name) && UserCollection[0].Name != null && UserCollection[0].Name != "")
+                {
+                    UserSettings.Name = UserCollection[0].Name;
+
+                    Task.Factory.StartNew(() => DataBaseRequstUser.UpdateItemInTableUser(FindByValueUser.Name, UserSettings.Name, UserSettings.idUser));
+                    CountEditDate++;
+                }
+                else
+                {
+                    ShowInfoBar(ControlPageInfoBar.Error("Некорректно введены данные", "Повторите попытку"));
+                    return ReturnResultEditUser.IncorrectData;
+                }
+            }
+
+            if (UserCollection[0].Surname != UserSettings.Surname)
+            {
+                if (!DataBaseAuthorization.CheckSpace(UserCollection[0].Surname) && UserCollection[0].Surname != null && UserCollection[0].Surname != "")
+                {
+                    UserSettings.Surname = UserCollection[0].Surname;
+
+                    Task.Factory.StartNew(() => DataBaseRequstUser.UpdateItemInTableUser(FindByValueUser.Surname, UserSettings.Surname, UserSettings.idUser));
+                    CountEditDate++;
+                }
+                else
+                {
+                    ShowInfoBar(ControlPageInfoBar.Error("Некорректно введены данные", "Повторите попытку"));
+                    return ReturnResultEditUser.IncorrectData;
+                }
+            }
+
+            if (UserCollection[0].PhoneNumber != UserSettings.PhoneNumber)
+            {
+                if (!DataBaseAuthorization.CheckSpace(UserCollection[0].PhoneNumber) && UserCollection[0].PhoneNumber != null && UserCollection[0].PhoneNumber != "")
+                {
+                    if (!DataBaseAuthorization.PhoneNumberCheck(UserCollection[0].PhoneNumber))
+                    {
+                        UserSettings.PhoneNumber = UserCollection[0].PhoneNumber;
+
+                        Task.Factory.StartNew(() => DataBaseRequstUser.UpdateItemInTableUser(FindByValueUser.PhoneNumber, UserSettings.PhoneNumber, UserSettings.idUser));
+                        CountEditDate++;
+                    }
+                    else
+                    {
+                        ShowInfoBar(ControlPageInfoBar.Error($"Номер телефона {UserCollection[0].PhoneNumber} занят", "Введите другой и повторите попытку"));
+                        return ReturnResultEditUser.DataRegistered;
+                    }
+                }
+                else
+                {
+                    ShowInfoBar(ControlPageInfoBar.Error("Некорректно введены данные", "Повторите попытку"));
+                    return ReturnResultEditUser.IncorrectData;
+                }
+            }
+
+            if (UserCollection[0].Email != UserSettings.Email)
+            {
+                if (!DataBaseAuthorization.CheckSpace(UserCollection[0].Email) && UserCollection[0].Email != null && UserCollection[0].Email != "")
+                {
+                    if (!DataBaseAuthorization.EmailCheck(UserCollection[0].Email))
+                    {
+                        UserSettings.Email = UserCollection[0].Email;
+
+                        Task.Factory.StartNew(() => DataBaseRequstUser.UpdateItemInTableUser(FindByValueUser.Email, UserSettings.Email, UserSettings.idUser));
+                        CountEditDate++;
+                    }
+                    else
+                    {
+                        ShowInfoBar(ControlPageInfoBar.Error($"E-mail {UserCollection[0].Email} занят", "Введите другой и повторите попытку"));
+                        return ReturnResultEditUser.DataRegistered;
+                    }
+                }
+                else
+                {
+                    ShowInfoBar(ControlPageInfoBar.Error("Некорректно введены данные", "Повторите попытку"));
+                    return ReturnResultEditUser.IncorrectData;
+                }
+            }
+
+            if (CountEditDate == 0)
+            {
+                ShowInfoBar(ControlPageInfoBar.Warning("Данные остались в прежнем виде", "По этому не были изменены"));
+                return ReturnResultEditUser.NoChange;
+            }
+
+            ShowInfoBar(ControlPageInfoBar.Accept("Данные успешно изменены", ""));
+            return ReturnResultEditUser.Success;
+        }
         private void DeleteUserMethod(DataGrid obj)
         {
             DataGridUser = obj;
-            throw new NotImplementedException();
+            isEdit = false;
+            isDelete = true;
         }
 
-        private void SaveChangesMethod(DataGrid obj)
+        private async void SaveChangesMethod(DataGrid obj)
         {
             DataGridUser = obj;
+            
+            if(isEdit || isDelete)
+            {
+                DataGridUser.IsReadOnly = true;
+                DataGridUser.Columns[0].Visibility = Visibility.Visible;
 
-            if (DataGridUser.Columns[6].Visibility == Visibility.Collapsed)
-                DataGridUser.Columns[6].Visibility = Visibility.Visible;
+                if (DataGridUser.Columns[6].Visibility == Visibility.Collapsed)
+                    DataGridUser.Columns[6].Visibility = Visibility.Visible;
+
+                if (isEdit)
+                {
+                    ReturnResultEditUser Editing = EditingUser();
+
+                    await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        UserCollection.Remove((UserAccount)DataGridUser.SelectedItem);
+                        UserCollection.Add(UserSettings);
+                    });
+
+                    isEdit = false;
+                }
+                else if (isDelete)
+                {
+                    DataBaseRequstUser.DeleteUser(UserCollection[0].idUser);
+                    ShowInfoBar(ControlPageInfoBar.Accept($"Пользователь {UserCollection[0].Login} успешно удалён.", ""));
+                    await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        UserCollection.Remove(UserCollection[0]);
+                    });
+                    
+                    isDelete = false;
+                }
+            }
+            else
+            {
+                ShowInfoBar(ControlPageInfoBar.Warning("Вы не выбрали ни одно действие", ""));
+            }
         }
 
         private void NoEditingModeMethod(DataGrid obj)
         {
             DataGridUser = obj;
+
+            DataGridUser.Columns[0].Visibility = Visibility.Visible;
+            DataGridUser.IsReadOnly = true;
+
+            UserCollection.Clear();
 
             if (isVisibleAllUser)
             {
@@ -251,23 +400,52 @@ namespace GameShop.ViewModels
 
             VisibilityAppBarNoEditingMode = Visibility.Visible;
             VisibilityAppBarEditingMode = Visibility.Collapsed;
+
+            ShowInfoBar(ControlPageInfoBar.Information("Режим редактирования выключен", ""));
         }
 
-        private void RefreshTableMethod(DataGrid obj)
+        private async void RefreshTableMethod(DataGrid obj)
         {
             DataGridUser = obj;
+            //Проверка, если режим редактирования, обновлять только одну строку
 
-            if (isVisibleAllUser)
-                InitializationAllUserCollection();
+            if (VisibilityAppBarEditingMode != Visibility.Visible)
+            {
+                UserCollection.Clear();
+
+                if (isVisibleAllUser)
+                {
+                    InitializationAllUserCollection();
+                }
+                else
+                {
+                    InitializationStaffUserCollection();
+                }
+
+                if (DataGridUser.Columns[6].Visibility == Visibility.Collapsed)
+                    DataGridUser.Columns[6].Visibility = Visibility.Visible;
+            }
             else
-                InitializationStaffUserCollection();
+            {
+                var idUser = UserCollection[0].idUser;
+                await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    UserCollection.Clear();
+                    foreach (var item in DataBaseRequstUser.ReadingDataUser(FindByValueUser.idUser, idUser))
+                    {
+                        UserCollection.Add(item);
+                    }
+                });
+            }
 
-            if (DataGridUser.Columns[6].Visibility == Visibility.Collapsed)
-                DataGridUser.Columns[6].Visibility = Visibility.Visible;
+            ShowInfoBar(ControlPageInfoBar.Accept("Обновлено", ""));
         }
 
         public void InitializationAllUserCollection()
         {
+            IsVisibleAllCollection = true;
+            IsVisibleStaffCollection = false;
+
             DataGridUser.Visibility = Visibility.Visible;
             DataGridUser.UnloadingRowDetails += DataGridUser_UnloadingRowDetails;
 
@@ -278,7 +456,18 @@ namespace GameShop.ViewModels
             {
                 UserCollection.Clear();
 
-                foreach (var item in DataBaseRequstUser.ReadingDataUser())
+
+                foreach (var item in DataBaseRequstUser.ReadingDataUser(FindByValueUser.Status, Status.Admin))
+                {
+                    UserCollection.Add(item);
+                }
+
+                foreach (var item in DataBaseRequstUser.ReadingDataUser(FindByValueUser.Status, Status.Personal))
+                {
+                    UserCollection.Add(item);
+                }
+
+                foreach (var item in DataBaseRequstUser.ReadingDataUser(FindByValueUser.Status, Status.User))
                 {
                     UserCollection.Add(item);
                 }
@@ -286,6 +475,9 @@ namespace GameShop.ViewModels
         }
         public void InitializationStaffUserCollection()
         {
+            IsVisibleStaffCollection = true;
+            IsVisibleAllCollection = false;
+
             DataGridUser.Visibility = Visibility.Visible;
             DataGridUser.UnloadingRowDetails += DataGridUser_UnloadingRowDetails;
 

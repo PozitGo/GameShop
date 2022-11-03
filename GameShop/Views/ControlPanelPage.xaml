@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-    xmlns:viewmodels="using:GameShop.ViewModels"
+    xmlns:viewmodels="using:GameShop.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:ControlPanelViewModel}"
     Style="{StaticResource PageStyle}"
     x:Name="PageRoot"
     mc:Ignorable="d">
@@ -23,7 +23,7 @@
             
             <MenuBar VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" Visibility="Visible">
                 <MenuBarItem Title="Навигация" Visibility="Visible">
-                    <MenuFlyoutItem Text="Управление персоналом" Command="{x:Bind ViewModel.NavigateToStaffPage, Mode=OneWay}"/>
+                    <MenuFlyoutItem Text="Управление пользователями" Command="{x:Bind ViewModel.NavigateToStaffPage, Mode=OneWay}"/>
                     <MenuFlyoutItem Text="Управление товарами"/>
                 </MenuBarItem>
             </MenuBar>
