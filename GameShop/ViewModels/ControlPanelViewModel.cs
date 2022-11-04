@@ -100,7 +100,7 @@ namespace GameShop.ViewModels
             set
             {
                 SetProperty(ref _IsOpenInfoBar, value);
-            } 
+            }
         }
 
         private InfoBarSeverity _SeverityInfoBar;
@@ -148,6 +148,21 @@ namespace GameShop.ViewModels
             }
         }
 
+        private Visibility _VisibilityStackPanelReport;
+        public Visibility VisibilityStackPanelReport
+        {
+            get => _VisibilityStackPanelReport;
+            set => SetProperty(ref _VisibilityStackPanelReport, value);
+        }
+
+        private string _TextBoxTextReport;
+
+        public string TextBoxTextReport
+        {
+            get => _TextBoxTextReport;
+            set => SetProperty(ref _TextBoxTextReport, value);
+        }
+
         public void ShowInfoBar(InfoBar bar)
         {
             TitleInfoBar = bar.Title;
@@ -166,7 +181,7 @@ namespace GameShop.ViewModels
         private SelectionChangedEventArgs SelectItemsOrder;
 
         private SelectionChangedEventArgs SelectItemsCheck;
-        public ICommand AppBarButtonAddOrder => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(AppBarButtonAddOrderClick);
+        public ICommand AppBarButtonAddOrder => new RelayCommand<DataGrid>(AppBarButtonAddOrderClick);
         private async void AppBarButtonAddOrderClick(DataGrid data)
         {
             DataGridOrderSettings = data;
@@ -205,7 +220,7 @@ namespace GameShop.ViewModels
             ContentCheckBoxUniteCheck = "Объеденить в новый чек";
         }
 
-        public ICommand AppBarButtonEditOrder => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(AppBarButtonEditOrderClick);
+        public ICommand AppBarButtonEditOrder => new RelayCommand<DataGrid>(AppBarButtonEditOrderClick);
 
         ObservableCollection<Order> OrderCollectionSettingsOldItems = new ObservableCollection<Order>();
         private async void AppBarButtonEditOrderClick(DataGrid data)
@@ -263,7 +278,7 @@ namespace GameShop.ViewModels
                 ShowInfoBar(ControlPageInfoBar.Error("Заказ для изменения не выбран", "Выберете заказ и повторите попытку"));
         }
 
-        public ICommand AppBarButtonDeleteOrder => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(AppBarButtonDeleteClick);
+        public ICommand AppBarButtonDeleteOrder => new RelayCommand<DataGrid>(AppBarButtonDeleteClick);
         private async void AppBarButtonDeleteClick(DataGrid data)
         {
             DataGridOrderUPGRADE = data;
@@ -331,7 +346,7 @@ namespace GameShop.ViewModels
                 ShowInfoBar(ControlPageInfoBar.Error("У вас не выбран заказ/чек для изменения", "Выберете заказ/чек и повторите попытку"));
         }
 
-        public ICommand AppBarButtonAccept => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(AppBarButtonAcceptClick);
+        public ICommand AppBarButtonAccept => new RelayCommand<DataGrid>(AppBarButtonAcceptClick);
         private void AppBarButtonAcceptClick(DataGrid data)
         {
             DataGridOrderUPGRADE = data;
@@ -367,7 +382,7 @@ namespace GameShop.ViewModels
 
         }
 
-        public ICommand AppBarButtonClearOrder => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(AppBarButtonClearClick);
+        public ICommand AppBarButtonClearOrder => new RelayCommand<DataGrid>(AppBarButtonClearClick);
         private void AppBarButtonClearClick(DataGrid data)
         {
             DataGridOrderUPGRADE = data;
@@ -401,7 +416,7 @@ namespace GameShop.ViewModels
             }
         }
 
-        public ICommand AppBarButtonRefresh => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(AppBarButtonRefreshClick);
+        public ICommand AppBarButtonRefresh => new RelayCommand<DataGrid>(AppBarButtonRefreshClick);
         private void AppBarButtonRefreshClick(DataGrid data)
         {
             DataGridOrderUPGRADE = data;
@@ -414,7 +429,7 @@ namespace GameShop.ViewModels
             InitializationCollectionOrderUPGRADE();
         }
 
-        public ICommand DeleteAllOrdersOnIdCheckCommand => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<Check>(DeleteAllOrdersOnIdCheck);
+        public ICommand DeleteAllOrdersOnIdCheckCommand => new RelayCommand<Check>(DeleteAllOrdersOnIdCheck);
 
         private async void DeleteAllOrdersOnIdCheck(Check check)
         {
@@ -630,7 +645,7 @@ namespace GameShop.ViewModels
             }
         }
 
-        public ICommand AppBarButtonClearSettingsTable => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(AppBarButtonClearSettingsTableClick);
+        public ICommand AppBarButtonClearSettingsTable => new RelayCommand<DataGrid>(AppBarButtonClearSettingsTableClick);
         private void AppBarButtonClearSettingsTableClick(DataGrid data)
         {
             DataGridOrderUPGRADE = data;
@@ -656,7 +671,7 @@ namespace GameShop.ViewModels
             VisibilityCheckBoxUniteCheck = "Collapsed";
         }
 
-        public ICommand RadionButtonTableOrderCommand => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(RadionButtonTableOrder);
+        public ICommand RadionButtonTableOrderCommand => new RelayCommand<DataGrid>(RadionButtonTableOrder);
         private async void RadionButtonTableOrder(DataGrid data)
         {
             await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -671,9 +686,11 @@ namespace GameShop.ViewModels
             });
 
             InitializationCollectionOrderUPGRADE();
+
+            VisibilityStackPanelReport = Visibility.Collapsed;
         }
 
-        public ICommand RadionButtonTableCheckCommand => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(RadionButtonTableCheck);
+        public ICommand RadionButtonTableCheckCommand => new RelayCommand<DataGrid>(RadionButtonTableCheck);
         private void RadionButtonTableCheck(DataGrid data)
         {
             DataGridCheck = data;
@@ -684,6 +701,8 @@ namespace GameShop.ViewModels
 
             if (DataGridOrderUPGRADE != null)
                 DataGridOrderUPGRADE.Visibility = Visibility.Collapsed;
+
+            VisibilityStackPanelReport = Visibility.Collapsed;
         }
 
         public ControlPanelViewModel()
@@ -694,6 +713,7 @@ namespace GameShop.ViewModels
             VisibilityCheckBoxUniteCheck = "Collapsed";
             VisibilitySaveButtonCommandBar = "Collapsed";
             IsOpenInfoBar = false;
+            VisibilityStackPanelReport = Visibility.Collapsed;
 
             Task.Factory.StartNew(() => InitializationNameProduct());
         }
@@ -806,9 +826,9 @@ namespace GameShop.ViewModels
 
                 int.TryParse(TextAutoSuggestBoxFindNameProduct, out idProduct);
 
-                if (idProduct != 0)
+                if (idProduct != 0 && idProduct <= NameProduct.Count)
                 {
-                    ResultNameProduct.Add(NameProduct[idProduct]);
+                    ResultNameProduct.Add(NameProduct[idProduct - 1]);
                 }
                 else
                 {
@@ -1096,7 +1116,7 @@ namespace GameShop.ViewModels
             }
         }
 
-        public ICommand SortActiveOrderCollection => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(SortActiveOrderCollectionClick);
+        public ICommand SortActiveOrderCollection => new RelayCommand<DataGrid>(SortActiveOrderCollectionClick);
         private async void SortActiveOrderCollectionClick(DataGrid data)
         {
             DataGridOrderUPGRADE = data;
@@ -1121,7 +1141,7 @@ namespace GameShop.ViewModels
             });
         }
 
-        public ICommand SortByidCheck => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(SortByidCheckClick);
+        public ICommand SortByidCheck => new RelayCommand<DataGrid>(SortByidCheckClick);
         private async void SortByidCheckClick(DataGrid data)
         {
             DataGridOrderUPGRADE = data;
@@ -1173,7 +1193,7 @@ namespace GameShop.ViewModels
             }
         }
 
-        public ICommand SortByRangeSumOrder => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(SortByRangeSumOrderClick);
+        public ICommand SortByRangeSumOrder => new RelayCommand<DataGrid>(SortByRangeSumOrderClick);
         private async void SortByRangeSumOrderClick(DataGrid data)
         {
             DataGridOrderUPGRADE = data;
@@ -1254,7 +1274,7 @@ namespace GameShop.ViewModels
             }
         }
 
-        public ICommand SortByRangeSumCheck => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(SortByRangeSumCheckClick);
+        public ICommand SortByRangeSumCheck => new RelayCommand<DataGrid>(SortByRangeSumCheckClick);
         private async void SortByRangeSumCheckClick(DataGrid data)
         {
             DataGridCheck = data;
@@ -1336,7 +1356,7 @@ namespace GameShop.ViewModels
             }
         }
 
-        public ICommand SortByDataCheck => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(SortByDataCheckClick);
+        public ICommand SortByDataCheck => new RelayCommand<DataGrid>(SortByDataCheckClick);
         private async void SortByDataCheckClick(DataGrid data)
         {
             DataGridCheck = data;
@@ -1382,7 +1402,7 @@ namespace GameShop.ViewModels
             }
         }
 
-        public ICommand SortOrdersByLoginUser => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(SortOrdersByLoginUserClick);
+        public ICommand SortOrdersByLoginUser => new RelayCommand<DataGrid>(SortOrdersByLoginUserClick);
         private async void SortOrdersByLoginUserClick(DataGrid data)
         {
             DataGridOrderUPGRADE = data;
@@ -1448,7 +1468,7 @@ namespace GameShop.ViewModels
                 }
             }
         }
-        public ICommand SortCheckByIdOrder => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(SortCheckByIdOrderClick);
+        public ICommand SortCheckByIdOrder => new RelayCommand<DataGrid>(SortCheckByIdOrderClick);
         private async void SortCheckByIdOrderClick(DataGrid data)
         {
             DataGridCheck = data;
@@ -1509,29 +1529,83 @@ namespace GameShop.ViewModels
             InitializationCollectionCheck();
         }
 
-        public ICommand ReportOrder => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(ReportOrderClick);
+        public ICommand ReportOrder => new RelayCommand(ReportOrderClick);
 
-        private async void ReportOrderClick(DataGrid obj)
+        private async void ReportOrderClick()
         {
-            DataGridOrderUPGRADE = obj;
+            Check tempReportCheck = null;
+            ModelUPGRADEOrder tempReportOrder = null;
 
-            var ReportOrder = (ModelUPGRADEOrder)DataGridOrderUPGRADE.SelectedItem;
+            Check checkReport = null;
+            ObservableCollection<ModelUPGRADEOrder> tempCollectionOrders = null;
 
-            var ReportCheck = (ModelUPGRADEOrder)DataGridCheck.SelectedItem;
 
-            TextBlock text = new TextBlock();
-            
-
-            ContentDialog Report = new ContentDialog()
+            if (BeInCheck && DataGridCheck.SelectedItem != null)
             {
-                Title = "Отчёт",
-                CloseButtonText = "Ок",
-            };
+                tempReportCheck = (Check)DataGridCheck.SelectedItem;
+            }
+            else if (BeInOrder && DataGridOrderUPGRADE.SelectedItem != null)
+            {
+                tempReportOrder = (ModelUPGRADEOrder)DataGridOrderUPGRADE.SelectedItem;
+            }
 
-            Report.Content = text;
-            await Report.ShowAsync();
+            if (tempReportCheck != null)
+            {
+                checkReport = tempReportCheck;
+                var tempOrder = ReadingDataOrder(FindByValueOrder.idCheck, checkReport.idCheck);
+                tempCollectionOrders = ConvertOrderAndOrderUPGRADE.ConvertFromOrderCollectionInOrderUPGRADECollection(tempOrder);
+            }
+            else if (tempReportOrder != null)
+            {
 
+                var tempCheck = ReadingDataCheck(FindByValueCheck.idCheck, tempReportOrder.idCheck);
+                checkReport = tempCheck[0];
 
+                var tempOrder = ReadingDataOrder(FindByValueOrder.idCheck, tempReportOrder.idCheck);
+                tempCollectionOrders = ConvertOrderAndOrderUPGRADE.ConvertFromOrderCollectionInOrderUPGRADECollection(tempOrder);
+            }
+            string idCheck = "Чек # " + checkReport.idCheck.ToString();
+            string NameCompany = $"❖GameShop\t{idCheck}\t\t\t\t\t\t\t\t{checkReport.Data}\n";
+            string trait = "--------------------------------------------------------------------------------------------------------\n";
+            string Orders = "";
+
+            foreach (var item in tempCollectionOrders)
+            {
+                Orders = Orders + $"# {item.idOrder}  Назв.: {item.NameProduct}\tЛогин:{item.LoginUser}  Кол-во:{item.Quantity}  Сумма:{item.Price}\n";
+            }
+
+            string Check = $"\nИтого: {checkReport.Sum}";
+
+            await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                VisibilityStackPanelReport = Visibility.Visible;
+
+                if (DataGridOrderUPGRADE != null)
+                    DataGridOrderUPGRADE.Visibility = Visibility.Collapsed;
+
+                if (DataGridCheck != null)
+                    DataGridCheck.Visibility = Visibility.Collapsed;
+                
+                TextBoxTextReport = NameCompany + trait + Orders + trait + Check;
+            });
+        }
+
+        public ICommand CloseReport => new RelayCommand(CloseReportClick);
+
+        private void CloseReportClick()
+        {
+            if (BeInCheck)
+            {
+                if (DataGridCheck != null)
+                    DataGridCheck.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                if (DataGridOrderUPGRADE != null)
+                    DataGridOrderUPGRADE.Visibility = Visibility.Visible;
+            }
+
+            VisibilityStackPanelReport = Visibility.Collapsed;
         }
 
         public ICommand NavigateToStaffPage => new RelayCommand(NavigateToStaffPageClick);

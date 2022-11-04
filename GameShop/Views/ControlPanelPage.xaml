@@ -23,40 +23,41 @@
 
             <StackPanel  VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" Visibility="Visible" Orientation="Horizontal" Spacing="10">
                 <MenuBar>
-                    <MenuBarItem Title="Навигация" Visibility="Visible">
-                        <MenuFlyoutItem Text="Управление пользователями" Command="{x:Bind ViewModel.NavigateToStaffPage, Mode=OneWay}"/>
-                        <MenuFlyoutItem Text="Управление товарами"/>
+                    <MenuBarItem Title="Навигация" Visibility="Visible" FontFamily="Cascadia Code SemiBold">
+                        <MenuFlyoutItem Text="Управление пользователями" Command="{x:Bind ViewModel.NavigateToStaffPage, Mode=OneWay}" FontFamily="Cascadia Code SemiBold"/>
+                        <MenuFlyoutItem Text="Управление товарами" FontFamily="Cascadia Code SemiBold"/>
                     </MenuBarItem>
                 </MenuBar>
                 <CommandBar>
-                    <AppBarButton Icon="List" Label="Отчет"/>
+                    <AppBarButton Icon="List" Label="Отчет" Command="{x:Bind ViewModel.ReportOrder, Mode=OneWay}"/>
                 </CommandBar>
-                    
-                <Button Content="Настройки фильтрации" Grid.Row="1" Grid.Column="1"  VerticalAlignment="Center" HorizontalAlignment="Left">
+
+                <Button Content="Настройки фильтрации" Grid.Row="1" Grid.Column="1"  VerticalAlignment="Center" HorizontalAlignment="Left" FontFamily="Cascadia Code SemiBold">
                     <Button.Flyout>
                         <MenuFlyout>
-                            <MenuFlyoutItem Text="Сбросить все фильтры" Command="{x:Bind ViewModel.ClearFilters, Mode=OneWay}"/>
+                            <MenuFlyoutItem Text="Сбросить все фильтры" Command="{x:Bind ViewModel.ClearFilters, Mode=OneWay}" FontFamily="Cascadia Code SemiBold"/>
                             <MenuFlyoutSeparator/>
-                            <MenuFlyoutSubItem Text="Фильтрация без изменения коллекции">
-                                <MenuFlyoutItem Text="Отобразить активные заказы" Command="{x:Bind ViewModel.SortActiveOrderCollection, Mode=OneWay}" CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}"/>
+                            <MenuFlyoutSubItem Text="Фильтрация без изменения коллекции" FontFamily="Cascadia Code SemiBold">
+                                <MenuFlyoutItem Text="Отобразить активные заказы" Command="{x:Bind ViewModel.SortActiveOrderCollection, Mode=OneWay}" CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}" FontFamily="Cascadia Code SemiBold"/>
                                 <MenuFlyoutSeparator/>
-                                <MenuFlyoutItem Text="Отобразить заказы по номеру чека" Command="{x:Bind ViewModel.SortByidCheck, Mode=OneWay}" CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}"/>
+                                <MenuFlyoutItem Text="Отобразить заказы по номеру чека" Command="{x:Bind ViewModel.SortByidCheck, Mode=OneWay}" CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}" FontFamily="Cascadia Code SemiBold"/>
                                 <MenuFlyoutSeparator/>
-                                <MenuFlyoutItem Text="Отобразить заказы по сумме от-до" Command="{x:Bind ViewModel.SortByRangeSumOrder, Mode=OneWay}"  CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}"/>
+                                <MenuFlyoutItem Text="Отобразить заказы по сумме от-до" Command="{x:Bind ViewModel.SortByRangeSumOrder, Mode=OneWay}"  CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}" FontFamily="Cascadia Code SemiBold"/>
                                 <MenuFlyoutSeparator/>
-                                <MenuFlyoutItem Text="Отобразить чеки по сумме от-до" Command="{x:Bind ViewModel.SortByRangeSumCheck, Mode=OneWay}" CommandParameter="{x:Bind CheckMainTable, Mode=OneWay}"/>
+                                <MenuFlyoutItem Text="Отобразить чеки по сумме от-до" Command="{x:Bind ViewModel.SortByRangeSumCheck, Mode=OneWay}" CommandParameter="{x:Bind CheckMainTable, Mode=OneWay}" FontFamily="Cascadia Code SemiBold"/>
                                 <MenuFlyoutSeparator/>
-                                <MenuFlyoutItem Text="Отобразить чек по дате оформления" Command="{x:Bind ViewModel.SortByDataCheck, Mode=OneWay}" CommandParameter="{x:Bind CheckMainTable, Mode=OneWay}"/>
+                                <MenuFlyoutItem Text="Отобразить чек по дате оформления" Command="{x:Bind ViewModel.SortByDataCheck, Mode=OneWay}" CommandParameter="{x:Bind CheckMainTable, Mode=OneWay}" FontFamily="Cascadia Code SemiBold"/>
                                 <MenuFlyoutSeparator/>
-                                <MenuFlyoutItem Text="Отобразить заказы по логину покупателя" Command="{x:Bind ViewModel.SortOrdersByLoginUser, Mode=OneWay}" CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}"/>
+                                <MenuFlyoutItem Text="Отобразить заказы по логину покупателя" Command="{x:Bind ViewModel.SortOrdersByLoginUser, Mode=OneWay}" CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}" FontFamily="Cascadia Code SemiBold"/>
                                 <MenuFlyoutSeparator/>
-                                <MenuFlyoutItem Text="Найти чек по номеру заказа" Command="{x:Bind ViewModel.SortCheckByIdOrder, Mode=OneWay}" CommandParameter="{x:Bind CheckMainTable, Mode=OneWay}"/>
+                                <MenuFlyoutItem Text="Найти чек по номеру заказа" Command="{x:Bind ViewModel.SortCheckByIdOrder, Mode=OneWay}" CommandParameter="{x:Bind CheckMainTable, Mode=OneWay}" FontFamily="Cascadia Code SemiBold"/>
                             </MenuFlyoutSubItem>
                         </MenuFlyout>
                     </Button.Flyout>
                 </Button>
 
                 <AutoSuggestBox
+                    FontFamily="Cascadia Code SemiBold"
                     Width="350"
                     PlaceholderText="Введите номер товара"
                     QueryIcon="Find"
@@ -64,7 +65,14 @@
                     ItemsSource="{x:Bind ViewModel.ResultNameProduct, Mode=TwoWay}"
                     Height="30"/>          
             </StackPanel>
- 
+
+            <StackPanel Padding="10" Spacing="10" BorderThickness="2" Grid.Row="1" Width="1000" HorizontalAlignment="Left" Height="500" VerticalAlignment="Top" x:Name="StackPanelReport" Visibility="{x:Bind ViewModel.VisibilityStackPanelReport, Mode=TwoWay}">
+                <TextBlock FontSize="24" FontWeight="Bold" Text="Отчёт" VerticalAlignment="Top" HorizontalAlignment="Left"  FontFamily="Cascadia Code SemiBold"/>
+                <TextBlock Text="{x:Bind ViewModel.TextBoxTextReport, Mode=TwoWay}" FontFamily="Cascadia Code SemiBold"/>
+                <Button Content="Ок" Width="100" FontFamily="Cascadia Code SemiBold" HorizontalAlignment="Left" VerticalAlignment="Bottom" Command="{x:Bind ViewModel.CloseReport, Mode=OneWay}"/>
+            </StackPanel>
+
+
             <muxc:InfoBar Grid.Row="0" Grid.Column="0"
                                       VerticalAlignment="Center"
                                       HorizontalAlignment="Right"
