@@ -15,19 +15,65 @@
     <Grid x:Name="ContentArea" BorderBrush="{ThemeResource SystemControlAltHighAcrylicWindowBrush}" BorderThickness="2" CornerRadius="20">
         <Grid Background="{ThemeResource SystemControlAltHighAcrylicWindowBrush}">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"></RowDefinition>
-                <RowDefinition Height="20*"></RowDefinition>
                 <RowDefinition Height="2*"></RowDefinition>
-                <RowDefinition Height="7*"></RowDefinition>
+                <RowDefinition Height="21*"></RowDefinition>
+                <RowDefinition Height="2*"></RowDefinition>
+                <RowDefinition Height="6*"></RowDefinition>
             </Grid.RowDefinitions>
-            
-            <MenuBar VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" Visibility="Visible">
-                <MenuBarItem Title="Навигация" Visibility="Visible">
-                    <MenuFlyoutItem Text="Управление пользователями" Command="{x:Bind ViewModel.NavigateToStaffPage, Mode=OneWay}"/>
-                    <MenuFlyoutItem Text="Управление товарами"/>
-                </MenuBarItem>
-            </MenuBar>
-            
+
+            <StackPanel  VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" Visibility="Visible" Orientation="Horizontal" Spacing="10">
+                <MenuBar>
+                    <MenuBarItem Title="Навигация" Visibility="Visible">
+                        <MenuFlyoutItem Text="Управление пользователями" Command="{x:Bind ViewModel.NavigateToStaffPage, Mode=OneWay}"/>
+                        <MenuFlyoutItem Text="Управление товарами"/>
+                    </MenuBarItem>
+                </MenuBar>
+                <CommandBar>
+                    <AppBarButton Icon="List" Label="Отчет"/>
+                </CommandBar>
+                    
+                <Button Content="Настройки фильтрации" Grid.Row="1" Grid.Column="1"  VerticalAlignment="Center" HorizontalAlignment="Left">
+                    <Button.Flyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="Сбросить все фильтры" Command="{x:Bind ViewModel.ClearFilters, Mode=OneWay}"/>
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutSubItem Text="Фильтрация без изменения коллекции">
+                                <MenuFlyoutItem Text="Отобразить активные заказы" Command="{x:Bind ViewModel.SortActiveOrderCollection, Mode=OneWay}" CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}"/>
+                                <MenuFlyoutSeparator/>
+                                <MenuFlyoutItem Text="Отобразить заказы по номеру чека" Command="{x:Bind ViewModel.SortByidCheck, Mode=OneWay}" CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}"/>
+                                <MenuFlyoutSeparator/>
+                                <MenuFlyoutItem Text="Отобразить заказы по сумме от-до" Command="{x:Bind ViewModel.SortByRangeSumOrder, Mode=OneWay}"  CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}"/>
+                                <MenuFlyoutSeparator/>
+                                <MenuFlyoutItem Text="Отобразить чеки по сумме от-до" Command="{x:Bind ViewModel.SortByRangeSumCheck, Mode=OneWay}" CommandParameter="{x:Bind CheckMainTable, Mode=OneWay}"/>
+                                <MenuFlyoutSeparator/>
+                                <MenuFlyoutItem Text="Отобразить чек по дате оформления" Command="{x:Bind ViewModel.SortByDataCheck, Mode=OneWay}" CommandParameter="{x:Bind CheckMainTable, Mode=OneWay}"/>
+                                <MenuFlyoutSeparator/>
+                                <MenuFlyoutItem Text="Отобразить заказы по логину покупателя" Command="{x:Bind ViewModel.SortOrdersByLoginUser, Mode=OneWay}" CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}"/>
+                                <MenuFlyoutSeparator/>
+                                <MenuFlyoutItem Text="Найти чек по номеру заказа" Command="{x:Bind ViewModel.SortCheckByIdOrder, Mode=OneWay}" CommandParameter="{x:Bind CheckMainTable, Mode=OneWay}"/>
+                            </MenuFlyoutSubItem>
+                        </MenuFlyout>
+                    </Button.Flyout>
+                </Button>
+
+                <AutoSuggestBox
+                    Width="350"
+                    PlaceholderText="Введите номер товара"
+                    QueryIcon="Find"
+                    Text="{x:Bind ViewModel.TextAutoSuggestBoxFindNameProduct, Mode=TwoWay}"
+                    ItemsSource="{x:Bind ViewModel.ResultNameProduct, Mode=TwoWay}"
+                    Height="30"/>          
+            </StackPanel>
+ 
+            <muxc:InfoBar Grid.Row="0" Grid.Column="0"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Right"
+                                      IsOpen="{x:Bind ViewModel.IsOpenInfoBar, Mode=TwoWay}"
+                                      Severity="{x:Bind ViewModel.SeverityInfoBar, Mode=TwoWay}"
+                                      Title="{x:Bind ViewModel.TitleInfoBar, Mode=TwoWay}"
+                                      Message="{x:Bind ViewModel.MessageInfoBar, Mode=TwoWay}"/>
+
+
             <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
                 <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Padding="10" Text="Панель управления покупками" FontSize="25" FontFamily="Cascadia Code SemiBold"/>
             </StackPanel>
@@ -38,8 +84,8 @@
                     <RowDefinition Height="225"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition  Width="5*"></ColumnDefinition>
-                    <ColumnDefinition Width="2*"></ColumnDefinition>
+                    <ColumnDefinition  Width="11*"></ColumnDefinition>
+                    <ColumnDefinition Width="4*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
 
                 <CommandBar
@@ -65,31 +111,7 @@
                     <AppBarButton Icon="Refresh" Label="Обновить" FontFamily="Cascadia Code SemiBold" Command="{x:Bind ViewModel.AppBarButtonRefresh, Mode=OneWay}" CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}"/>
                 </CommandBar>
 
-                <Button Content="Настройки фильтрации" Grid.Row="1" Grid.Column="1"  VerticalAlignment="Top" HorizontalAlignment="Left">
-                    <Button.Flyout>
-                        <MenuFlyout>
-                            <MenuFlyoutItem Text="Сбросить все фильтры" Command="{x:Bind ViewModel.ClearFilters, Mode=OneWay}"/>
-                            <MenuFlyoutSeparator/>
-                            <MenuFlyoutSubItem Text="Фильтрация без изменения коллекции">
-                                <MenuFlyoutItem Text="Отобразить активные заказы" Command="{x:Bind ViewModel.SortActiveOrderCollection, Mode=OneWay}" CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}"/>
-                                <MenuFlyoutSeparator/>
-                                <MenuFlyoutItem Text="Отобразить заказы по номеру чека" Command="{x:Bind ViewModel.SortByidCheck, Mode=OneWay}" CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}"/>
-                                <MenuFlyoutSeparator/>
-                                <MenuFlyoutItem Text="Отобразить заказы по сумме от-до" Command="{x:Bind ViewModel.SortByRangeSumOrder, Mode=OneWay}"  CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}"/>
-                                <MenuFlyoutSeparator/>
-                                <MenuFlyoutItem Text="Отобразить чеки по сумме от-до" Command="{x:Bind ViewModel.SortByRangeSumCheck, Mode=OneWay}" CommandParameter="{x:Bind CheckMainTable, Mode=OneWay}"/>
-                                <MenuFlyoutSeparator/>
-                                <MenuFlyoutItem Text="Отобразить чек по дате оформления" Command="{x:Bind ViewModel.SortByDataCheck, Mode=OneWay}" CommandParameter="{x:Bind CheckMainTable, Mode=OneWay}"/>
-                                <MenuFlyoutSeparator/>
-                                <MenuFlyoutItem Text="Отобразить заказы по логину покупателя" Command="{x:Bind ViewModel.SortOrdersByLoginUser, Mode=OneWay}" CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}"/>
-                                <MenuFlyoutSeparator/>
-                                <MenuFlyoutItem Text="Найти чек по номеру заказа" Command="{x:Bind ViewModel.SortCheckByIdOrder, Mode=OneWay}" CommandParameter="{x:Bind CheckMainTable, Mode=OneWay}"/>
-                            </MenuFlyoutSubItem>
-                        </MenuFlyout>
-                    </Button.Flyout>
-                </Button>
-
-                <StackPanel Padding="10" VerticalAlignment="Top" Orientation="Vertical" HorizontalAlignment="Left" Grid.Row="3" Grid.Column="2" >
+                <StackPanel Padding="10" Spacing="20" Orientation="Horizontal" Grid.Row="3" Grid.Column="2" VerticalAlignment="Top">
                     <StackPanel HorizontalAlignment="Left">
                         <muxc:RadioButtons FontFamily="Cascadia Code SemiBold" Header="Отображение таблиц">
                             <RadioButton Content="Список заказов" Command="{x:Bind ViewModel.RadionButtonTableOrderCommand, Mode=OneWay}" CommandParameter="{x:Bind OrderMainTable, Mode=OneWay}"/>
@@ -97,19 +119,10 @@
                         </muxc:RadioButtons>
                     </StackPanel>
                 </StackPanel>
-                <muxc:InfoBar Grid.Row="3" Grid.Column="2"
-                                      VerticalAlignment="Center"
-                                      Margin="0,80,0,0"
-                                      IsOpen="{x:Bind ViewModel.IsOpenInfoBar, Mode=TwoWay}"
-                                      Severity="{x:Bind ViewModel.SeverityInfoBar, Mode=TwoWay}"
-                                      Title="{x:Bind ViewModel.TitleInfoBar, Mode=TwoWay}"
-                                      Message="{x:Bind ViewModel.MessageInfoBar, Mode=TwoWay}"/>
 
-
-                <StackPanel Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Right" Spacing="5" Padding="3">
+                <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Top" HorizontalAlignment="Left" Spacing="10" Padding="3" Orientation="Horizontal">
                     <CheckBox FontFamily="Cascadia Code SemiBold" Visibility="{x:Bind ViewModel.VisibilityCheckBoxUniteCheck, Mode=TwoWay}" IsChecked="{x:Bind ViewModel.IsCheckedCheckBoxUniteCheck, Mode=TwoWay}" Command="{x:Bind ViewModel.IsVisibleCheckBoxUniteCheckCommand, Mode=TwoWay}" Content="{x:Bind ViewModel.ContentCheckBoxUniteCheck, Mode=TwoWay}"/>
                     <Button Content="{x:Bind ViewModel.ContentSaveButtonCommandBar, Mode=TwoWay}" Visibility="{x:Bind ViewModel.VisibilitySaveButtonCommandBar, Mode=TwoWay}" Command="{ x:Bind ViewModel.AppBarButtonSaveButton, Mode=TwoWay}" HorizontalAlignment="Right"/>
-
                 </StackPanel>
 
                 <controls:DataGrid
@@ -150,18 +163,12 @@
                             HorizontalAlignment="Left"
                             Visibility="Collapsed">
 
-                <controls:DataGrid.RowDetailsTemplate>
-                    <DataTemplate>
-
-                    </DataTemplate>
-                </controls:DataGrid.RowDetailsTemplate>
-
                 <controls:DataGrid.Columns>
                     <controls:DataGridTextColumn Header="Номер чека" IsReadOnly="False" Binding="{Binding idCheck}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                     <controls:DataGridTextColumn Header="Дата" IsReadOnly="False" Binding="{Binding Data}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                     <controls:DataGridTextColumn Header="Сумма покупки" IsReadOnly="False" Binding="{Binding Sum}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                 </controls:DataGrid.Columns>
-            </controls:DataGrid>
+                </controls:DataGrid>
 
             <controls:DataGrid Grid.Row="1" Grid.Column="0"
                             Height="690"

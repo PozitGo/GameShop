@@ -1,7 +1,10 @@
-﻿using GameShop.DataBase;
+﻿using GalaSoft.MvvmLight.Command;
+using GameShop.DataBase;
 using GameShop.Enum;
 using GameShop.Model;
+using GameShop.Services;
 using GameShop.ViewModels.InfoBars;
+using GameShop.Views;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using Microsoft.UI.Xaml.Controls;
@@ -85,8 +88,11 @@ namespace GameShop.ViewModels
         public ICommand EditingMode => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(EditingModeMethod);
         public ICommand SaveChanges => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(SaveChangesMethod);
         public ICommand NoEditingMode => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(NoEditingModeMethod);
-        public ICommand RefreshTable => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(RefreshTableMethod);
+        public ICommand RefreshTable => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(RefreshTableClick);
 
+        public ICommand NavigateToOrder => new RelayCommand(NavigateToOrderClick);
+
+        private void NavigateToOrderClick() => NavigationService.Navigate(typeof(ControlPanelPage));
         //Кнопку понижения и повышения статусов сделать видной только админам
         //В режиме редактирования обновлять только пользователя которого редактируют
         private void UpStatusUserMethod(DataGrid obj)
@@ -404,7 +410,7 @@ namespace GameShop.ViewModels
             ShowInfoBar(ControlPageInfoBar.Information("Режим редактирования выключен", ""));
         }
 
-        private async void RefreshTableMethod(DataGrid obj)
+        private async void RefreshTableClick(DataGrid obj)
         {
             DataGridUser = obj;
             //Проверка, если режим редактирования, обновлять только одну строку

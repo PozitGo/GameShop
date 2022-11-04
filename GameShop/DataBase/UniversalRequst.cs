@@ -29,6 +29,32 @@ namespace GameShop.DataBase
                     Collection.Add(int.Parse(readerBy[NameId].ToString()));
                 }
             }
+            
+            return Collection;
+        }
+
+        public static ObservableCollection<string> ReadingAllToIdFromTableString(string NameTable, string NameId)
+        {
+            DataBaseConnect db = new DataBaseConnect();
+            MySqlCommand command = new MySqlCommand();
+            DataTable table = new DataTable();
+            MySqlDataAdapter adapter = new MySqlDataAdapter();
+
+            ObservableCollection<string> Collection = new ObservableCollection<string>();
+
+            command = new MySqlCommand($"SELECT {NameId} FROM `{NameTable}`", db.IsConnection());
+
+            adapter.SelectCommand = command;
+            adapter.Fill(table);
+
+            if (table.Rows.Count > 0)
+            {
+                MySqlDataReader readerBy = command.ExecuteReader();
+                for (int i = 0; readerBy.Read(); i++)
+                {
+                    Collection.Add(readerBy[NameId].ToString());
+                }
+            }
 
             return Collection;
         }

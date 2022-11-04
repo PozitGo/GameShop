@@ -39,6 +39,10 @@ namespace GameShop.ViewModels
 
         public ObservableCollection<int> AllidUserCollection = new ObservableCollection<int>();
 
+        public ObservableCollection<string> NameProduct = new ObservableCollection<string>();
+
+        public ObservableCollection<string> ResultNameProduct = new ObservableCollection<string>();
+
         public ObservableCollection<string> answerOrder = new ObservableCollection<string>();
 
         public DataGrid DataGridOrderUPGRADE;
@@ -93,7 +97,10 @@ namespace GameShop.ViewModels
         public bool IsOpenInfoBar
         {
             get => _IsOpenInfoBar;
-            set => SetProperty(ref _IsOpenInfoBar, value);
+            set
+            {
+                SetProperty(ref _IsOpenInfoBar, value);
+            } 
         }
 
         private InfoBarSeverity _SeverityInfoBar;
@@ -129,14 +136,15 @@ namespace GameShop.ViewModels
             }
         }
 
-        private string _Texts;
-
-        public string Texts
+        private string _TextAutoSuggestBoxFindNameProduct;
+        public string TextAutoSuggestBoxFindNameProduct
         {
-            get => _Texts;
+            get => _TextAutoSuggestBoxFindNameProduct;
             set
             {
-                SetProperty(ref _Texts, value);
+                FindNameProductOnidProduct();
+
+                SetProperty(ref _TextAutoSuggestBoxFindNameProduct, value);
             }
         }
 
@@ -649,16 +657,20 @@ namespace GameShop.ViewModels
         }
 
         public ICommand RadionButtonTableOrderCommand => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(RadionButtonTableOrder);
-        private void RadionButtonTableOrder(DataGrid data)
+        private async void RadionButtonTableOrder(DataGrid data)
         {
-            DataGridOrderUPGRADE = data;
-            BeInOrder = true;
-            BeInCheck = false;
-            InitializationCollectionOrderUPGRADE();
-            DataGridOrderUPGRADE.Visibility = Visibility.Visible;
+            await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                DataGridOrderUPGRADE = data;
+                BeInOrder = true;
+                BeInCheck = false;
+                DataGridOrderUPGRADE.Visibility = Visibility.Visible;
 
-            if (DataGridCheck != null)
-                DataGridCheck.Visibility = Visibility.Collapsed;
+                if (DataGridCheck != null)
+                    DataGridCheck.Visibility = Visibility.Collapsed;
+            });
+
+            InitializationCollectionOrderUPGRADE();
         }
 
         public ICommand RadionButtonTableCheckCommand => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(RadionButtonTableCheck);
@@ -674,12 +686,6 @@ namespace GameShop.ViewModels
                 DataGridOrderUPGRADE.Visibility = Visibility.Collapsed;
         }
 
-        public ICommand Test => new RelayCommand(TestClick);
-        private void TestClick()
-        {
-
-        }
-
         public ControlPanelViewModel()
         {
             IsVisibleCheckBoxUniteCheckCommand = new RelayCommand(IsVisibleCheckBoxUniteCheck);
@@ -689,23 +695,23 @@ namespace GameShop.ViewModels
             VisibilitySaveButtonCommandBar = "Collapsed";
             IsOpenInfoBar = false;
 
-            Texts = "Проверка";
+            Task.Factory.StartNew(() => InitializationNameProduct());
         }
 
         private async void InitializationCollectionOrderUPGRADE()
         {
-            if (DataGridOrderUPGRADE != null)
-                DataGridOrderUPGRADE.UnloadingRowDetails += DataGridOrderUPGRADE_UnloadingRowDetails;
-            else
-                ShowInfoBar(ControlPageInfoBar.Warning("Коллекция заказов пустая", "Выберете таблицу заказы и повторите попытку"));
-            
-            await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            await Task.Factory.StartNew(() =>
+            {
+                if (DataGridOrderUPGRADE != null)
+                    DataGridOrderUPGRADE.UnloadingRowDetails += DataGridOrderUPGRADE_UnloadingRowDetails;
+                else
+                    ShowInfoBar(ControlPageInfoBar.Warning("Коллекция заказов пустая", "Выберете таблицу заказы и повторите попытку"));
+            });
+
+            if (OrderUPGRADECollection.Count == 0)
             {
                 ObservableCollection<Order> OrderCollection = new ObservableCollection<Order>();
-                if (OrderUPGRADECollection.Count == 0)
-                {
-
-                    Task task = Task.Factory.StartNew(() =>
+                await Task.Factory.StartNew(() =>
                     {
                         foreach (var item in ReadingDataOrder())
                         {
@@ -713,13 +719,15 @@ namespace GameShop.ViewModels
                         }
                     });
 
-                    task.Wait();
-                    foreach (var item in ConvertOrderAndOrderUPGRADE.ConvertFromOrderCollectionInOrderUPGRADECollection(OrderCollection))
+                foreach (var item in ConvertOrderAndOrderUPGRADE.ConvertFromOrderCollectionInOrderUPGRADECollection(OrderCollection))
+                {
+                    await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
                         OrderUPGRADECollection.Add(item);
-                    }
+                    });
                 }
-            });
+            }
+
             if (DataGridOrderUPGRADE != null)
                 DataGridOrderUPGRADE.SelectionChanged += DataGridOrderUPGRADE_SelectionChanged;
             else
@@ -743,7 +751,7 @@ namespace GameShop.ViewModels
                     }
 
                 });
-            
+
             if (DataGridCheck != null)
                 DataGridCheck.SelectionChanged += DataGridCheck_SelectionChanged;
         }
@@ -781,6 +789,33 @@ namespace GameShop.ViewModels
 
         }
 
+        private void InitializationNameProduct()
+        {
+            foreach (var item in UniversalRequst.ReadingAllToIdFromTableString("product", "Name"))
+            {
+                NameProduct.Add(item);
+            }
+        }
+
+        private async void FindNameProductOnidProduct()
+        {
+            await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                ResultNameProduct.Clear();
+                int idProduct = 0;
+
+                int.TryParse(TextAutoSuggestBoxFindNameProduct, out idProduct);
+
+                if (idProduct != 0)
+                {
+                    ResultNameProduct.Add(NameProduct[idProduct]);
+                }
+                else
+                {
+                    ResultNameProduct.Add("Нет результатов");
+                }
+            });
+        }
         private async void AddNewOrder(Order item)
         {
 
@@ -1472,6 +1507,31 @@ namespace GameShop.ViewModels
             InitializationCollectionOrderUPGRADE();
 
             InitializationCollectionCheck();
+        }
+
+        public ICommand ReportOrder => new Microsoft.Toolkit.Mvvm.Input.RelayCommand<DataGrid>(ReportOrderClick);
+
+        private async void ReportOrderClick(DataGrid obj)
+        {
+            DataGridOrderUPGRADE = obj;
+
+            var ReportOrder = (ModelUPGRADEOrder)DataGridOrderUPGRADE.SelectedItem;
+
+            var ReportCheck = (ModelUPGRADEOrder)DataGridCheck.SelectedItem;
+
+            TextBlock text = new TextBlock();
+            
+
+            ContentDialog Report = new ContentDialog()
+            {
+                Title = "Отчёт",
+                CloseButtonText = "Ок",
+            };
+
+            Report.Content = text;
+            await Report.ShowAsync();
+
+
         }
 
         public ICommand NavigateToStaffPage => new RelayCommand(NavigateToStaffPageClick);
