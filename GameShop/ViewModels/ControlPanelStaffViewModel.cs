@@ -93,6 +93,10 @@ namespace GameShop.ViewModels
         public ICommand NavigateToOrder => new RelayCommand(NavigateToOrderClick);
 
         private void NavigateToOrderClick() => NavigationService.Navigate(typeof(ControlPanelPage));
+
+        public ICommand NavigateToProductPage => new RelayCommand(NavigateToProductPageClick);
+
+        private void NavigateToProductPageClick() => NavigationService.Navigate(typeof(ProductControlPanelPage));
         //Кнопку понижения и повышения статусов сделать видной только админам
         //В режиме редактирования обновлять только пользователя которого редактируют
         private void UpStatusUserMethod(DataGrid obj)
@@ -413,7 +417,6 @@ namespace GameShop.ViewModels
         private async void RefreshTableClick(DataGrid obj)
         {
             DataGridUser = obj;
-            //Проверка, если режим редактирования, обновлять только одну строку
 
             if (VisibilityAppBarEditingMode != Visibility.Visible)
             {

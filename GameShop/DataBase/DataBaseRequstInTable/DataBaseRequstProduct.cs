@@ -45,14 +45,6 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                         Collection = ReadProductsByParametr(command, adapter, table, parametr, NameFieldByTable);
                     }
                     break;
-                case FindByValueProduct.Quantity:
-                    if (parametr != null)
-                    {
-                        NameFieldByTable = "@" + nameof(FindByValueProduct.Quantity);
-                        command = new MySqlCommand("SELECT * FROM `product` WHERE " + NameFieldByTable + " = Quantity", db.IsConnection());
-                        Collection = ReadProductsByParametr(command, adapter, table, parametr, NameFieldByTable);
-                    }
-                    break;
                 case FindByValueProduct.Name:
                     if (parametr != null)
                     {
@@ -146,10 +138,8 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                     Collection[i].idProduct = int.Parse(readerBy["idProduct"].ToString());
                     Collection[i].idCategory = int.Parse(readerBy["idCategory"].ToString());
                     Collection[i].Price = float.Parse(readerBy["Price"].ToString());
-                    Collection[i].Quantity = int.Parse(readerBy["Quantity"].ToString());
                     Collection[i].Name = readerBy["Name"].ToString();
                     Collection[i].Manufacturer = readerBy["Manufacturer"].ToString();
-                    Collection[i].Rating = int.Parse(readerBy["Rating"].ToString());
                     Collection[i].BasicDescription = readerBy["BasicDescription"].ToString();
                 }
             }
@@ -177,10 +167,8 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                     Collection[i].idProduct = int.Parse(readerBy["idProduct"].ToString());
                     Collection[i].idCategory = int.Parse(readerBy["idCategory"].ToString());
                     Collection[i].Price = float.Parse(readerBy["Price"].ToString());
-                    Collection[i].Quantity = int.Parse(readerBy["Quantity"].ToString());
                     Collection[i].Name = readerBy["Name"].ToString();
                     Collection[i].Manufacturer = readerBy["Manufacturer"].ToString();
-                    Collection[i].Rating = int.Parse(readerBy["Rating"].ToString());
                     Collection[i].BasicDescription = readerBy["BasicDescription"].ToString();
                 }
             }
@@ -201,10 +189,8 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                     command.Parameters.Add("@idProduct", MySqlDbType.Int32).Value = value.idProduct;
                     command.Parameters.Add("@idCategory", MySqlDbType.Int32).Value = value.idCategory;
                     command.Parameters.Add("@Price", MySqlDbType.Int32).Value = value.Price;
-                    command.Parameters.Add("@Quantity", MySqlDbType.Int32).Value = value.Quantity;
                     command.Parameters.Add("@Name", MySqlDbType.Double).Value = value.Name;
                     command.Parameters.Add("@Manufacturer", MySqlDbType.Int32).Value = value.Manufacturer;
-                    command.Parameters.Add("@Rating", MySqlDbType.VarChar).Value = value.Rating;
                     command.Parameters.Add("@BasicDescription", MySqlDbType.Int32).Value = value.BasicDescription;
 
                     if (command.ExecuteNonQuery() == 7)

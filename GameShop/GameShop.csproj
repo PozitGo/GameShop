@@ -158,9 +158,13 @@
     <Compile Include="Activation\LoginActivationHandler.cs" />
     <Compile Include="Behaviors\NavigationViewHeaderBehavior.cs" />
     <Compile Include="Behaviors\NavigationViewHeaderMode.cs" />
+    <Compile Include="Convert\ConvertProductAndProductUPGRADE.cs" />
+    <Compile Include="Convert\ImageConverter.cs" />
     <Compile Include="DataBase\DataBaseAuthorization.cs" />
     <Compile Include="DataBase\DataBaseConnect.cs" />
+    <Compile Include="DataBase\DataBaseRequstInTable\DataBasePhotoRequst.cs" />
     <Compile Include="DataBase\DataBaseRequstInTable\DataBaseRequestOrder.cs" />
+    <Compile Include="DataBase\DataBaseRequstInTable\DataBaseRequstCategory.cs" />
     <Compile Include="DataBase\DataBaseRequstInTable\DataBaseRequstCheck.cs" />
     <Compile Include="DataBase\DataBaseRequstInTable\DataBaseRequstProduct.cs" />
     <Compile Include="DataBase\DataBaseRequstInTable\DataBaseRequstUser.cs" />
@@ -184,6 +188,7 @@
     <Compile Include="Model\ModelTableInDataBase\PhotoProduct.cs" />
     <Compile Include="Model\ModelTableInDataBase\Product.cs" />
     <Compile Include="Model\ModelTableInDataBase\UserAccount.cs" />
+    <Compile Include="Model\ModelUPGRADEProduct.cs" />
     <Compile Include="Model\UserSessionModel.cs" />
     <Compile Include="Services\JsonObjectSerializer.cs" />
     <Compile Include="Services\UserSessionService.cs" />
@@ -198,6 +203,7 @@
     <Compile Include="ViewModels\InfoBars\ControlPageInfoBar.cs" />
     <Compile Include="ViewModels\LoginPViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\ProductControlPanelViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="Views\AccountsPage.xaml.cs">
       <DependentUpon>AccountsPage.xaml</DependentUpon>
@@ -213,6 +219,9 @@
     </Compile>
     <Compile Include="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ProductControlPanelPage.xaml.cs">
+      <DependentUpon>ProductControlPanelPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ShellPage.xaml.cs">
       <DependentUpon>ShellPage.xaml</DependentUpon>
@@ -274,6 +283,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ProductControlPanelPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

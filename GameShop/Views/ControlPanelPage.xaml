@@ -25,7 +25,7 @@
                 <MenuBar>
                     <MenuBarItem Title="Навигация" Visibility="Visible" FontFamily="Cascadia Code SemiBold">
                         <MenuFlyoutItem Text="Управление пользователями" Command="{x:Bind ViewModel.NavigateToStaffPage, Mode=OneWay}" FontFamily="Cascadia Code SemiBold"/>
-                        <MenuFlyoutItem Text="Управление товарами" FontFamily="Cascadia Code SemiBold"/>
+                        <MenuFlyoutItem Text="Управление товарами" Command="{x:Bind ViewModel.NavigateToProductPage, Mode=OneWay}" FontFamily="Cascadia Code SemiBold"/>
                     </MenuBarItem>
                 </MenuBar>
                 <CommandBar>

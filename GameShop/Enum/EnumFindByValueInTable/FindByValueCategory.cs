@@ -3,6 +3,6 @@
     public enum FindByValueCategory
     {
         idCategory,
-        Name
+        NameCategory
     }
 }

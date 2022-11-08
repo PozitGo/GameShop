@@ -18,7 +18,7 @@
             <MenuBar VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" Visibility="Visible">
                 <MenuBarItem Title="Навигация" Visibility="Visible" FontFamily="Cascadia Code SemiBold">
                     <MenuFlyoutItem Text="Управление покупками" Command="{x:Bind ViewModel.NavigateToOrder, Mode=OneWay}" FontFamily="Cascadia Code SemiBold"/>
-                    <MenuFlyoutItem Text="Управление товарами" FontFamily="Cascadia Code SemiBold"/>
+                    <MenuFlyoutItem Text="Управление товарами"  Command="{x:Bind ViewModel.NavigateToProductPage, Mode=OneWay}" FontFamily="Cascadia Code SemiBold"/>
                 </MenuBarItem>
             </MenuBar>
 

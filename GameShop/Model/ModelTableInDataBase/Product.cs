@@ -10,13 +10,9 @@ namespace GameShop.Model
 
         public float Price { get; set; }
 
-        public float Quantity { get; set; }
-
         public string Name { get; set; }
 
         public string Manufacturer { get; set; }
-
-        public float Rating { get; set; }
 
         public string BasicDescription { get; set; }
     }

@@ -1533,6 +1533,7 @@ namespace GameShop.ViewModels
 
         private async void ReportOrderClick()
         {
+
             Check tempReportCheck = null;
             ModelUPGRADEOrder tempReportOrder = null;
 
@@ -1564,30 +1565,36 @@ namespace GameShop.ViewModels
                 var tempOrder = ReadingDataOrder(FindByValueOrder.idCheck, tempReportOrder.idCheck);
                 tempCollectionOrders = ConvertOrderAndOrderUPGRADE.ConvertFromOrderCollectionInOrderUPGRADECollection(tempOrder);
             }
-            string idCheck = "Чек # " + checkReport.idCheck.ToString();
-            string NameCompany = $"❖GameShop\t{idCheck}\t\t\t\t\t\t\t\t{checkReport.Data}\n";
-            string trait = "--------------------------------------------------------------------------------------------------------\n";
-            string Orders = "";
 
-            foreach (var item in tempCollectionOrders)
+            if (tempReportCheck != null || tempReportOrder != null)
             {
-                Orders = Orders + $"# {item.idOrder}  Назв.: {item.NameProduct}\tЛогин:{item.LoginUser}  Кол-во:{item.Quantity}  Сумма:{item.Price}\n";
+                string idCheck = "Чек # " + checkReport.idCheck.ToString();
+                string NameCompany = $"❖GameShop\t{idCheck}\t\t\t\t\t\t\t\t{checkReport.Data}\n";
+                string trait = "--------------------------------------------------------------------------------------------------------\n";
+                string Orders = "";
+
+                foreach (var item in tempCollectionOrders)
+                {
+                    Orders = Orders + $"# {item.idOrder}  Назв.: {item.NameProduct}\tЛогин:{item.LoginUser}  Кол-во:{item.Quantity}  Сумма:{item.Price}\n";
+                }
+
+                string Check = $"\nИтого: {checkReport.Sum}";
+
+                await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    VisibilityStackPanelReport = Visibility.Visible;
+
+                    if (DataGridOrderUPGRADE != null)
+                        DataGridOrderUPGRADE.Visibility = Visibility.Collapsed;
+
+                    if (DataGridCheck != null)
+                        DataGridCheck.Visibility = Visibility.Collapsed;
+
+                    TextBoxTextReport = NameCompany + trait + Orders + trait + Check;
+                });
             }
-
-            string Check = $"\nИтого: {checkReport.Sum}";
-
-            await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                VisibilityStackPanelReport = Visibility.Visible;
-
-                if (DataGridOrderUPGRADE != null)
-                    DataGridOrderUPGRADE.Visibility = Visibility.Collapsed;
-
-                if (DataGridCheck != null)
-                    DataGridCheck.Visibility = Visibility.Collapsed;
-                
-                TextBoxTextReport = NameCompany + trait + Orders + trait + Check;
-            });
+            else
+                ShowInfoBar(ControlPageInfoBar.Error("Cоздать отчёт невозможно", "Выберете поле в таблице и повторите попытку"));
         }
 
         public ICommand CloseReport => new RelayCommand(CloseReportClick);
@@ -1611,5 +1618,9 @@ namespace GameShop.ViewModels
         public ICommand NavigateToStaffPage => new RelayCommand(NavigateToStaffPageClick);
 
         private void NavigateToStaffPageClick() => NavigationService.Navigate(typeof(ControlPanelStaffPage));
+
+        public ICommand NavigateToProductPage => new RelayCommand(NavigateToProductPageClick);
+
+        private void NavigateToProductPageClick() => NavigationService.Navigate(typeof(ProductControlPanelPage));
     }
 }

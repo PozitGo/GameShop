@@ -145,4 +145,8 @@
     <value>ControlPanelStaff</value>
     <comment>Navigation view item name for ControlPanelStaff</comment>
   </data>
+  <data name="Shell_ProductControlPanel.Content" xml:space="preserve">
+    <value>ProductControlPanel</value>
+    <comment>Navigation view item name for ProductControlPanel</comment>
+  </data>
 </root>
