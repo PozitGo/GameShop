@@ -388,6 +388,9 @@ namespace GameShop.ViewModels
                 {
                     if (DataGridCollectionProduct.Visibility == Visibility.Collapsed)
                         DataGridCollectionProduct.Visibility = Visibility.Visible;
+
+                    await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ImageAddProduct.Clear());
+                    await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => EncryptedImages.Clear());
                     InitializationProductCollection();
                 }
                 else
@@ -406,16 +409,64 @@ namespace GameShop.ViewModels
 
             if(IsAddMode)
             {
-                if(DataGridCollectionCategory.Visibility == Visibility.Visible)
+                if (AddTextBoxTextNameProduct != null && AddTextBoxTextNameProduct != "" && AddTextBoxTextManufacturer != null && AddTextBoxTextManufacturer != "" && AddTextBoxTextPrice != null && AddTextBoxTextPrice != "" && AddTextBoxTextDescription != null && AddTextBoxTextDescription != "")
                 {
-                    if(CategoryCollection.Count != 0 && CategoryCollection != null)
+                    if (int.Parse(AddTextBoxTextPrice) > 0)
                     {
-                        DataBaseRequstCategory.SaveNewItemCategoryByDB(CategoryCollection[0]);
+                        bool ResultSavePhoto = true;
+                        if (AddComboBoxTextNameCategory != null && AddComboBoxTextNameCategory != "")
+                        {
+                            Product product = new Product();
+                            Task task = Task.Factory.StartNew(() =>
+                            {
+                                product.idProduct = DataBaseRequstProduct.MaxIdProduct() + 1;
+                                product.Name = AddTextBoxTextNameProduct;
+                                product.Price = double.Parse(AddTextBoxTextPrice);
+                                product.Manufacturer = AddTextBoxTextManufacturer;
+                                product.BasicDescription = AddTextBoxTextDescription;
+
+                                for (int i = 0; i < NameCategory.Count; i++)
+                                {
+                                    if (NameCategory[0] == AddComboBoxTextNameCategory)
+                                    {
+                                        product.idCategory = i + 1;
+                                        break;
+                                    }
+
+                                }
+
+                                DataBaseRequstProduct.SaveNewItemProductByDB(product);
+                                if (EncryptedImages.Count != 0)
+                                    ResultSavePhoto = DataBasePhotoRequst.SavePhoto(EncryptedImages, product.idProduct);
+                            });
+
+                            task.Wait();
+
+                            IsVisibleProduct = true;
+                            NoEditModeClick(obj);
+
+                            if (ResultSavePhoto)
+                            {
+                                ShowInfoBar(ControlPageInfoBar.Accept("Товар добавлен", ""));
+                            }
+                            else
+                            {
+                                ShowInfoBar(ControlPageInfoBar.Warning("Одна или несколько фотографий не были добавлены", "Размер бинарных данных больше 65кб"));
+                            }
+                        }
+                        else
+                        {
+                            ShowInfoBar(ControlPageInfoBar.Error("Не выбрана категория", ""));
+                        }
+                    }
+                    else
+                    {
+                        ShowInfoBar(ControlPageInfoBar.Error("Цена не может быть меньше 0", ""));
                     }
                 }
                 else
                 {
-                    
+                    ShowInfoBar(ControlPageInfoBar.Error("Не все поля заполнены", ""));
                 }
             }
             else if(EditProduct || EditCategory)

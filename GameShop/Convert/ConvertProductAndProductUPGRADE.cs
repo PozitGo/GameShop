@@ -35,9 +35,13 @@ namespace GameShop.Convert
                     ProductUPGRADE[i].BasicDescription = Product[i].BasicDescription;
 
                     var tempImage = new List<BitmapImage>();
-                    foreach (var item in DataBasePhotoRequst.ReadPhoto(Product[i].idProduct)) tempImage.Add(ImageConverter.GetBitmapAsync(item));
+                    var temp = DataBasePhotoRequst.ReadPhoto(Product[i].idProduct);
+                    if(temp != null)
+                    {
+                        foreach (var item in DataBasePhotoRequst.ReadPhoto(Product[i].idProduct)) tempImage.Add(ImageConverter.GetBitmapAsync(item));
 
-                    ProductUPGRADE[i].PhotoProduct = tempImage;
+                        ProductUPGRADE[i].PhotoProduct = tempImage;
+                    }
                 }
             };
 
@@ -68,21 +72,9 @@ namespace GameShop.Convert
             return Product;
         }
 
-        public static ModelUPGRADEProduct ConvertFromProductInProductUPGRADE(Product product, int idProduct = -1)
+        public static ModelUPGRADEProduct ConvertFromProductInProductUPGRADE(Product product)
         {
             ModelUPGRADEProduct ProductU = new ModelUPGRADEProduct();
-
-            if (idProduct == -1)
-            {
-                if (product.idProduct != 0)
-                    ProductU.idProduct = product.idProduct;
-                else
-                    ProductU.idProduct = 1;
-            }
-            else
-            {
-                ProductU.idProduct = idProduct;
-            }
 
             ProductU.idProduct = product.idProduct;
             ProductU.idCategory = product.idCategory;
@@ -93,9 +85,14 @@ namespace GameShop.Convert
             ProductU.BasicDescription = product.BasicDescription;
             
             var tempImage = new List<BitmapImage>();
-            foreach (var item in DataBasePhotoRequst.ReadPhoto(ProductU.idProduct)) tempImage.Add(ImageConverter.GetBitmapAsync(item));
+            var temp = DataBasePhotoRequst.ReadPhoto(ProductU.idProduct);
+            
+            if(temp != null)
+            {
+                foreach (var item in temp) tempImage.Add(ImageConverter.GetBitmapAsync(item));
 
-            ProductU.PhotoProduct = tempImage;
+                ProductU.PhotoProduct = tempImage;
+            }
 
             return ProductU;
         }

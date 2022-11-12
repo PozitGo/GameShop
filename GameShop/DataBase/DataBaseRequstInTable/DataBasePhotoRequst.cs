@@ -76,6 +76,46 @@ namespace GameShop.DataBase.DataBaseRequstInTable
 
             return PhotoBytes;
         }
+
+        public static void SavePhoto(byte[] Photo, int idProduct)
+        {
+            DataBaseConnect db = new DataBaseConnect();
+            MySqlCommand command = new MySqlCommand();
+
+            command = new MySqlCommand($"INSERT INTO `photoproduct` (`idProduct`, `PhotoProduct`) VALUES (@idProduct, @PhotoProduct)", db.IsConnection());
+
+            command.Parameters.Add(new MySqlParameter("@idProduct", MySqlDbType.Int32));
+            command.Parameters["@idProduct"].Value = idProduct;
+
+            command.Parameters.Add(new MySqlParameter("@PhotoProduct", MySqlDbType.Blob));
+            command.Parameters["@PhotoProduct"].Value = Photo;
+
+            command.ExecuteNonQuery();
+
+            command.Parameters.Clear();
+        }
+
+        public static void SavePhoto(List<byte[]> Photo, int idProduct)
+        {
+            DataBaseConnect db = new DataBaseConnect();
+            MySqlCommand command = new MySqlCommand();
+
+            for (int i = 0; i < Photo.Count; i++)
+            {
+                command = new MySqlCommand($"INSERT INTO `photoproduct` (`idProduct`, `PhotoProduct`) VALUES (@idProduct, @PhotoProduct)", db.IsConnection());
+
+                command.Parameters.Add(new MySqlParameter("@idProduct", MySqlDbType.Int32));
+                command.Parameters["@idProduct"].Value = idProduct;
+
+                command.Parameters.Add(new MySqlParameter("@PhotoProduct", MySqlDbType.Blob));
+                command.Parameters["@PhotoProduct"].Value = Photo[i];
+
+                command.ExecuteNonQuery();
+
+                command.Parameters.Clear();
+            }
+        }
+    }
     }
     
 }

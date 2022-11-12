@@ -305,5 +305,15 @@ namespace GameShop.DataBase.DataBaseRequstInTable
 
             command.Parameters.Clear();
         }
+
+        public static int MaxIdProduct()
+        {
+            DataBaseConnect db = new DataBaseConnect();
+            MySqlCommand command = new MySqlCommand();
+
+            command = new MySqlCommand($"SELECT MAX(`idProduct`) FROM `photoproduct`", db.IsConnection());
+
+            return (int)command.ExecuteScalar();
+        }
     }
 }
