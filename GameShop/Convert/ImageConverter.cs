@@ -8,6 +8,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
+using System.Collections.ObjectModel;
 
 namespace GameShop.Convert
 {
@@ -38,7 +39,7 @@ namespace GameShop.Convert
 
             return bitmapImage;
         }
-
+        
         public static List<ImageSource> CreateImageSources(List<byte[]> imagesData)
         {
             List<ImageSource> imageSources = new List<ImageSource>();

@@ -18,7 +18,7 @@ namespace GameShop.DataBase.DataBaseRequstInTable
 
             string NameFieldByTable;
             ObservableCollection<Product> Collection = new ObservableCollection<Product>();
-
+            
             switch (readBy)
             {
                 case FindByValueProduct.idProduct:

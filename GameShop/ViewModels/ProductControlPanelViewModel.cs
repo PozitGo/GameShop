@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight.Command;
 using GameShop.Convert;
+using GameShop.DataBase;
 using GameShop.DataBase.DataBaseRequstInTable;
 using GameShop.Enum;
 using GameShop.Model;
@@ -7,12 +8,20 @@ using GameShop.ViewModels.InfoBars;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using Microsoft.UI.Xaml.Controls;
+using Org.BouncyCastle.Crypto.IO;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Windows.Storage.Streams;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace GameShop.ViewModels
 {
@@ -21,6 +30,12 @@ namespace GameShop.ViewModels
         public ObservableCollection<ModelUPGRADEProduct> ProductCollection = new ObservableCollection<ModelUPGRADEProduct>();
 
         public ObservableCollection<Category> CategoryCollection = new ObservableCollection<Category>();
+
+        public ObservableCollection<string> NameCategory = new ObservableCollection<string>();
+
+        public List<byte[]> EncryptedImages = new List<byte[]>();
+
+        public ObservableCollection<BitmapImage> ImageAddProduct = new ObservableCollection<BitmapImage>();
 
         DataGrid DataGridCollectionProduct = new DataGrid();
 
@@ -98,6 +113,49 @@ namespace GameShop.ViewModels
             get => _PanelAddProduct;
             set => SetProperty(ref _PanelAddProduct, value);
         }
+
+        private Visibility _VisibilitySaveButton;
+        public Visibility VisibilitySaveButton
+        {
+            get => _VisibilitySaveButton;
+            set => SetProperty(ref _VisibilitySaveButton, value);
+        }
+
+        private string _AddTextBoxTextNameProduct;
+        public string AddTextBoxTextNameProduct
+        {
+            get => _AddTextBoxTextNameProduct;
+            set => SetProperty(ref _AddTextBoxTextNameProduct, value);
+        }
+
+        private string _AddTextBoxTextManufacturer;
+        public string AddTextBoxTextManufacturer
+        {
+            get => _AddTextBoxTextManufacturer;
+            set => SetProperty(ref _AddTextBoxTextManufacturer, value);
+        }
+
+        private string _AddTextBoxTextPrice;
+        public string AddTextBoxTextPrice
+        {
+            get => _AddTextBoxTextPrice;
+            set => SetProperty(ref _AddTextBoxTextPrice, value);
+        }
+
+        private string _AddComboBoxTextNameCategory;
+        public string AddComboBoxTextNameCategory
+        {
+            get => _AddComboBoxTextNameCategory;
+            set => SetProperty(ref _AddComboBoxTextNameCategory, value);
+        }
+
+        private string _AddTextBoxTextDescription;
+        public string AddTextBoxTextDescription
+        {
+            get => _AddTextBoxTextDescription;
+            set => SetProperty(ref _AddTextBoxTextDescription, value);
+        }
+
         public ProductControlPanelViewModel()
         {
             VisibilityEditsMode = Visibility.Collapsed;
@@ -105,6 +163,7 @@ namespace GameShop.ViewModels
             VisibilityExitMode = Visibility.Collapsed;
             VisibilityNoEditMode = Visibility.Visible;
             PanelAddProduct = Visibility.Collapsed;
+            VisibilitySaveButton = Visibility.Collapsed;
 
             InfoBarIsOpen = false;
         }
@@ -142,6 +201,13 @@ namespace GameShop.ViewModels
                     CategoryCollection.Add(item);
                 });
             }
+        }
+
+        private async void InitializationNameCategoryCollection()
+        {
+            NameCategory.Clear();
+
+            foreach (var item in UniversalRequst.ReadingAllToIdFromTableString("category", "NameCategory")) await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => NameCategory.Add(item));
         }
         public ICommand EditMode => new RelayCommand<DataGrid>(EditModeClick);
         private void EditModeClick(DataGrid obj)
@@ -195,6 +261,7 @@ namespace GameShop.ViewModels
                 VisibilityNoEditMode = Visibility.Collapsed;
                 VisibilityExitMode = Visibility.Visible;
                 VisibilityAddMode = Visibility.Collapsed;
+                VisibilitySaveButton = Visibility.Visible;
 
                 ShowInfoBar(ControlPageInfoBar.Information("Режим редактирования включен", ""));
             }
@@ -225,15 +292,70 @@ namespace GameShop.ViewModels
             VisibilityAddMode = Visibility.Visible;
             VisibilityNoEditMode = Visibility.Collapsed;
             VisibilityExitMode = Visibility.Visible;
+            VisibilitySaveButton = Visibility.Visible;
 
         }
-        
+
         public ICommand AddProduct => new RelayCommand<DataGrid>(AddProductClick);
         private void AddProductClick(DataGrid obj)
         {
             DataGridCollectionProduct = obj;
 
+            InitializationNameCategoryCollection();
+
             PanelAddProduct = Visibility.Visible;
+        }
+
+        public ICommand AddPhotoInProduct => new RelayCommand<DataGrid>(AddPhotoInProductClick);
+        private async void AddPhotoInProductClick(DataGrid obj)
+        {
+            DataGridCollectionProduct = obj;
+            Image image = new Image();
+
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
+            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary;
+
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".png");
+
+            Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
+
+            if (file != null)
+            {
+                byte[] fileBytes = null;
+
+                using (var stream = await file.OpenReadAsync())
+                {
+                    fileBytes = new byte[stream.Size];
+                    using (var reader = new DataReader(stream))
+                    {
+                        await reader.LoadAsync((uint)stream.Size);
+                        reader.ReadBytes(fileBytes);
+                    }
+                }
+                
+                EncryptedImages.Add(fileBytes);
+
+                await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ImageAddProduct.Clear());
+
+                for (int i = 0; i < EncryptedImages.Count; i++) await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ImageAddProduct.Add(ImageConverter.GetBitmapAsync(EncryptedImages[i])));
+            }
+    }
+
+        public ICommand AddCategory => new RelayCommand<DataGrid>(AddCategoryClick);
+        private void AddCategoryClick(DataGrid obj)
+        {
+            DataGridCollectionCategory = obj;
+            CategoryCollection.Clear();
+            CategoryCollection.Add(new Category());
+
+            DataGridCollectionCategory.IsReadOnly = false;
+
+            if (DataGridCollectionCategory.Columns.Count != 0)
+                DataGridCollectionCategory.Columns[0].Visibility = Visibility.Collapsed;
+
+            DataGridCollectionCategory.Visibility = Visibility.Visible;
         }
 
         public ICommand NoEditMode => new RelayCommand<DataGrid>(NoEditModeClick);
@@ -245,7 +367,9 @@ namespace GameShop.ViewModels
             VisibilityNoEditMode = Visibility.Visible;
             VisibilityExitMode = Visibility.Collapsed;
             PanelAddProduct = Visibility.Collapsed;
+            VisibilitySaveButton = Visibility.Collapsed;
             ShowInfoBar(ControlPageInfoBar.Information("Режим редактирования выключен", ""));
+            
             if (EditProduct)
             {
                 if (DataGridCollectionProduct.Columns.Count != 0)
@@ -258,7 +382,7 @@ namespace GameShop.ViewModels
                     DataGridCollectionCategory.Columns[0].Visibility = Visibility.Visible;
                 InitializationCategoryCollection();
             }
-            else if(IsAddMode)
+            else if (IsAddMode)
             {
                 if (IsVisibleProduct)
                 {
@@ -272,6 +396,31 @@ namespace GameShop.ViewModels
                         DataGridCollectionCategory.Visibility = Visibility.Visible;
                     InitializationCategoryCollection();
                 }
+            }
+        }
+
+        public ICommand SaveButton => new RelayCommand<DataGrid>(SaveButtonClick);
+        private void SaveButtonClick(DataGrid obj)
+        {
+            DataGridCollectionProduct = obj;
+
+            if(IsAddMode)
+            {
+                if(DataGridCollectionCategory.Visibility == Visibility.Visible)
+                {
+                    if(CategoryCollection.Count != 0 && CategoryCollection != null)
+                    {
+                        DataBaseRequstCategory.SaveNewItemCategoryByDB(CategoryCollection[0]);
+                    }
+                }
+                else
+                {
+                    
+                }
+            }
+            else if(EditProduct || EditCategory)
+            {
+                
             }
         }
 

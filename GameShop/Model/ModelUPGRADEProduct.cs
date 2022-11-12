@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace GameShop.Model
 {
@@ -11,6 +12,6 @@ namespace GameShop.Model
     {
         public string NameCategory { get; set; }
 
-        public List<ImageSource> PhotoProduct { get; set; }
+        public List<BitmapImage> PhotoProduct { get; set; }
     }
 }

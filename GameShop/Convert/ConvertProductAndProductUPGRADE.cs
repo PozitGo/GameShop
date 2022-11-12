@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GameShop.DataBase.DataBaseRequstInTable;
 using Microsoft.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace GameShop.Convert
 {
@@ -32,7 +33,11 @@ namespace GameShop.Convert
                     ProductUPGRADE[i].Price = Product[i].Price;
                     ProductUPGRADE[i].Manufacturer = Product[i].Manufacturer;
                     ProductUPGRADE[i].BasicDescription = Product[i].BasicDescription;
-                    ProductUPGRADE[i].PhotoProduct = ImageConverter.CreateImageSources(DataBasePhotoRequst.ReadPhoto(Product[i].idProduct));
+
+                    var tempImage = new List<BitmapImage>();
+                    foreach (var item in DataBasePhotoRequst.ReadPhoto(Product[i].idProduct)) tempImage.Add(ImageConverter.GetBitmapAsync(item));
+
+                    ProductUPGRADE[i].PhotoProduct = tempImage;
                 }
             };
 
@@ -86,7 +91,11 @@ namespace GameShop.Convert
             ProductU.Price = product.Price;
             ProductU.Manufacturer = product.Manufacturer;
             ProductU.BasicDescription = product.BasicDescription;
-            ProductU.PhotoProduct = ImageConverter.CreateImageSources(DataBasePhotoRequst.ReadPhoto(product.idProduct));
+            
+            var tempImage = new List<BitmapImage>();
+            foreach (var item in DataBasePhotoRequst.ReadPhoto(ProductU.idProduct)) tempImage.Add(ImageConverter.GetBitmapAsync(item));
+
+            ProductU.PhotoProduct = tempImage;
 
             return ProductU;
         }
