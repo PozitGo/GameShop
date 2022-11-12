@@ -166,7 +166,7 @@ namespace GameShop.ViewModels
             VisibilitySaveButton = Visibility.Collapsed;
 
             InfoBarIsOpen = false;
-        }
+        } 
 
         private async void InitializationProductCollection()
         {
