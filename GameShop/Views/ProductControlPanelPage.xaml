@@ -65,7 +65,7 @@
                 <AppBarSeparator Visibility="{x:Bind ViewModel.VisibilityEditsMode, Mode=TwoWay}"/>
                 <AppBarButton Icon="Delete" Label="Удалить выбранный объект" FontFamily="Cascadia Code SemiBold" Visibility="{x:Bind ViewModel.VisibilityEditsMode, Mode=TwoWay}"/>
                 <AppBarSeparator Visibility="{x:Bind ViewModel.VisibilityEditsMode, Mode=TwoWay}"/>
-                <AppBarButton Icon="Save" Label="Сохранить изменения" FontFamily="Cascadia Code SemiBold" Visibility="{x:Bind ViewModel.VisibilitySaveButton, Mode=TwoWay}" Command="{x:Bind ViewModel.SaveButton, Mode=OneWay}" CommandParameter="{x:Bind ProductMainTable, Mode=OneWay}"/>
+                <AppBarButton Icon="Save" Label="Сохранить" FontFamily="Cascadia Code SemiBold" Visibility="{x:Bind ViewModel.VisibilitySaveButton, Mode=TwoWay}" Command="{x:Bind ViewModel.SaveButton, Mode=OneWay}" CommandParameter="{x:Bind ProductMainTable, Mode=OneWay}"/>
                 <AppBarSeparator Visibility="{x:Bind ViewModel.VisibilitySaveButton, Mode=TwoWay}"/>
                 <AppBarButton Icon="Clear" Label="Выйти из режима" FontFamily="Cascadia Code SemiBold" Visibility="{x:Bind ViewModel.VisibilityExitMode, Mode=TwoWay}" Command="{x:Bind ViewModel.NoEditMode, Mode=OneWay}" CommandParameter="{x:Bind ProductMainTable, Mode=OneWay}"/>
                 <AppBarSeparator/>
@@ -108,14 +108,13 @@
                         </StackPanel>
                         <StackPanel  Width="200" Spacing="30">
                             <TextBox Header="Цена за ед." FontFamily="Cascadia Code SemiBold" Text="{x:Bind ViewModel.AddTextBoxTextPrice, Mode=TwoWay}"/>
-                            <ComboBox Header="Категория"  Width="200" FontFamily="Cascadia Code SemiBold" ItemsSource="{x:Bind ViewModel.NameCategory, Mode=OneWay}" Text="{x:Bind ViewModel.AddComboBoxTextNameCategory, Mode=TwoWay}"/>
+                            <ComboBox Header="Категория"  Width="200" FontFamily="Cascadia Code SemiBold" ItemsSource="{x:Bind ViewModel.NameCategory, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.AddComboBoxTextNameCategory, Mode=TwoWay}"/>
                         </StackPanel>
                     </StackPanel>
                 </StackPanel>
 
                 <StackPanel Grid.Row="2" Spacing="10" Padding="10">
                     <TextBox Header="Описание" FontFamily="Cascadia Code SemiBold" Height="200" Text="{x:Bind ViewModel.AddTextBoxTextDescription, Mode=TwoWay}"/>
-                    <Button Content="Добавить" Width="200" FontFamily="Cascadia Code SemiBold" HorizontalAlignment="Left"/>
                 </StackPanel>
             </Grid>
             <controls:DataGrid

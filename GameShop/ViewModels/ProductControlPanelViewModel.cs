@@ -359,7 +359,7 @@ namespace GameShop.ViewModels
         }
 
         public ICommand NoEditMode => new RelayCommand<DataGrid>(NoEditModeClick);
-        private void NoEditModeClick(DataGrid obj)
+        private async void NoEditModeClick(DataGrid obj)
         {
             DataGridCollectionProduct = obj;
             VisibilityEditsMode = Visibility.Collapsed;
@@ -391,6 +391,7 @@ namespace GameShop.ViewModels
 
                     await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ImageAddProduct.Clear());
                     await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => EncryptedImages.Clear());
+                    
                     InitializationProductCollection();
                 }
                 else

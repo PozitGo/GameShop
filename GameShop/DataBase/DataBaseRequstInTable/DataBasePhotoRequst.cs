@@ -1,10 +1,6 @@
-﻿using GameShop.Convert;
-using MySql.Data.MySqlClient;
+﻿using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Data;
-using System.Drawing;
-using System.IO;
-using Windows.UI.Xaml.Media;
 
 namespace GameShop.DataBase.DataBaseRequstInTable
 {
@@ -46,11 +42,11 @@ namespace GameShop.DataBase.DataBaseRequstInTable
 
             int CountPhoto = DataBasePhotoRequst.CountPhotoProduct(idProduct);
 
-            if(CountPhoto == 0)
+            if (CountPhoto == 0)
             {
                 return null;
             }
-            
+
             command = new MySqlCommand($"SELECT `PhotoProduct` FROM `photoproduct` WHERE `idProduct` = @idProduct", db.IsConnection());
 
             command.Parameters.Add(new MySqlParameter("@idProduct", MySqlDbType.Int32));
@@ -59,8 +55,8 @@ namespace GameShop.DataBase.DataBaseRequstInTable
             adapter.SelectCommand = command;
             adapter.Fill(table);
 
-            List<byte[]> PhotoBytes = new List<byte[]> ();
-            
+            List<byte[]> PhotoBytes = new List<byte[]>();
+
             if (table.Rows.Count > 0)
             {
                 MySqlDataReader readerBy = command.ExecuteReader();
@@ -95,7 +91,7 @@ namespace GameShop.DataBase.DataBaseRequstInTable
             command.Parameters.Clear();
         }
 
-        public static void SavePhoto(List<byte[]> Photo, int idProduct)
+        public static bool SavePhoto(List<byte[]> Photo, int idProduct)
         {
             DataBaseConnect db = new DataBaseConnect();
             MySqlCommand command = new MySqlCommand();
@@ -110,12 +106,21 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                 command.Parameters.Add(new MySqlParameter("@PhotoProduct", MySqlDbType.Blob));
                 command.Parameters["@PhotoProduct"].Value = Photo[i];
 
-                command.ExecuteNonQuery();
+                try
+                {
+                    command.ExecuteNonQuery();
+                    command.Parameters.Clear();
+                }
+                catch (System.Exception)
+                {
 
-                command.Parameters.Clear();
+                    return false;
+                }
+
             }
+
+            return true;
         }
     }
-    }
-    
 }
+

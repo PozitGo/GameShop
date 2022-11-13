@@ -3,7 +3,6 @@ using GameShop.Model;
 using MySql.Data.MySqlClient;
 using System.Collections.ObjectModel;
 using System.Data;
-using System.Threading.Tasks;
 
 namespace GameShop.DataBase.DataBaseRequstInTable
 {
@@ -18,7 +17,7 @@ namespace GameShop.DataBase.DataBaseRequstInTable
 
             string NameFieldByTable;
             ObservableCollection<Product> Collection = new ObservableCollection<Product>();
-            
+
             switch (readBy)
             {
                 case FindByValueProduct.idProduct:
@@ -177,143 +176,138 @@ namespace GameShop.DataBase.DataBaseRequstInTable
             return Collection;
         }
 
-        public static Task<bool> SaveNewItemProductByDB(Product value)
+        public static void SaveNewItemProductByDB(Product value)
         {
-            //потом добавить делегат в принемаемые параметры и инициализировать коллекцию вместе с записью
-            return Task.Factory.StartNew(() =>
+
+            if (value != null)
             {
-                if (value != null)
-                {
-                    DataBaseConnect db = new DataBaseConnect();
-                    MySqlCommand command = new MySqlCommand("INSERT INTO `product` (idProduct, idCategory, Price, Quantity, Name, Manufacturer, Rating, BasicDescription) VALUES (@idProduct, @idCategory, @Price, @Quantity, @Name, @Manufacturer, @Rating, @BasicDescription)", db.IsConnection());
-                    command.Parameters.Add("@idProduct", MySqlDbType.Int32).Value = value.idProduct;
-                    command.Parameters.Add("@idCategory", MySqlDbType.Int32).Value = value.idCategory;
-                    command.Parameters.Add("@Price", MySqlDbType.Int32).Value = value.Price;
-                    command.Parameters.Add("@Name", MySqlDbType.Double).Value = value.Name;
-                    command.Parameters.Add("@Manufacturer", MySqlDbType.Int32).Value = value.Manufacturer;
-                    command.Parameters.Add("@BasicDescription", MySqlDbType.Int32).Value = value.BasicDescription;
+                DataBaseConnect db = new DataBaseConnect();
+                MySqlCommand command = new MySqlCommand("INSERT INTO `product` (idProduct, idCategory, Price, Name, Manufacturer, BasicDescription) VALUES (@idProduct, @idCategory, @Price, @Name, @Manufacturer, @BasicDescription)", db.IsConnection());
+                command.Parameters.Add("@idProduct", MySqlDbType.Int32).Value = value.idProduct;
+                command.Parameters.Add("@idCategory", MySqlDbType.Int32).Value = value.idCategory;
+                command.Parameters.Add("@Price", MySqlDbType.Double).Value = value.Price;
+                command.Parameters.Add("@Name", MySqlDbType.VarChar).Value = value.Name;
+                command.Parameters.Add("@Manufacturer", MySqlDbType.VarChar).Value = value.Manufacturer;
+                command.Parameters.Add("@BasicDescription", MySqlDbType.VarChar).Value = value.BasicDescription;
 
-                    if (command.ExecuteNonQuery() == 7)
-                        return true;
-                }
-                return false;
-            });
-        }
-
-        public static T FindValueByidProduct<T>(int idProduct, FindByValueProduct findBy)
-        {
-            DataBaseConnect db = new DataBaseConnect();
-            MySqlCommand command = new MySqlCommand();
-            DataTable table = new DataTable();
-            MySqlDataAdapter adapter = new MySqlDataAdapter();
-
-            command.Parameters.Clear();
-
-            string NameField = "";
-            T Data = default;
-            switch (findBy)
-            {
-                case FindByValueProduct.idCategory:
-                    NameField = nameof(FindByValueProduct.idCategory);
-                    command = new MySqlCommand($"SELECT {NameField} FROM `product` WHERE @idProduct = idProduct", db.IsConnection());
-                    break;
-                case FindByValueProduct.Price:
-                    NameField = nameof(FindByValueProduct.Price);
-                    command = new MySqlCommand($"SELECT {NameField} FROM `product` WHERE @idProduct = idProduct", db.IsConnection());
-                    break;
-                case FindByValueProduct.Quantity:
-                    NameField = nameof(FindByValueProduct.Quantity);
-                    command = new MySqlCommand($"SELECT {NameField} FROM `product` WHERE @idProduct = idProduct", db.IsConnection());
-                    break;
-                case FindByValueProduct.Name:
-                    NameField = nameof(FindByValueProduct.Name);
-                    command = new MySqlCommand($"SELECT {NameField} FROM `product` WHERE @idProduct = idProduct", db.IsConnection());
-                    break;
-                case FindByValueProduct.Manufacturer:
-                    NameField = nameof(FindByValueProduct.Manufacturer);
-                    command = new MySqlCommand($"SELECT {NameField} FROM `product` WHERE @idProduct = idProduct", db.IsConnection());
-                    break;
-                case FindByValueProduct.BasicDescription:
-                    NameField = nameof(FindByValueProduct.BasicDescription);
-                    command = new MySqlCommand($"SELECT {NameField} FROM `product` WHERE @idProduct = idProduct", db.IsConnection());
-                    break;
-            }
-
-
-            command.Parameters.Add(new MySqlParameter("@idProduct", MySqlDbType.Int32));
-            command.Parameters["@idProduct"].Value = idProduct;
-
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-
-            if (table.Rows.Count > 0)
-            {
-                MySqlDataReader readerBy = command.ExecuteReader();
-                for (int i = 0; readerBy.Read(); i++)
-                {
-                    Data = (T)readerBy[NameField];
-                }
-            }
-
-            command.Parameters.Clear();
-            return Data;
-        }
-
-        public static void UpdateItemInTableProduct<T>(FindByValueProduct findBy, T newValue, int IdPrimaryKey)
-        {
-            DataBaseConnect db = new DataBaseConnect();
-            MySqlCommand command = new MySqlCommand();
-
-
-            command = new MySqlCommand($"UPDATE `product` SET `{findBy.ToString()}` = @newValue WHERE `{nameof(FindByValueProduct.idProduct)}` = @idProduct", db.IsConnection());
-
-            command.Parameters.Add(new MySqlParameter("@idProduct", MySqlDbType.Int32));
-            command.Parameters["@idProduct"].Value = IdPrimaryKey;
-
-            try
-            {
-                command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Double));
-                command.Parameters["@newValue"].Value = newValue;
                 command.ExecuteNonQuery();
             }
-            catch
+        }
+
+            public static T FindValueByidProduct<T>(int idProduct, FindByValueProduct findBy)
             {
+                DataBaseConnect db = new DataBaseConnect();
+                MySqlCommand command = new MySqlCommand();
+                DataTable table = new DataTable();
+                MySqlDataAdapter adapter = new MySqlDataAdapter();
+
+                command.Parameters.Clear();
+
+                string NameField = "";
+                T Data = default;
+                switch (findBy)
+                {
+                    case FindByValueProduct.idCategory:
+                        NameField = nameof(FindByValueProduct.idCategory);
+                        command = new MySqlCommand($"SELECT {NameField} FROM `product` WHERE @idProduct = idProduct", db.IsConnection());
+                        break;
+                    case FindByValueProduct.Price:
+                        NameField = nameof(FindByValueProduct.Price);
+                        command = new MySqlCommand($"SELECT {NameField} FROM `product` WHERE @idProduct = idProduct", db.IsConnection());
+                        break;
+                    case FindByValueProduct.Quantity:
+                        NameField = nameof(FindByValueProduct.Quantity);
+                        command = new MySqlCommand($"SELECT {NameField} FROM `product` WHERE @idProduct = idProduct", db.IsConnection());
+                        break;
+                    case FindByValueProduct.Name:
+                        NameField = nameof(FindByValueProduct.Name);
+                        command = new MySqlCommand($"SELECT {NameField} FROM `product` WHERE @idProduct = idProduct", db.IsConnection());
+                        break;
+                    case FindByValueProduct.Manufacturer:
+                        NameField = nameof(FindByValueProduct.Manufacturer);
+                        command = new MySqlCommand($"SELECT {NameField} FROM `product` WHERE @idProduct = idProduct", db.IsConnection());
+                        break;
+                    case FindByValueProduct.BasicDescription:
+                        NameField = nameof(FindByValueProduct.BasicDescription);
+                        command = new MySqlCommand($"SELECT {NameField} FROM `product` WHERE @idProduct = idProduct", db.IsConnection());
+                        break;
+                }
+
+
+                command.Parameters.Add(new MySqlParameter("@idProduct", MySqlDbType.Int32));
+                command.Parameters["@idProduct"].Value = idProduct;
+
+                adapter.SelectCommand = command;
+                adapter.Fill(table);
+
+                if (table.Rows.Count > 0)
+                {
+                    MySqlDataReader readerBy = command.ExecuteReader();
+                    for (int i = 0; readerBy.Read(); i++)
+                    {
+                        Data = (T)readerBy[NameField];
+                    }
+                }
+
+                command.Parameters.Clear();
+                return Data;
+            }
+
+            public static void UpdateItemInTableProduct<T>(FindByValueProduct findBy, T newValue, int IdPrimaryKey)
+            {
+                DataBaseConnect db = new DataBaseConnect();
+                MySqlCommand command = new MySqlCommand();
+
+
+                command = new MySqlCommand($"UPDATE `product` SET `{findBy.ToString()}` = @newValue WHERE `{nameof(FindByValueProduct.idProduct)}` = @idProduct", db.IsConnection());
+
+                command.Parameters.Add(new MySqlParameter("@idProduct", MySqlDbType.Int32));
+                command.Parameters["@idProduct"].Value = IdPrimaryKey;
 
                 try
                 {
-                    command.Parameters.Clear();
-
-                    command.Parameters.Add(new MySqlParameter("@idProduct", MySqlDbType.Int32));
-                    command.Parameters["@idProduct"].Value = IdPrimaryKey;
-
-                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Int32));
+                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Double));
                     command.Parameters["@newValue"].Value = newValue;
                     command.ExecuteNonQuery();
                 }
                 catch
                 {
-                    command.Parameters.Clear();
 
-                    command.Parameters.Add(new MySqlParameter("@idProduct", MySqlDbType.Int32));
-                    command.Parameters["@idProduct"].Value = IdPrimaryKey;
+                    try
+                    {
+                        command.Parameters.Clear();
 
-                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.VarChar));
-                    command.Parameters["@newValue"].Value = newValue;
-                    command.ExecuteNonQuery();
+                        command.Parameters.Add(new MySqlParameter("@idProduct", MySqlDbType.Int32));
+                        command.Parameters["@idProduct"].Value = IdPrimaryKey;
+
+                        command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Int32));
+                        command.Parameters["@newValue"].Value = newValue;
+                        command.ExecuteNonQuery();
+                    }
+                    catch
+                    {
+                        command.Parameters.Clear();
+
+                        command.Parameters.Add(new MySqlParameter("@idProduct", MySqlDbType.Int32));
+                        command.Parameters["@idProduct"].Value = IdPrimaryKey;
+
+                        command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.VarChar));
+                        command.Parameters["@newValue"].Value = newValue;
+                        command.ExecuteNonQuery();
+                    }
                 }
+
+                command.Parameters.Clear();
             }
 
-            command.Parameters.Clear();
-        }
+            public static int MaxIdProduct()
+            {
+                DataBaseConnect db = new DataBaseConnect();
+                MySqlCommand command = new MySqlCommand();
 
-        public static int MaxIdProduct()
-        {
-            DataBaseConnect db = new DataBaseConnect();
-            MySqlCommand command = new MySqlCommand();
+                command = new MySqlCommand($"SELECT MAX(`idProduct`) FROM `photoproduct`", db.IsConnection());
 
-            command = new MySqlCommand($"SELECT MAX(`idProduct`) FROM `photoproduct`", db.IsConnection());
-
-            return (int)command.ExecuteScalar();
+                return (int)command.ExecuteScalar();
+            }
         }
     }
-}
