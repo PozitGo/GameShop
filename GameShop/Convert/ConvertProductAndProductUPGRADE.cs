@@ -33,15 +33,7 @@ namespace GameShop.Convert
                     ProductUPGRADE[i].Price = Product[i].Price;
                     ProductUPGRADE[i].Manufacturer = Product[i].Manufacturer;
                     ProductUPGRADE[i].BasicDescription = Product[i].BasicDescription;
-
-                    var tempImage = new List<BitmapImage>();
-                    var temp = DataBasePhotoRequst.ReadPhoto(Product[i].idProduct);
-                    if(temp != null)
-                    {
-                        foreach (var item in DataBasePhotoRequst.ReadPhoto(Product[i].idProduct)) tempImage.Add(ImageConverter.GetBitmapAsync(item));
-
-                        ProductUPGRADE[i].PhotoProduct = tempImage;
-                    }
+                    ProductUPGRADE[i].PhotoProducts = DataBasePhotoRequst.ReadPhoto(Product[i].idProduct);
                 }
             };
 
@@ -83,16 +75,7 @@ namespace GameShop.Convert
             ProductU.Price = product.Price;
             ProductU.Manufacturer = product.Manufacturer;
             ProductU.BasicDescription = product.BasicDescription;
-            
-            var tempImage = new List<BitmapImage>();
-            var temp = DataBasePhotoRequst.ReadPhoto(ProductU.idProduct);
-            
-            if(temp != null)
-            {
-                foreach (var item in temp) tempImage.Add(ImageConverter.GetBitmapAsync(item));
-
-                ProductU.PhotoProduct = tempImage;
-            }
+            ProductU.PhotoProducts = DataBasePhotoRequst.ReadPhoto(product.idProduct);
 
             return ProductU;
         }

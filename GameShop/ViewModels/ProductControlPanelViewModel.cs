@@ -8,20 +8,15 @@ using GameShop.ViewModels.InfoBars;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using Microsoft.UI.Xaml.Controls;
-using Org.BouncyCastle.Crypto.IO;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
 
 namespace GameShop.ViewModels
 {
@@ -33,9 +28,7 @@ namespace GameShop.ViewModels
 
         public ObservableCollection<string> NameCategory = new ObservableCollection<string>();
 
-        public List<byte[]> EncryptedImages = new List<byte[]>();
-
-        public ObservableCollection<BitmapImage> ImageAddProduct = new ObservableCollection<BitmapImage>();
+        public ObservableCollection<ImageAddProduct> ImageAddProduct = new ObservableCollection<ImageAddProduct>();
 
         DataGrid DataGridCollectionProduct = new DataGrid();
 
@@ -44,6 +37,8 @@ namespace GameShop.ViewModels
         bool EditProduct;
         bool EditCategory;
         bool IsAddMode;
+        bool isAddCategory;
+        bool isAddProduct;
 
         bool IsVisibleProduct;
 
@@ -156,6 +151,13 @@ namespace GameShop.ViewModels
             set => SetProperty(ref _AddTextBoxTextDescription, value);
         }
 
+        public string _PlaceholderTextComboBoxCategory;
+        public string PlaceholderTextComboBoxCategory
+        {
+            get => _PlaceholderTextComboBoxCategory;
+            set => SetProperty(ref _PlaceholderTextComboBoxCategory, value);
+        }
+
         public ProductControlPanelViewModel()
         {
             VisibilityEditsMode = Visibility.Collapsed;
@@ -166,8 +168,26 @@ namespace GameShop.ViewModels
             VisibilitySaveButton = Visibility.Collapsed;
 
             InfoBarIsOpen = false;
-        } 
+        }
 
+        public async void DefaultPhoto()
+        {
+            Windows.Storage.StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/Square150x150Logo.scale-200.png"));
+            ;
+            byte[] fileBytes = null;
+
+            using (var stream = await file.OpenReadAsync())
+            {
+                fileBytes = new byte[stream.Size];
+                using (var reader = new DataReader(stream))
+                {
+                    await reader.LoadAsync((uint)stream.Size);
+                    reader.ReadBytes(fileBytes);
+                }
+            }
+            byte[] temp = new byte[1] { 1 };
+            await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ImageAddProduct.Add(new ImageAddProduct(temp, ImageConverter.GetBitmapAsync(fileBytes))));
+        }
         private async void InitializationProductCollection()
         {
             ProductCollection.Clear();
@@ -226,6 +246,7 @@ namespace GameShop.ViewModels
                         DataGridCollectionProduct.Columns[0].Visibility = Visibility.Collapsed;
                     if (DataGridCollectionCategory.Columns.Count != 0)
                         DataGridCollectionCategory.Columns[0].Visibility = Visibility.Collapsed;
+                    DefaultPhoto();
 
                     Windows.Foundation.IAsyncAction asyncAction = Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
@@ -272,6 +293,114 @@ namespace GameShop.ViewModels
             }
         }
 
+        public ICommand EditSelectedItem => new RelayCommand<DataGrid>(EditSelectedItemButtonClick);
+
+        static ModelUPGRADEProduct OldItemProduct = null;
+        static Category OldItemCategory = null;
+        public static void UpdateItemProduct(ModelUPGRADEProduct OldItem, ModelUPGRADEProduct NewItem)
+        {
+            if (OldItem.Name != NewItem.Name)
+            {
+                Task.Factory.StartNew(() => DataBaseRequstProduct.UpdateItemInTableProduct(FindByValueProduct.Name, NewItem.Name, NewItem.idProduct));
+            }
+
+            if (OldItem.Price != NewItem.Price)
+            {
+                Task.Factory.StartNew(() => DataBaseRequstProduct.UpdateItemInTableProduct(FindByValueProduct.Price, NewItem.Price, NewItem.idProduct));
+            }
+
+            if (OldItem.idCategory != NewItem.idCategory)
+            {
+                Task.Factory.StartNew(() => DataBaseRequstProduct.UpdateItemInTableProduct(FindByValueProduct.idCategory, NewItem.idCategory, NewItem.idProduct));
+            }
+
+            if (OldItem.BasicDescription != NewItem.BasicDescription)
+            {
+                Task.Factory.StartNew(() => DataBaseRequstProduct.UpdateItemInTableProduct(FindByValueProduct.BasicDescription, NewItem.BasicDescription, NewItem.idProduct));
+            }
+
+            if (OldItem.Manufacturer != NewItem.Manufacturer)
+            {
+                Task.Factory.StartNew(() => DataBaseRequstProduct.UpdateItemInTableProduct(FindByValueProduct.Manufacturer, NewItem.Manufacturer, NewItem.idProduct));
+            }
+
+        }
+
+        public static void UpdateItemCategory(Category OldItem, Category NewItem)
+        {
+            if (OldItem.NameCategory != NewItem.NameCategory)
+            {
+                Task.Factory.StartNew(() => DataBaseRequstCategory.UpdateItemInTableCategory(FindByValueCategory.NameCategory, NewItem.NameCategory, NewItem.idCategory));
+            }
+
+            if (OldItem.Description != NewItem.Description)
+            {
+                Task.Factory.StartNew(() => DataBaseRequstCategory.UpdateItemInTableCategory(FindByValueCategory.Description, NewItem.Description, NewItem.idCategory));
+            }
+        }
+        private async void EditSelectedItemButtonClick(DataGrid obj)
+        {
+            DataGridCollectionProduct = obj;
+
+
+            if (EditProduct || EditCategory)
+            {
+                if (EditProduct)
+                {
+                    PanelAddProduct = Visibility.Visible;
+                    DataGridCollectionProduct.Visibility = Visibility.Collapsed;
+                    DataGridCollectionCategory.Visibility = Visibility.Collapsed;
+
+                    await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ImageAddProduct.Clear());
+                    InitializationNameCategoryCollection();
+
+                    OldItemProduct = new ModelUPGRADEProduct(ProductCollection[0]);
+
+                    AddTextBoxTextNameProduct = ProductCollection[0].Name;
+                    AddTextBoxTextManufacturer = ProductCollection[0].Manufacturer;
+                    AddTextBoxTextPrice = ProductCollection[0].Price.ToString();
+                    PlaceholderTextComboBoxCategory = ProductCollection[0].NameCategory;
+                    AddTextBoxTextDescription = ProductCollection[0].BasicDescription;
+
+                    if (ProductCollection[0].PhotoProducts == null)
+                    {
+                        DefaultPhoto();
+                    }
+                    else
+                    {
+                        for (int i = 0; i < ProductCollection[0].PhotoProducts.Count; i++)
+                        {
+                            for (int j = 0; j < ProductCollection[0].PhotoProducts[i].BitPhotoProducts.Count; j++)
+                            {
+                                await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ImageAddProduct.Add(new ImageAddProduct(null, ProductCollection[0].PhotoProducts[i].BitPhotoProducts[i])));
+                            }
+                        }
+                    }
+                }
+                else if (EditCategory)
+                {
+                    if (DataGridCollectionCategory.Columns.Count != 0)
+                        DataGridCollectionCategory.Columns[0].Visibility = Visibility.Collapsed;
+
+                    DataGridCollectionCategory.IsReadOnly = false;
+
+                    OldItemCategory = new Category(CategoryCollection[0].idCategory, CategoryCollection[0].NameCategory, CategoryCollection[0].Description);
+                }
+
+                VisibilityEditsMode = Visibility.Visible;
+                VisibilityNoEditMode = Visibility.Collapsed;
+                VisibilityExitMode = Visibility.Visible;
+                VisibilityAddMode = Visibility.Collapsed;
+                VisibilitySaveButton = Visibility.Visible;
+
+                ShowInfoBar(ControlPageInfoBar.Information("Режим редактирования включен", ""));
+            }
+            else
+            {
+                ShowInfoBar(ControlPageInfoBar.Error("Не выбран объект таблицы", ""));
+            }
+        }
+
         public ICommand AddMode => new RelayCommand<DataGrid>(AddModeClick);
         private void AddModeClick(DataGrid obj)
         {
@@ -279,6 +408,7 @@ namespace GameShop.ViewModels
             IsAddMode = true;
             EditProduct = false;
             EditCategory = false;
+
 
             if (DataGridCollectionProduct != null)
                 DataGridCollectionProduct.Visibility = Visibility.Collapsed;
@@ -296,12 +426,16 @@ namespace GameShop.ViewModels
 
         }
 
-        public ICommand AddProduct => new RelayCommand<DataGrid>(AddProductClick);
-        private void AddProductClick(DataGrid obj)
+        public ICommand AddProduct => new RelayCommand<DataGrid>(AddProductClickAsync);
+        private void AddProductClickAsync(DataGrid obj)
         {
             DataGridCollectionProduct = obj;
+            isAddProduct = true;
+            isAddCategory = false;
 
             InitializationNameCategoryCollection();
+
+            DefaultPhoto();
 
             PanelAddProduct = Visibility.Visible;
         }
@@ -310,7 +444,6 @@ namespace GameShop.ViewModels
         private async void AddPhotoInProductClick(DataGrid obj)
         {
             DataGridCollectionProduct = obj;
-            Image image = new Image();
 
             var picker = new Windows.Storage.Pickers.FileOpenPicker();
             picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
@@ -321,10 +454,9 @@ namespace GameShop.ViewModels
 
             Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
 
+            byte[] fileBytes = null;
             if (file != null)
             {
-                byte[] fileBytes = null;
-
                 using (var stream = await file.OpenReadAsync())
                 {
                     fileBytes = new byte[stream.Size];
@@ -334,14 +466,115 @@ namespace GameShop.ViewModels
                         reader.ReadBytes(fileBytes);
                     }
                 }
-                
-                EncryptedImages.Add(fileBytes);
 
-                await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ImageAddProduct.Clear());
+                if (ImageAddProduct.Count != 0)
+                    if (ImageAddProduct[0].ByteImage != null)
+                        if (ImageAddProduct.Count == 1 && ImageAddProduct[0].ByteImage[0] == 1)
+                        {
+                            await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ImageAddProduct.Clear());
+                        }
 
-                for (int i = 0; i < EncryptedImages.Count; i++) await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ImageAddProduct.Add(ImageConverter.GetBitmapAsync(EncryptedImages[i])));
+                await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ImageAddProduct.Add(new ImageAddProduct(fileBytes, ImageConverter.GetBitmapAsync(fileBytes))));
             }
-    }
+        }
+
+        public ICommand DeletePhotoInProduct => new RelayCommand<DataGrid>(DeletePhotoInProductClick);
+        private async void DeletePhotoInProductClick(DataGrid obj)
+        {
+            DataGridCollectionProduct = obj;
+            Image image = new Image();
+
+            bool isClosed = false;
+            TextBox box = new TextBox();
+            box.Header = "Введите номер фотографии";
+            box.Visibility = Visibility.Visible;
+            int NumberPhoto = 0;
+            ContentDialog DeletePhoto = new ContentDialog()
+            {
+                Title = "Удаление фотографии",
+                CloseButtonText = "Отмена",
+                CloseButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(() => { isClosed = true; }),
+                PrimaryButtonText = "Удалить",
+
+                PrimaryButtonCommand = new Microsoft.Toolkit.Mvvm.Input.RelayCommand(async () =>
+                {
+                    int.TryParse(box.Text, out NumberPhoto);
+
+                    if (NumberPhoto != 0 && !isClosed && NumberPhoto <= ImageAddProduct.Count)
+                    {
+
+                        if (ImageAddProduct[NumberPhoto - 1].ByteImage == null)
+                        {
+                            await Task.Factory.StartNew(() =>
+                            {
+                                int idPhoto = ProductCollection[0].PhotoProducts[NumberPhoto - 1].idPhoto;
+                                DataBasePhotoRequst.DeletePhoto(idPhoto);
+                            });
+
+                            await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ProductCollection[0].PhotoProducts.RemoveAt(NumberPhoto - 1));
+
+                            if (ProductCollection[0].PhotoProducts.Count <= 0)
+                            {
+                                DefaultPhoto();
+                            }
+
+                            await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ImageAddProduct.RemoveAt(NumberPhoto - 1));
+                        }
+                        else
+                        {
+                            await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ImageAddProduct.RemoveAt(NumberPhoto - 1));
+
+                            try
+                            {
+                                if (ProductCollection[0].PhotoProducts.Count <= 0)
+                                {
+                                    DefaultPhoto();
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                if (ImageAddProduct.Count == 0)
+                                    DefaultPhoto();
+                            }
+                        }
+
+                    }
+                    else
+                        ShowInfoBar(ControlPageInfoBar.Error("Номер фотографии введён некорректно", ""));
+                }),
+            };
+
+            DeletePhoto.Content = box;
+            await DeletePhoto.ShowAsync();
+        }
+
+        public ICommand DeleteItemButton => new RelayCommand<DataGrid>(DeleteItemButtonClick);
+        private void DeleteItemButtonClick(DataGrid obj)
+        {
+            DataGridCollectionProduct = obj;
+
+            if (EditProduct)
+            {
+                Task.Factory.StartNew(() => DataBaseRequstProduct.DeleteProduct(ProductCollection[0].idProduct));
+
+                DataGridCollectionProduct.Visibility = Visibility.Visible;
+                if (DataGridCollectionCategory != null)
+                    DataGridCollectionCategory.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                Task.Factory.StartNew(() => DataBaseRequstCategory.DeleteCategory(CategoryCollection[0].idCategory));
+
+                DataGridCollectionCategory.Visibility = Visibility.Visible;
+                DataGridCollectionProduct.Visibility = Visibility.Collapsed;
+            }
+
+
+            ShowInfoBar(ControlPageInfoBar.Error("Удалено", ""));
+            NoEditModeClick(obj);
+
+        }
+
 
         public ICommand AddCategory => new RelayCommand<DataGrid>(AddCategoryClick);
         private void AddCategoryClick(DataGrid obj)
@@ -349,6 +582,8 @@ namespace GameShop.ViewModels
             DataGridCollectionCategory = obj;
             CategoryCollection.Clear();
             CategoryCollection.Add(new Category());
+            isAddCategory = true;
+            isAddProduct = false;
 
             DataGridCollectionCategory.IsReadOnly = false;
 
@@ -368,8 +603,9 @@ namespace GameShop.ViewModels
             VisibilityExitMode = Visibility.Collapsed;
             PanelAddProduct = Visibility.Collapsed;
             VisibilitySaveButton = Visibility.Collapsed;
+
             ShowInfoBar(ControlPageInfoBar.Information("Режим редактирования выключен", ""));
-            
+
             if (EditProduct)
             {
                 if (DataGridCollectionProduct.Columns.Count != 0)
@@ -384,18 +620,22 @@ namespace GameShop.ViewModels
             }
             else if (IsAddMode)
             {
-                if (IsVisibleProduct)
+                if (isAddProduct)
                 {
                     if (DataGridCollectionProduct.Visibility == Visibility.Collapsed)
                         DataGridCollectionProduct.Visibility = Visibility.Visible;
 
                     await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ImageAddProduct.Clear());
-                    await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => EncryptedImages.Clear());
-                    
+
+                    isAddProduct = false;
+                    IsAddMode = false;
                     InitializationProductCollection();
                 }
                 else
                 {
+                    isAddCategory = false;
+                    IsAddMode = false;
+                    DataGridCollectionCategory.IsReadOnly = true;
                     if (DataGridCollectionCategory.Visibility == Visibility.Collapsed)
                         DataGridCollectionCategory.Visibility = Visibility.Visible;
                     InitializationCategoryCollection();
@@ -408,71 +648,150 @@ namespace GameShop.ViewModels
         {
             DataGridCollectionProduct = obj;
 
-            if(IsAddMode)
+            if (IsAddMode)
             {
-                if (AddTextBoxTextNameProduct != null && AddTextBoxTextNameProduct != "" && AddTextBoxTextManufacturer != null && AddTextBoxTextManufacturer != "" && AddTextBoxTextPrice != null && AddTextBoxTextPrice != "" && AddTextBoxTextDescription != null && AddTextBoxTextDescription != "")
+                if (isAddProduct)
                 {
-                    if (int.Parse(AddTextBoxTextPrice) > 0)
+                    if (AddTextBoxTextNameProduct != null && AddTextBoxTextNameProduct != "" && AddTextBoxTextManufacturer != null && AddTextBoxTextManufacturer != "" && AddTextBoxTextPrice != null && AddTextBoxTextPrice != "" && AddTextBoxTextDescription != null && AddTextBoxTextDescription != "")
                     {
-                        bool ResultSavePhoto = true;
-                        if (AddComboBoxTextNameCategory != null && AddComboBoxTextNameCategory != "")
+                        if (int.Parse(AddTextBoxTextPrice) > 0)
                         {
-                            Product product = new Product();
-                            Task task = Task.Factory.StartNew(() =>
+                            bool ResultSavePhoto = true;
+                            if (AddComboBoxTextNameCategory != null && AddComboBoxTextNameCategory != "")
                             {
-                                product.idProduct = DataBaseRequstProduct.MaxIdProduct() + 1;
-                                product.Name = AddTextBoxTextNameProduct;
-                                product.Price = double.Parse(AddTextBoxTextPrice);
-                                product.Manufacturer = AddTextBoxTextManufacturer;
-                                product.BasicDescription = AddTextBoxTextDescription;
-
-                                for (int i = 0; i < NameCategory.Count; i++)
+                                Product product = new Product();
+                                Task task = Task.Factory.StartNew(() =>
                                 {
-                                    if (NameCategory[0] == AddComboBoxTextNameCategory)
+                                    product.idProduct = DataBaseRequstProduct.MaxIdProduct() + 1;
+                                    product.Name = AddTextBoxTextNameProduct;
+                                    product.Price = double.Parse(AddTextBoxTextPrice);
+                                    product.Manufacturer = AddTextBoxTextManufacturer;
+                                    product.BasicDescription = AddTextBoxTextDescription;
+
+                                    for (int i = 0; i < NameCategory.Count; i++)
                                     {
-                                        product.idCategory = i + 1;
-                                        break;
+                                        if (NameCategory[i] == AddComboBoxTextNameCategory)
+                                        {
+                                            product.idCategory = i + 1;
+                                            break;
+                                        }
+
                                     }
 
+                                    DataBaseRequstProduct.SaveNewItemProductByDB(product);
+                                    if (ImageAddProduct.Count != 0)
+                                    {
+                                        for (int i = 0; i < ImageAddProduct.Count; i++)
+                                        {
+                                            ResultSavePhoto = DataBasePhotoRequst.SavePhoto(ImageAddProduct[i].ByteImage, product.idProduct);
+                                        }
+                                    }
+
+                                });
+
+                                task.Wait();
+
+                                IsVisibleProduct = true;
+                                NoEditModeClick(obj);
+
+                                if (ResultSavePhoto)
+                                {
+                                    ShowInfoBar(ControlPageInfoBar.Accept("Товар добавлен", ""));
                                 }
-
-                                DataBaseRequstProduct.SaveNewItemProductByDB(product);
-                                if (EncryptedImages.Count != 0)
-                                    ResultSavePhoto = DataBasePhotoRequst.SavePhoto(EncryptedImages, product.idProduct);
-                            });
-
-                            task.Wait();
-
-                            IsVisibleProduct = true;
-                            NoEditModeClick(obj);
-
-                            if (ResultSavePhoto)
-                            {
-                                ShowInfoBar(ControlPageInfoBar.Accept("Товар добавлен", ""));
+                                else
+                                {
+                                    ShowInfoBar(ControlPageInfoBar.Warning("Одна или несколько фотографий не были добавлены", "Размер бинарных данных больше 65кб"));
+                                }
                             }
                             else
                             {
-                                ShowInfoBar(ControlPageInfoBar.Warning("Одна или несколько фотографий не были добавлены", "Размер бинарных данных больше 65кб"));
+                                ShowInfoBar(ControlPageInfoBar.Error("Не выбрана категория", ""));
                             }
                         }
                         else
                         {
-                            ShowInfoBar(ControlPageInfoBar.Error("Не выбрана категория", ""));
+                            ShowInfoBar(ControlPageInfoBar.Error("Цена не может быть меньше 0", ""));
                         }
                     }
                     else
                     {
-                        ShowInfoBar(ControlPageInfoBar.Error("Цена не может быть меньше 0", ""));
+                        ShowInfoBar(ControlPageInfoBar.Error("Не все поля заполнены", ""));
                     }
+                }
+                else if (isAddCategory)
+                {
+                    if (CategoryCollection[0].NameCategory != null && CategoryCollection[0].NameCategory != "" && CategoryCollection[0].Description != null && CategoryCollection[0].Description != "")
+                    {
+                        CategoryCollection[0].idCategory = DataBaseRequstCategory.MaxIdCategory() + 1;
+
+                        DataBaseRequstCategory.SaveNewItemCategoryByDB(CategoryCollection[0]);
+                        NoEditModeClick(obj);
+                        ShowInfoBar(ControlPageInfoBar.Accept("Категория товара добавлена", ""));
+
+                        if (DataGridCollectionCategory.Columns.Count != 0 && DataGridCollectionCategory.Columns[0].Visibility == Visibility.Collapsed)
+                            DataGridCollectionCategory.Columns[0].Visibility = Visibility.Visible;
+                    }
+                    else
+                        ShowInfoBar(ControlPageInfoBar.Error("Не все поля заполнены", ""));
+                }
+
+            }
+            else if (EditProduct || EditCategory)
+            {
+                if (EditProduct)
+                {
+                    for (int i = 0; i < ImageAddProduct.Count; i++)
+                    {
+                        if (ImageAddProduct[i].ByteImage != null)
+                        {
+                            DataBasePhotoRequst.SavePhoto(ImageAddProduct[i].ByteImage, ProductCollection[0].idProduct);
+                        }
+                    }
+
+                    ProductCollection[0].Name = AddTextBoxTextNameProduct;
+                    ProductCollection[0].Manufacturer = AddTextBoxTextManufacturer;
+                    ProductCollection[0].Price = double.Parse(AddTextBoxTextPrice);
+
+                    if (AddComboBoxTextNameCategory != null)
+                    {
+                        for (int i = 0; i < NameCategory.Count; i++)
+                        {
+                            if (NameCategory[i] == AddComboBoxTextNameCategory)
+                            {
+                                ProductCollection[0].idCategory = i + 1;
+                            }
+                        }
+                    }
+
+                    ProductCollection[0].BasicDescription = AddTextBoxTextDescription;
+
+                    Task task = Task.Factory.StartNew(() => UpdateItemProduct(OldItemProduct, ProductCollection[0]));
+
+                    DataGridCollectionProduct.Visibility = Visibility.Visible;
+
+                    if (DataGridCollectionCategory != null)
+                        DataGridCollectionCategory.Visibility = Visibility.Collapsed;
+
+                    task.Wait();
+                    NoEditModeClick(obj);
+
+                    ShowInfoBar(ControlPageInfoBar.Accept("Сохранено", ""));
                 }
                 else
                 {
-                    ShowInfoBar(ControlPageInfoBar.Error("Не все поля заполнены", ""));
+                    Task task = Task.Factory.StartNew(() => UpdateItemCategory(OldItemCategory, CategoryCollection[0]));
+
+                    DataGridCollectionProduct.Visibility = Visibility.Collapsed;
+
+                    if (DataGridCollectionCategory != null)
+                        DataGridCollectionCategory.Visibility = Visibility.Visible;
+
+                    DataGridCollectionCategory.IsReadOnly = true;
+                    task.Wait();
+                    NoEditModeClick(obj);
+
+                    ShowInfoBar(ControlPageInfoBar.Accept("Сохранено", ""));
                 }
-            }
-            else if(EditProduct || EditCategory)
-            {
-                
             }
         }
 

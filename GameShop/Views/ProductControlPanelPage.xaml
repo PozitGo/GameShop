@@ -61,9 +61,9 @@
                 <AppBarSeparator Visibility="{x:Bind ViewModel.VisibilityAddMode, Mode=TwoWay}"/>
                 <AppBarButton Icon="Add" Label="Добавить категорию" FontFamily="Cascadia Code SemiBold" Visibility="{x:Bind ViewModel.VisibilityAddMode, Mode=TwoWay}" Command="{x:Bind ViewModel.AddCategory,Mode=OneWay}" CommandParameter="{x:Bind CategoryMainTable, Mode=OneWay}"/>
                 <AppBarSeparator Visibility="{x:Bind ViewModel.VisibilityAddMode, Mode=TwoWay}"/>
-                <AppBarButton Icon="Edit" Label="Редактировать выбрраный объект" FontFamily="Cascadia Code SemiBold" Visibility="{x:Bind ViewModel.VisibilityEditsMode, Mode=TwoWay}"/>
+                <AppBarButton Icon="Edit" Label="Редактировать выбранный объект" FontFamily="Cascadia Code SemiBold" Visibility="{x:Bind ViewModel.VisibilityEditsMode, Mode=TwoWay}" Command="{x:Bind ViewModel.EditSelectedItem, Mode=OneWay}" CommandParameter="{x:Bind ProductMainTable, Mode=OneWay}"/>
                 <AppBarSeparator Visibility="{x:Bind ViewModel.VisibilityEditsMode, Mode=TwoWay}"/>
-                <AppBarButton Icon="Delete" Label="Удалить выбранный объект" FontFamily="Cascadia Code SemiBold" Visibility="{x:Bind ViewModel.VisibilityEditsMode, Mode=TwoWay}"/>
+                <AppBarButton Icon="Delete" Label="Удалить выбранный объект" FontFamily="Cascadia Code SemiBold" Visibility="{x:Bind ViewModel.VisibilityEditsMode, Mode=TwoWay}" Command="{x:Bind ViewModel.DeleteItemButton, Mode=OneWay}" CommandParameter="{x:Bind ProductMainTable, Mode=OneWay}"/>
                 <AppBarSeparator Visibility="{x:Bind ViewModel.VisibilityEditsMode, Mode=TwoWay}"/>
                 <AppBarButton Icon="Save" Label="Сохранить" FontFamily="Cascadia Code SemiBold" Visibility="{x:Bind ViewModel.VisibilitySaveButton, Mode=TwoWay}" Command="{x:Bind ViewModel.SaveButton, Mode=OneWay}" CommandParameter="{x:Bind ProductMainTable, Mode=OneWay}"/>
                 <AppBarSeparator Visibility="{x:Bind ViewModel.VisibilitySaveButton, Mode=TwoWay}"/>
@@ -86,7 +86,7 @@
                             <FlipView x:Name="Gallery" Height="200" Width="200" ItemsSource="{x:Bind ViewModel.ImageAddProduct, Mode=OneWay}">
                                 <FlipView.ItemTemplate>
                                     <DataTemplate x:DataType="BitmapImage">
-                                        <Image Source="{x:Bind Mode=OneWay}" Height="200" Width="200" Stretch="UniformToFill"/>
+                                        <Image Source="{Binding Image, Mode=OneWay}" Height="200" Width="200" Stretch="UniformToFill"/>
                                     </DataTemplate>
                                 </FlipView.ItemTemplate>
                             </FlipView>
@@ -97,8 +97,11 @@
                                 NumberOfPages="{x:Bind ViewModel.ImageAddProduct.Count}"
                                 SelectedPageIndex="{x:Bind Path=Gallery.SelectedIndex, Mode=TwoWay}" />
                         </StackPanel>
-                        <StackPanel Spacing="10">
-                            <Button VerticalAlignment="Top" HorizontalAlignment="Center" Content="Добавить" Command="{x:Bind ViewModel.AddPhotoInProduct, Mode=OneWay}" CommandParameter="{x:Bind ProductMainTable, Mode=OneWay}"/>
+                        <StackPanel Spacing="10" VerticalAlignment="Top" HorizontalAlignment="Center">
+                            <CommandBar>
+                                <AppBarButton Icon="Add" Content="Добавить" Command="{x:Bind ViewModel.AddPhotoInProduct, Mode=OneWay}" CommandParameter="{x:Bind ProductMainTable, Mode=OneWay}"/>
+                                <AppBarButton Icon="Delete" Content="Удалить" Command="{x:Bind ViewModel.DeletePhotoInProduct, Mode=OneWay}" CommandParameter="{x:Bind ProductMainTable, Mode=OneWay}"/>
+                            </CommandBar>
                         </StackPanel>
                     </StackPanel>
                     <StackPanel Spacing="50" Padding="20" VerticalAlignment="Top" Orientation="Horizontal" >
@@ -108,7 +111,7 @@
                         </StackPanel>
                         <StackPanel  Width="200" Spacing="30">
                             <TextBox Header="Цена за ед." FontFamily="Cascadia Code SemiBold" Text="{x:Bind ViewModel.AddTextBoxTextPrice, Mode=TwoWay}"/>
-                            <ComboBox Header="Категория"  Width="200" FontFamily="Cascadia Code SemiBold" ItemsSource="{x:Bind ViewModel.NameCategory, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.AddComboBoxTextNameCategory, Mode=TwoWay}"/>
+                            <ComboBox Header="Категория"  Width="200" FontFamily="Cascadia Code SemiBold" ItemsSource="{x:Bind ViewModel.NameCategory, Mode=OneWay}" PlaceholderText="{x:Bind ViewModel.PlaceholderTextComboBoxCategory, Mode=TwoWay}" SelectedItem="{x:Bind ViewModel.AddComboBoxTextNameCategory, Mode=TwoWay}"/>
                         </StackPanel>
                     </StackPanel>
                 </StackPanel>
@@ -126,6 +129,7 @@
                 VerticalScrollBarVisibility="Visible"
                 HorizontalScrollBarVisibility="Visible"
                 IsReadOnly="True"
+                SelectionMode="Single"
                 ItemsSource="{x:Bind ViewModel.ProductCollection, Mode=OneWay}"
                 Visibility="Collapsed">
 

@@ -181,6 +181,7 @@
     <Compile Include="Enum\Status.cs" />
     <Compile Include="Helpers\Json.cs" />
     <Compile Include="Helpers\NavHelper.cs" />
+    <Compile Include="Model\ImageAddProduct.cs" />
     <Compile Include="Model\ModelTableInDataBase\Category.cs" />
     <Compile Include="Model\ModelTableInDataBase\Check.cs" />
     <Compile Include="Model\ModelTableInDataBase\Order.cs" />

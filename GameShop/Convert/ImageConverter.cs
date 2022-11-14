@@ -50,7 +50,7 @@ namespace GameShop.Convert
                     imageSources.Add(GetImageSourceAsync(item));
                 }
             }
-
+            
             return imageSources;
         }
 

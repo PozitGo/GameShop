@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
+﻿using System.Collections.Generic;
 
 namespace GameShop.Model
 {
@@ -12,6 +6,18 @@ namespace GameShop.Model
     {
         public string NameCategory { get; set; }
 
-        public List<BitmapImage> PhotoProduct { get; set; }
+        public List<PhotoProduct> PhotoProducts { get; set; }
+
+        public ModelUPGRADEProduct()
+        {
+
+        }
+
+        public ModelUPGRADEProduct(ModelUPGRADEProduct product)
+        {
+            this.idProduct = product.idProduct; this.idCategory = product.idCategory; this.Price = product.Price; this.Name = product.Name; this.Manufacturer = product.Manufacturer;
+            this.BasicDescription = product.BasicDescription; this.NameCategory = product.NameCategory; this.PhotoProducts = product.PhotoProducts;
+        }
+
     }
 }

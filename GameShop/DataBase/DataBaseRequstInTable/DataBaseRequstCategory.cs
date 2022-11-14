@@ -1,13 +1,8 @@
 ﻿using GameShop.Enum;
 using GameShop.Model;
 using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameShop.DataBase.DataBaseRequstInTable
 {
@@ -159,7 +154,7 @@ namespace GameShop.DataBase.DataBaseRequstInTable
             command.Parameters["@idCategory"].Value = idCategory;
 
             adapter.SelectCommand = command;
-            adapter.Fill(table);
+            adapter.FillAsync(table);
 
             if (table.Rows.Count > 0)
             {
@@ -173,7 +168,7 @@ namespace GameShop.DataBase.DataBaseRequstInTable
             command.Parameters.Clear();
             return Data;
         }
-        
+
         public static void SaveNewItemCategoryByDB(Category category)
         {
             if (category != null)
@@ -183,13 +178,11 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                 command.Parameters.Add("@idCategory", MySqlDbType.Int32).Value = category.idCategory;
                 command.Parameters.Add("@NameCategory", MySqlDbType.VarChar).Value = category.NameCategory;
                 command.Parameters.Add("@Description", MySqlDbType.VarChar).Value = category.Description;
-                
-                if (command.ExecuteNonQuery() == 1)
-                {
-                    command.Parameters.Clear();
-                }
-                else
-                    command.Parameters.Clear();
+
+                command.ExecuteNonQuery();
+
+                command.Parameters.Clear();
+
             }
         }
         public static void UpdateItemInTableCategory<T>(FindByValueCategory findBy, T newValue, int IdPrimaryKey)
@@ -197,7 +190,7 @@ namespace GameShop.DataBase.DataBaseRequstInTable
             DataBaseConnect db = new DataBaseConnect();
             MySqlCommand command = new MySqlCommand();
 
-            command = new MySqlCommand($"UPDATE `category` SET `{findBy.ToString()}` = @newValue WHERE `{nameof(FindByValueCheck.idCheck)}` = @idCategory", db.IsConnection());
+            command = new MySqlCommand($"UPDATE `category` SET `{findBy.ToString()}` = @newValue WHERE `{nameof(FindByValueCategory.idCategory)}` = @idCategory", db.IsConnection());
 
             command.Parameters.Add(new MySqlParameter("@idCategory", MySqlDbType.Int32));
             command.Parameters["@idCategory"].Value = IdPrimaryKey;
@@ -206,6 +199,30 @@ namespace GameShop.DataBase.DataBaseRequstInTable
             command.Parameters["@newValue"].Value = newValue;
             command.ExecuteNonQuery();
 
+            command.Parameters.Clear();
+        }
+
+        public static int MaxIdCategory()
+        {
+            DataBaseConnect db = new DataBaseConnect();
+            MySqlCommand command = new MySqlCommand();
+
+            command = new MySqlCommand($"SELECT MAX(`idCategory`) FROM `category`", db.IsConnection());
+
+            return (int)command.ExecuteScalar();
+        }
+
+        public static void DeleteCategory(int idCategory)
+        {
+            DataBaseConnect db = new DataBaseConnect();
+            MySqlCommand command = new MySqlCommand();
+
+            command = new MySqlCommand($"DELETE FROM `category` WHERE `idCategory` = @idCategory", db.IsConnection());
+
+            command.Parameters.Add(new MySqlParameter("@idCategory", MySqlDbType.Int32));
+            command.Parameters["@idCategory"].Value = idCategory;
+
+            command.ExecuteNonQuery();
             command.Parameters.Clear();
         }
     }
