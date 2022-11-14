@@ -3,6 +3,7 @@ using GameShop.Model;
 using MySql.Data.MySqlClient;
 using NPOI.SS.Formula.Functions;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Threading.Tasks;
 
@@ -85,7 +86,7 @@ namespace GameShop.DataBase.DataBaseRequstInTable
                 {
                     PhotoProduct photoProduct = new PhotoProduct();
                     byte[] tempByte = readerBy["PhotoProduct"] as byte[];
-                    photoProduct.BitPhotoProducts = new List<Windows.UI.Xaml.Media.Imaging.BitmapImage>();
+                    photoProduct.BitPhotoProducts = new ObservableCollection<Windows.UI.Xaml.Media.Imaging.BitmapImage>();
                     photoProduct.BitPhotoProducts.Add(ImageConverter.GetBitmapAsync(tempByte));
                     photoProduct.idPhoto = int.Parse(readerBy["idPhoto"].ToString());
                     photoProduct.idProduct = int.Parse(readerBy["idProduct"].ToString());

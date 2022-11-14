@@ -10,6 +10,7 @@ using Microsoft.Toolkit.Uwp.UI.Controls;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Storage;
@@ -575,7 +576,6 @@ namespace GameShop.ViewModels
 
         }
 
-
         public ICommand AddCategory => new RelayCommand<DataGrid>(AddCategoryClick);
         private void AddCategoryClick(DataGrid obj)
         {
@@ -656,7 +656,7 @@ namespace GameShop.ViewModels
                     {
                         if (int.Parse(AddTextBoxTextPrice) > 0)
                         {
-                            bool ResultSavePhoto = true;
+                            bool[] ResultSavePhoto = null;
                             if (AddComboBoxTextNameCategory != null && AddComboBoxTextNameCategory != "")
                             {
                                 Product product = new Product();
@@ -681,9 +681,10 @@ namespace GameShop.ViewModels
                                     DataBaseRequstProduct.SaveNewItemProductByDB(product);
                                     if (ImageAddProduct.Count != 0)
                                     {
+                                        ResultSavePhoto = new bool[ImageAddProduct.Count];
                                         for (int i = 0; i < ImageAddProduct.Count; i++)
                                         {
-                                            ResultSavePhoto = DataBasePhotoRequst.SavePhoto(ImageAddProduct[i].ByteImage, product.idProduct);
+                                            ResultSavePhoto[i] = DataBasePhotoRequst.SavePhoto(ImageAddProduct[i].ByteImage, product.idProduct);
                                         }
                                     }
 
@@ -694,13 +695,35 @@ namespace GameShop.ViewModels
                                 IsVisibleProduct = true;
                                 NoEditModeClick(obj);
 
-                                if (ResultSavePhoto)
+                                if (ResultSavePhoto.Where(x => x == true).Count() == 0)
                                 {
                                     ShowInfoBar(ControlPageInfoBar.Accept("Товар добавлен", ""));
                                 }
+                                else if (ResultSavePhoto.Where(x => x == true).Count() == 1)
+                                {
+                                    for (int i = 0; i < ResultSavePhoto.Length; i++)
+                                    {
+                                        if (ResultSavePhoto[i] == true)
+                                        {
+                                            ShowInfoBar(ControlPageInfoBar.Warning("Товар добавлен", "Фото " + (i + 1) + " не добавлено"));
+                                            break;
+                                        }
+                                    }
+                                }
                                 else
                                 {
-                                    ShowInfoBar(ControlPageInfoBar.Warning("Одна или несколько фотографий не были добавлены", "Размер бинарных данных больше 65кб"));
+                                    string Warning = "Фото ";
+
+                                    for (int i = 0; i < ResultSavePhoto.Length; i++)
+                                    {
+                                        if (ResultSavePhoto[i] == true)
+                                        {
+                                            Warning += (i + 1) + ", ";
+                                        }
+                                    }
+                                    Warning += "  не добавлены";
+
+                                    ShowInfoBar(ControlPageInfoBar.Warning("Товар добавлен", Warning));
                                 }
                             }
                             else

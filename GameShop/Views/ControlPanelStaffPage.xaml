@@ -73,19 +73,6 @@
                 IsReadOnly="True"
                 Visibility="Collapsed">
 
-                <controls:DataGrid.RowDetailsTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Padding="10" Spacing="10">
-                            <StackPanel Padding="10" Spacing="5">
-                                <TextBlock Text="Аватар:" FontFamily="Cascadia Code SemiBold"/>
-                            </StackPanel>
-                            <StackPanel Padding="10" Spacing="5">
-                                <TextBlock Text="" FontFamily="Cascadia Code SemiBold"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </DataTemplate>
-                </controls:DataGrid.RowDetailsTemplate>
-
                 <controls:DataGrid.Columns>
                     <controls:DataGridTextColumn Header="Номер пользователя" IsReadOnly="False" Binding="{Binding idUser}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                     <controls:DataGridTextColumn Header="Логин" IsReadOnly="False" Binding="{Binding Login}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>

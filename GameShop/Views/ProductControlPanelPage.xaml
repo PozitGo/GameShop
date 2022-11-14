@@ -133,19 +133,6 @@
                 ItemsSource="{x:Bind ViewModel.ProductCollection, Mode=OneWay}"
                 Visibility="Collapsed">
 
-                <controls:DataGrid.RowDetailsTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Padding="10" Spacing="10">
-                            <StackPanel Padding="10" Spacing="5">
-                                <TextBlock Text="Аватар:" FontFamily="Cascadia Code SemiBold"/>
-                            </StackPanel>
-                            <StackPanel Padding="10" Spacing="5">
-                                <TextBlock Text="" FontFamily="Cascadia Code SemiBold"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </DataTemplate>
-                </controls:DataGrid.RowDetailsTemplate>
-
                 <controls:DataGrid.Columns>
                     <controls:DataGridTextColumn Header="Номер продукта" IsReadOnly="False" Binding="{Binding idProduct}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>
                     <controls:DataGridTextColumn Header="Название категории" IsReadOnly="False" Binding="{Binding NameCategory}" Width="Auto" FontFamily="Cascadia Code SemiBold"/>

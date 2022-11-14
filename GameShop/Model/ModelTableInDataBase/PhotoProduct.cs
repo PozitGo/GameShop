@@ -1,5 +1,6 @@
 ﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace GameShop.Model
@@ -8,7 +9,15 @@ namespace GameShop.Model
     {
         public int idPhoto { get; set; }
         public int idProduct { get; set; }
-        public List<BitmapImage> BitPhotoProducts { get; set; }
+
+        private ObservableCollection<BitmapImage> _BitPhotoProducts;
+
+        public ObservableCollection<BitmapImage> BitPhotoProducts
+        {
+            get => _BitPhotoProducts; 
+            set => SetProperty(ref _BitPhotoProducts, value); 
+        }
+
 
         public PhotoProduct()
         {

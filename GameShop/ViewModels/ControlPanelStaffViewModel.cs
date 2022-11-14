@@ -130,7 +130,6 @@ namespace GameShop.ViewModels
 
         }
 
-        private bool IsVisibleAllCollection;
         private bool IsVisibleStaffCollection;
 
         private bool isDelete;
@@ -452,7 +451,6 @@ namespace GameShop.ViewModels
 
         public void InitializationAllUserCollection()
         {
-            IsVisibleAllCollection = true;
             IsVisibleStaffCollection = false;
 
             DataGridUser.Visibility = Visibility.Visible;
@@ -485,7 +483,6 @@ namespace GameShop.ViewModels
         public void InitializationStaffUserCollection()
         {
             IsVisibleStaffCollection = true;
-            IsVisibleAllCollection = false;
 
             DataGridUser.Visibility = Visibility.Visible;
             DataGridUser.UnloadingRowDetails += DataGridUser_UnloadingRowDetails;
