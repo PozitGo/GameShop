@@ -5,6 +5,7 @@ using GameShop.DataBase.DataBaseRequstInTable;
 using GameShop.Enum;
 using GameShop.Model;
 using GameShop.ViewModels.InfoBars;
+using GameShop.Views;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using Microsoft.UI.Xaml.Controls;
@@ -18,6 +19,7 @@ using Windows.Storage.Streams;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using NavigationService = GameShop.Services.NavigationService;
 
 namespace GameShop.ViewModels
 {
@@ -158,7 +160,7 @@ namespace GameShop.ViewModels
             get => _PlaceholderTextComboBoxCategory;
             set => SetProperty(ref _PlaceholderTextComboBoxCategory, value);
         }
-
+        
         public ProductControlPanelViewModel()
         {
             VisibilityEditsMode = Visibility.Collapsed;
@@ -170,6 +172,12 @@ namespace GameShop.ViewModels
 
             InfoBarIsOpen = false;
         }
+
+        public ICommand NavigateToOrder => new RelayCommand(NavigateToOrderClick);
+        private void NavigateToOrderClick() => NavigationService.Navigate(typeof(ControlPanelPage));
+
+        public ICommand NavigateToUsers => new RelayCommand(NavigateToUsersClick);
+        private void NavigateToUsersClick() => NavigationService.Navigate(typeof(ControlPanelStaffPage));
 
         public async void DefaultPhoto()
         {
