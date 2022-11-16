@@ -436,13 +436,21 @@ namespace GameShop.ViewModels
         }
 
         public ICommand AddProduct => new RelayCommand<DataGrid>(AddProductClickAsync);
-        private void AddProductClickAsync(DataGrid obj)
+        private async void AddProductClickAsync(DataGrid obj)
         {
             DataGridCollectionProduct = obj;
             isAddProduct = true;
             isAddCategory = false;
-
+            
+            await Window.Current.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ImageAddProduct.Clear());
             InitializationNameCategoryCollection();
+
+            AddTextBoxTextNameProduct = "";
+            AddTextBoxTextPrice = "";
+            AddTextBoxTextManufacturer = "";
+            AddTextBoxTextDescription = "";
+            AddComboBoxTextNameCategory = "";
+            PlaceholderTextComboBoxCategory = "";
 
             DefaultPhoto();
 
