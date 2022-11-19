@@ -33,7 +33,7 @@ namespace GameShop.DataBase
         public void OpenConnection()
         {
             if (Connection.State == System.Data.ConnectionState.Closed)
-                Connection.OpenAsync();
+                Connection.Open();
             else
                 Debug.WriteLine("База данных уже открыта");
         }
@@ -41,7 +41,7 @@ namespace GameShop.DataBase
         public void CloseConnection()
         {
             if (Connection.State == System.Data.ConnectionState.Open)
-                Connection.CloseAsync();
+                Connection.Close();
             else
                 Debug.WriteLine("База данных уже закрыта");
         }

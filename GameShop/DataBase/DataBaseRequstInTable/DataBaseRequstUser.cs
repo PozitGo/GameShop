@@ -259,25 +259,27 @@ namespace GameShop.DataBase
                 command.Parameters["@newValue"].Value = newValue;
                 command.ExecuteNonQuery();
             }
-
-            try
+            else
             {
+                try
+                {
 
-                command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.VarChar));
-                command.Parameters["@newValue"].Value = newValue;
-                command.ExecuteNonQuery();
-            }
-            catch
-            {
+                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.VarChar));
+                    command.Parameters["@newValue"].Value = newValue;
+                    command.ExecuteNonQuery();
+                }
+                catch
+                {
 
-                command.Parameters.Clear();
+                    command.Parameters.Clear();
 
-                command.Parameters.Add(new MySqlParameter("@idUser", MySqlDbType.Int32));
-                command.Parameters["@idUser"].Value = IdPrimaryKey;
+                    command.Parameters.Add(new MySqlParameter("@idUser", MySqlDbType.Int32));
+                    command.Parameters["@idUser"].Value = IdPrimaryKey;
 
-                command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Int32));
-                command.Parameters["@newValue"].Value = newValue;
-                command.ExecuteNonQuery();
+                    command.Parameters.Add(new MySqlParameter("@newValue", MySqlDbType.Int32));
+                    command.Parameters["@newValue"].Value = newValue;
+                    command.ExecuteNonQuery();
+                }
             }
 
             command.Parameters.Clear();

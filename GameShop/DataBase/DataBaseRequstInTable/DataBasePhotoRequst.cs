@@ -26,7 +26,7 @@ namespace GameShop.DataBase.DataBaseRequstInTable
             command.Parameters["@idProduct"].Value = idProduct;
 
             adapter.SelectCommand = command;
-            adapter.FillAsync(table);
+            adapter.Fill(table);
 
             if (table.Rows.Count == 1)
             {

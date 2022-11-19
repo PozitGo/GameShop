@@ -97,8 +97,6 @@ namespace GameShop.ViewModels
         public ICommand NavigateToProductPage => new RelayCommand(NavigateToProductPageClick);
 
         private void NavigateToProductPageClick() => NavigationService.Navigate(typeof(ProductControlPanelPage));
-        //Кнопку понижения и повышения статусов сделать видной только админам
-        //В режиме редактирования обновлять только пользователя которого редактируют
         private void UpStatusUserMethod(DataGrid obj)
         {
             DataGridUser = obj;

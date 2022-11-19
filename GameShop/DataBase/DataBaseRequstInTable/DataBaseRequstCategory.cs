@@ -154,7 +154,7 @@ namespace GameShop.DataBase.DataBaseRequstInTable
             command.Parameters["@idCategory"].Value = idCategory;
 
             adapter.SelectCommand = command;
-            adapter.FillAsync(table);
+            adapter.Fill(table);
 
             if (table.Rows.Count > 0)
             {

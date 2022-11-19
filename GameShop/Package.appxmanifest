@@ -10,7 +10,7 @@
   <Identity
     Name="C1164491-EA66-4E52-87D2-0BEB4AC40F13"
     Publisher="CN=PozitGo"
-    Version="1.0.0.0" />
+    Version="1.0.2.0" />
 
   <mp:PhoneIdentity PhoneProductId="C1164491-EA66-4E52-87D2-0BEB4AC40F13" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 

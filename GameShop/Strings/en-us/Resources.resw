@@ -122,7 +122,7 @@
     <comment>Application display name</comment>
   </data>
   <data name="AppDescription" xml:space="preserve">
-    <value>GameShop</value>
+    <value>Интернет магазин геймерских девайсов</value>
     <comment>Application description</comment>
   </data>
   <data name="Shell_Main.Content" xml:space="preserve">
